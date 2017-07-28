@@ -332,11 +332,11 @@ def trainIters(encoder1, encoder2, decoder, embeddings_index, word2index, data_t
     encoder_optimizer2 = optim.SGD(encoder2.parameters(), lr=learning_rate)
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
 
-    # start = time.time()
+    start = time.time()
     training_triplets = [variablesFromTriplets(random.choice(triplets), data_tokens)
                         for i in range(n_iters)]
-    # end = time.time()
-    # print(end - start)
+    end = time.time()
+    print('time spent prepare data: ' + str(end - start))
     criterion = nn.NLLLoss()
 
     for iter in range(1, n_iters + 1):
@@ -646,7 +646,7 @@ path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
 # path for experiment outputs
 exp_name = 'QG_seq2seq_baseline'
-path_to_exp_out = '/home/jack/Documents/QA_QG/GAN-general/exp_results/' + exp_name
+path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results/' + exp_name
 loss_f = 'loss.txt'
 sample_out_f = 'sample_outputs.txt'
 path_to_loss_f = path_to_exp_out + '/' + loss_f
