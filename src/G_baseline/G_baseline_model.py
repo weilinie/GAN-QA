@@ -57,7 +57,6 @@ class AttnDecoderRNN(nn.Module):
         self.output_size = output_size
         self.n_layers = n_layers
         self.dropout_p = dropout_p
-        self.embedding_dim = embedding_dim
         # self.embeddings_index = embeddings_index
 
         self.attn = nn.Linear(self.embedding_dim+self.hidden_size, 1)
