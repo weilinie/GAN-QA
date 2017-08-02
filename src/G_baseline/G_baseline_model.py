@@ -59,8 +59,8 @@ class AttnDecoderRNN(nn.Module):
         self.dropout_p = dropout_p
         # self.embeddings_index = embeddings_index
 
-        self.attn = nn.Linear(self.input_size+self.hidden_size, 1)
-        self.attn_combine = nn.Linear(self.hidden_size+self.hidden_size, self.input_size)
+        self.attn = nn.Linear(self.hidden_size+self.hidden_size, 1)
+        self.attn_combine = nn.Linear(self.input_size+self.hidden_size, self.input_size)
         self.dropout = nn.Dropout(self.dropout_p)
         self.gru = nn.GRU(self.input_size, self.hidden_size)
         self.out = nn.Linear(self.hidden_size, self.output_size)
