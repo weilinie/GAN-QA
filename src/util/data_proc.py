@@ -162,3 +162,4 @@ def variablesFromTriplets(triple, embeddings_index):
     ans_start_idx = torch.LongTensor([triple[3]])
     ans_end_idx  = torch.LongTensor([triple[4]])
     return (context, question, answer, ans_start_idx, ans_end_idx)
+

@@ -20,7 +20,8 @@ sys.path.insert(0, workspace_path)
 from data_proc import *
 from util import *
 from G_baseline_model import *
-from G_train_eval import *
+from G_train import *
+from G_eval import *
 
 
 use_cuda = torch.cuda.is_available()
@@ -75,6 +76,7 @@ embeddings_index['UNK'] = UNK_token
 ######### read corpus
 triplets = readSQuAD(path_to_data)
 
+
 ######### corpus preprocessing
 # TODO: need some work here: deal with inprecise tokenizer, 
 # words that do not appear in embeddings, etc
@@ -82,36 +84,18 @@ triplets = readSQuAD(path_to_data)
 ## find all unique tokens in the data (should be a subset of the number of embeddings)
 data_tokens = []
 for triple in triplets:
-    # c = [token.string.strip() for token in spacynlp.tokenizer(triple[0])]
     c = post_proc_tokenizer(spacynlp.tokenizer(triple[0]))
-    # q = [token.string.strip() for token in spacynlp.tokenizer(triple[1])]
     q = post_proc_tokenizer(spacynlp.tokenizer(triple[1]))
-    # a = [token.string.strip() for token in spacynlp.tokenizer(triple[2])]
     a = post_proc_tokenizer(spacynlp.tokenizer(triple[2]))
     data_tokens += c + q + a
 data_tokens = list(set(data_tokens)) # find unique
 data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens
-# print(data_tokens[0:20])
-# # experimental usage only
-# data_tokens = data_tokens[0:10000]
 
 num_tokens = len(data_tokens)
 effective_tokens = list(set(data_tokens).intersection(embeddings_index.keys()))
 print(effective_tokens[0:20])
 effective_num_tokens = len(effective_tokens)
-# generate some index
-# token_indices = random.sample(range(0, len(data_tokens)), 20)
-# # debugging purpose
-# token_subset = [data_tokens[i] for i in token_indices]
-# print('original tokens: ' + str(token_subset))
-# # extra preprocessing step to replace all tokens in data_tokens 
-# # that does not appear in embeddings_index to 'UNK'
-# # OOV_indices = [i for i, e in enumerate(data_tokens) if e not in set(embeddings_index.keys())] # indices of out of vocabulary words in data_tokens
-# for i in OOV_indices:
-#     data_tokens[i] = 'UNK'
-# # debugging: randomly sample 20 tokens from data_tokens. shouldn't be all UNK
-# token_subset = [data_tokens[i] for i in token_indices]
-# print('modified tokens: ' + str(token_subset))
+
 
 # build word2index dictionary and index2word dictionary
 word2index = {}
@@ -119,6 +103,7 @@ index2word = {}
 for i in range(effective_num_tokens):
     index2word[i] = effective_tokens[i]
     word2index[effective_tokens[i]] = i
+
 
 print('reading and preprocessing data complete.')
 print('found %s unique tokens in the intersection of corpus and word embeddings.' % effective_num_tokens)
@@ -162,73 +147,4 @@ trainIters(encoder1, encoder2, attn_decoder1, embeddings_index, word2index, inde
             path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
             50000, print_every=1, plot_every = 1)
 
-# save the final model
-# torch.save(encoder1, path_to_exp_out+'/encoder1.pth')
-# torch.save(encoder2, path_to_exp_out+'/encoder2.pth')
-# torch.save(attn_decoder1, path_to_exp_out+'/decoder.pth')
-
-######################################################################
-#
-
-# evaluateRandomly(encoder1, encoder2, attn_decoder1)
-
-
-######################################################################
-# Visualizing Attention
-# ---------------------
-#
-# A useful property of the attention mechanism is its highly interpretable
-# outputs. Because it is used to weight specific encoder outputs of the
-# input sequence, we can imagine looking where the network is focused most
-# at each time step.
-#
-# You could simply run ``plt.matshow(attentions)`` to see attention output
-# displayed as a matrix, with the columns being input steps and rows being
-# output steps:
-#
-
-# output_words, attentions = evaluate(
-#     encoder1, attn_decoder1, "je suis trop froid .")
-# plt.matshow(attentions.numpy())
-
-
-######################################################################
-# For a better viewing experience we will do the extra work of adding axes
-# and labels:
-#
-
-def showAttention(input_sentence, output_words, attentions):
-    # Set up figure with colorbar
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    cax = ax.matshow(attentions.numpy(), cmap='bone')
-    fig.colorbar(cax)
-
-    # Set up axes
-    ax.set_xticklabels([''] + input_sentence.split(' ') +
-                       ['<EOS>'], rotation=90)
-    ax.set_yticklabels([''] + output_words)
-
-    # Show label at every tick
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-
-    plt.show()
-
-
-def evaluateAndShowAttention(input_sentence):
-    output_words, attentions = evaluate(
-        encoder1, attn_decoder1, input_sentence)
-    print('input =', input_sentence)
-    print('output =', ' '.join(output_words))
-    showAttention(input_sentence, output_words, attentions)
-
-
-# evaluateAndShowAttention("elle a cinq ans de moins que moi .")
-
-# evaluateAndShowAttention("elle est trop petit .")
-
-# evaluateAndShowAttention("je ne crains pas de mourir .")
-
-# evaluateAndShowAttention("c est un jeune directeur plein de talent .")
 
