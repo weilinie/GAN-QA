@@ -48,10 +48,10 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
     input_length_answer = len(ans_var)
     target_length = len(question_var)
     
-    encoder_outputs_context = Variable(torch.zeros(input_length_context, encoder1.hidden_size))
+    encoder_outputs_context = Variable(torch.zeros(input_length_context, encoder1.input_size))
     encoder_outputs_context = encoder_outputs_context.cuda() if use_cuda else encoder_outputs_context
 
-    encoder_outputs_answer = Variable(torch.zeros(input_length_answer, encoder2.hidden_size))
+    encoder_outputs_answer = Variable(torch.zeros(input_length_answer, encoder2.input_size))
     encoder_outputs_answer = encoder_outputs_answer.cuda() if use_cuda else encoder_outputs_answer
    
     loss = 0
@@ -62,29 +62,18 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
     	encoder_output_context, encoder_hidden_context = encoder1(
         	context_var[ei], encoder_hidden_context, embeddings_index)
     	encoder_outputs_context[ei] = encoder_output_context[0][0]
-    # time2 = time.time()
-    # print('encoder 1 one pass time: ' + str(time2 - time1))
+
     # answer encoding
     for ei in range(input_length_answer):
         encoder_output_answer, encoder_hidden_answer = encoder2(
             ans_var[ei], encoder_hidden_answer, embeddings_index)
         encoder_outputs_answer[ei] = encoder_output_answer[0][0]
-    # time3 = time.time()
-    # print('encoder 2 one pass time: ' + str(time3 - time2))
+
     # concat the context encoding and answer encoding
     encoder_output = torch.cat((encoder_output_context, encoder_output_answer),1)
     encoder_outputs = torch.cat((encoder_outputs_context, encoder_outputs_answer),0)
 
     decoder_input = 'SOS' # Variable(embeddings_index['SOS'])
-    # decoder_input = decoder_input.cuda() if use_cuda else decoder_input
-    
-    # decoder_hidden = torch.cat(encoder_hidden_context, encoder_hidden_answer)
-
-    # #debug
-    # print(decoder_input.is_cuda)
-    # print(decoder_hidden.is_cuda)
-    # print(encoder_output.is_cuda)
-    # print(encoder_outputs.is_cuda)
 
     use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
 
@@ -100,7 +89,6 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
             loss += criterion(decoder_output[0], target)
             
             decoder_input = question_var[di] # Variable(embeddings_index[question_var[di]])  # Teacher forcing
-            # decoder_input = decoder_input.cuda() if use_cuda else decoder_input
 
     else:
         # Without teacher forcing: use its own predictions as the next input
@@ -109,11 +97,8 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
                 decoder_input, decoder_hidden, encoder_output, encoder_outputs, embeddings_index)
             topv, topi = decoder_output.data.topk(1)
             ni = topi[0][0]
-            # print(ni)
-            # print(type(ni))
             
             decoder_input = index2word[di] # Variable(embeddings_index[index2word[ni]])
-            # decoder_input = decoder_input.cuda() if use_cuda else decoder_input
             
             target = Variable(torch.LongTensor([word2index[question_var[di]]]))
             target = target.cuda() if use_cuda else target
@@ -121,20 +106,12 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
             loss += criterion(decoder_output[0], target)
             if ni == word2index['EOS']:
                 break
-    # time4 = time.time()
-    # print('decoder one pass time: ' + str(time4 - time3))
+
     loss.backward()
-    # time5 = time.time()
-    # print('backprop one pass time: ' + str(time5 - time4))
     encoder_optimizer1.step()
-    # time6 = time.time()
-    # print('encoder 1 optimization one pass step time: ' + str(time6 - time5))
     encoder_optimizer2.step()
-    # time7 = time.time()
-    # print('encoder 2 optimization one pass step time: ' + str(time7 - time6))
     decoder_optimizer.step()
-    # time8 = time.time()
-    # print('decoder optimization one pass step time: ' + str(time8 - time7))
+
     return loss.data[0] / target_length
 
 
@@ -170,11 +147,6 @@ def trainIters(encoder1, encoder2, decoder,
     encoder_optimizer2 = optim.SGD(encoder2.parameters(), lr=learning_rate)
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
 
-    # start = time.time()
-    # training_triplets = [variablesFromTriplets(random.choice(triplets), data_tokens)
-    #                     for i in range(n_iters)]
-    # end = time.time()
-    # print('time spent prepare data: ' + str(end - start))
     criterion = nn.NLLLoss()
 
     print()
