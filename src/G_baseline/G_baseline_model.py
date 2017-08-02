@@ -82,14 +82,16 @@ class AttnDecoderRNN(nn.Module):
 
         # for debugging purpose
         print('size of encoder outputs: ' + str(encoder_outputs.size()))
-        print('size of encoder output: ' + str(encoder_outputs[1,].size()))
+        print('size of encoder output: ' + str(encoder_outputs[1,].unsqueeze(0).size()))
         print('size of hideden: ' + str(hidden[0].size()))
         print('size of attn_weights: ' + str(attn_weights.size()))
 
 
         for i in range(encoder_outputs.size()[0]):
             print(i)
-            attn_weights[0,i] = F.softmax(self.attn(torch.cat((encoder_outputs[i,].unsqueeze(0), hidden[0]),1)))
+            attn_input = torch.cat((encoder_outputs[i,].unsqueeze(0), hidden[0]),1)
+            attn = self.attn(attn_input)
+            attn_weights[0,i] = F.softmax(attn)
         attn_applied = torch.bmm(attn_weights.unsqueeze(0), encoder_outputs.unsqueeze(0)) # attn_weights size = 1 x 1 x len input tokens after unsqueeze
  
         output = torch.cat((embedded[0], attn_applied[0]), 1)
