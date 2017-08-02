@@ -48,11 +48,11 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
     input_length_answer = len(ans_var)
     target_length = len(question_var)
     
-    encoder_outputs_context = Variable(torch.zeros(input_length_context, encoder1.input_size))
-    encoder_outputs_context = encoder_outputs_context.cuda() if use_cuda else encoder_outputs_context
+    encoder_hiddens_context = Variable(torch.zeros(input_length_context, encoder1.hidden_size))
+    encoder_hiddens_context = encoder_hiddens_context.cuda() if use_cuda else encoder_hiddens_context
 
-    encoder_outputs_answer = Variable(torch.zeros(input_length_answer, encoder2.input_size))
-    encoder_outputs_answer = encoder_outputs_answer.cuda() if use_cuda else encoder_outputs_answer
+    encoder_hiddens_answer = Variable(torch.zeros(input_length_answer, encoder2.hidden_size))
+    encoder_hiddens_answer = encoder_hiddens_answer.cuda() if use_cuda else encoder_hiddens_answer
    
     loss = 0
 
@@ -61,17 +61,16 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
     for ei in range(input_length_context):
     	encoder_output_context, encoder_hidden_context = encoder1(
         	context_var[ei], encoder_hidden_context, embeddings_index)
-    	encoder_outputs_context[ei] = encoder_output_context[0][0]
+    	encoder_hiddens_context[ei] = encoder_hidden_context[0][0]
 
     # answer encoding
     for ei in range(input_length_answer):
         encoder_output_answer, encoder_hidden_answer = encoder2(
             ans_var[ei], encoder_hidden_answer, embeddings_index)
-        encoder_outputs_answer[ei] = encoder_output_answer[0][0]
+        encoder_hiddens_answer[ei] = encoder_hidden_answer[0][0]
 
     # concat the context encoding and answer encoding
-    encoder_output = torch.cat((encoder_output_context, encoder_output_answer),1)
-    encoder_outputs = torch.cat((encoder_outputs_context, encoder_outputs_answer),0)
+    encoder_hiddens = torch.cat((encoder_hiddens_context, encoder_hiddens_answer),0)
 
     decoder_input = 'SOS' # Variable(embeddings_index['SOS'])
 
@@ -81,7 +80,7 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
         # Teacher forcing: Feed the target as the next input
         for di in range(target_length):
             decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, decoder_hidden, encoder_output, encoder_outputs, embeddings_index)
+                decoder_input, decoder_hidden, encoder_hiddens, embeddings_index)
 
             target = Variable(torch.LongTensor([word2index[question_var[di]]]))
             target = target.cuda() if use_cuda else target
@@ -94,7 +93,7 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
         # Without teacher forcing: use its own predictions as the next input
         for di in range(target_length):
             decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, decoder_hidden, encoder_output, encoder_outputs, embeddings_index)
+                decoder_input, decoder_hidden, encoder_hiddens, embeddings_index)
             topv, topi = decoder_output.data.topk(1)
             ni = topi[0][0]
             

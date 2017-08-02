@@ -65,7 +65,7 @@ class AttnDecoderRNN(nn.Module):
         self.gru = nn.GRU(self.input_size, self.hidden_size)
         self.out = nn.Linear(self.hidden_size, self.output_size)
 
-    def forward(self, input, hidden, encoder_output, encoder_outputs, embeddings_index):
+    def forward(self, input, hidden, encoder_outputs, embeddings_index):
 
         # because the number of input tokens varies, we move the init of attn to here
         # instead of in __init__ function
