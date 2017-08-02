@@ -3,7 +3,20 @@
 # training and evaluation
 #-----------------------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------------------------#
+import torch
+import torch.nn as nn
+from torch import optim
+from torch.autograd import Variable
+import torch.nn.functional as F
+import time
 
+import sys
+workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
+sys.path.insert(0, workspace_path)
+from data_proc import *
+from util import *
+
+use_cuda = torch.cuda.is_available()
 
 ######################################################################
 # Training the Model
@@ -20,7 +33,7 @@
 # instability 
 
 # context = input_variable
-def train(context_var, ans_var, question_var, embeddings_index, word2index, 
+def train(context_var, ans_var, question_var, embeddings_index, word2index, index2word, teacher_forcing_ratio,
     encoder1, encoder2, decoder, encoder_optimizer1, encoder_optimizer2, 
     decoder_optimizer, criterion):
     encoder_hidden_context = encoder1.initHidden()
@@ -96,8 +109,8 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index,
                 decoder_input, decoder_hidden, encoder_output, encoder_outputs, embeddings_index)
             topv, topi = decoder_output.data.topk(1)
             ni = topi[0][0]
-            print(ni)
-            print(type(ni))
+            # print(ni)
+            # print(type(ni))
             
             decoder_input = index2word[di] # Variable(embeddings_index[index2word[ni]])
             # decoder_input = decoder_input.cuda() if use_cuda else decoder_input
@@ -138,9 +151,12 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index,
 # of examples, time so far, estimated time) and average loss.
 #
 
-def trainIters(encoder1, encoder2, decoder, embeddings_index, word2index, data_tokens, max_length,
+def trainIters(encoder1, encoder2, decoder, 
+    embeddings_index, word2index, index2word, data_tokens, max_length, triplets, teacher_forcing_ratio,
     path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
     n_iters, print_every=10, plot_every=100, learning_rate=0.01):
+
+    begin_time = time.time()
 
     # open the files
     loss_f = open(path_to_loss_f,'w+') 
@@ -171,7 +187,7 @@ def trainIters(encoder1, encoder2, decoder, embeddings_index, word2index, data_t
         question_var = training_triple[1]
         
         start = time.time()
-        loss = train(context_var, ans_var, question_var, embeddings_index, word2index,
+        loss = train(context_var, ans_var, question_var, embeddings_index, word2index, index2word, teacher_forcing_ratio,
                      encoder1, encoder2, decoder, encoder_optimizer1, encoder_optimizer2, 
                      decoder_optimizer, criterion)
         end = time.time()
@@ -183,12 +199,12 @@ def trainIters(encoder1, encoder2, decoder, embeddings_index, word2index, data_t
         if iter % print_every == 0:
             print_loss_avg = print_loss_total / print_every
             print_loss_total = 0
-            print('%s (%d %d%%) %.4f' % (timeSince(start, iter / n_iters),
+            print('%s (%d %d%%) %.4f' % (timeSince(begin_time, iter / float(n_iters)),
                                          iter, iter / n_iters * 100, print_loss_avg))
             print('time for one training iteration: ' + str(end - start))
             print('---sample generated question---')
             # sample a triple and print the generated question
-            evaluateRandomly(encoder1, encoder2, decoder, triplets, embeddings_index, max_length, n=1)
+            evaluateRandomly(encoder1, encoder2, decoder, triplets, embeddings_index, word2index, index2word, max_length, n=1)
             print('-------------------------------')
             print('-------------------------------')
             print()
@@ -198,7 +214,7 @@ def trainIters(encoder1, encoder2, decoder, embeddings_index, word2index, data_t
             # plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
             loss_f.write(unicode(plot_loss_avg))
-            loss_f.write('\n')
+            loss_f.write(unicode('\n'))
 
     # showPlot(plot_losses)
     loss_f.close()
@@ -218,7 +234,7 @@ def trainIters(encoder1, encoder2, decoder, embeddings_index, word2index, data_t
 # attention outputs for display later.
 #
 # max_length constrains the maximum length of the generated question
-def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, max_length):
+def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, index2word, max_length):
     triple_var = variablesFromTriplets(triple, embeddings_index)
     context_var = triple_var[0]
     ans_var = triple_var[2]
@@ -283,13 +299,13 @@ def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, max_length):
 # input, target, and output to make some subjective quality judgements:
 #
 
-def evaluateRandomly(encoder1, encoder2, decoder, triplets, embeddings_index, max_length, n=1):
+def evaluateRandomly(encoder1, encoder2, decoder, triplets, embeddings_index, word2index, index2word, max_length, n=1):
     for i in range(n):
         triple = random.choice(triplets)
         print('context   > ', triple[0])
         print('question  > ', triple[1])
         print('answer    > ', triple[2])
-        output_words, attentions = evaluate(encoder1, encoder2, decoder, triple, embeddings_index, max_length)
+        output_words, attentions = evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, index2word, max_length)
         output_sentence = ' '.join(output_words)
         print('generated < ', output_sentence)
         print('')

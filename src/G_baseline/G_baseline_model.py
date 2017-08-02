@@ -6,9 +6,9 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from torch import optim
 import torch.nn.functional as F
 
+use_cuda = torch.cuda.is_available()
 
 ######################################################################
 # The Encoder
@@ -52,9 +52,10 @@ class EncoderRNN(nn.Module):
 # Attention Decoder
 # ^^^^^^^^^^^^^^^^^
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, 
+    def __init__(self, attn_model, input_size, hidden_size, output_size, 
         n_layers=1, dropout_p=0.1):
         super(AttnDecoderRNN, self).__init__()
+        self.attn_model = attn_model
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
@@ -62,7 +63,7 @@ class AttnDecoderRNN(nn.Module):
         self.dropout_p = dropout_p
         # self.embeddings_index = embeddings_index
 
-        # self.attn = nn.Linear(self.input_size+self.hidden_size, self.enc_output_len)
+        self.attn = nn.Linear(self.input_size+self.hidden_size, 1)
         self.attn_combine = nn.Linear(self.input_size+self.hidden_size, self.input_size)
         self.dropout = nn.Dropout(self.dropout_p)
         self.gru = nn.GRU(self.input_size, self.hidden_size)
@@ -72,25 +73,20 @@ class AttnDecoderRNN(nn.Module):
 
         # because the number of input tokens varies, we move the init of attn to here
         # instead of in __init__ function
-        attn = nn.Linear(self.input_size+self.hidden_size, encoder_outputs.size()[0])
-        if use_cuda:
-            attn = attn.cuda()
+        # attn = nn.Linear(self.input_size+self.hidden_size, encoder_outputs.size()[0])
+        # if use_cuda:
+        #     attn = attn.cuda()
         
         embedded = Variable(embeddings_index[input].view(1, 1, -1))
-        # try:
-        #     embedded = Variable(embeddings_index[input].view(1, 1, -1))
-        # except KeyError:
-        #     embedded = Variable(embeddings_index['UNK'].view(1, 1, -1))
-        # embedded = input.view(1,1,-1)
         if use_cuda:
             embedded = embedded.cuda()
         # embedded = self.dropout(embedded)
 
-        attn_weights = F.softmax(
-            attn(torch.cat((embedded[0], hidden[0]), 1)))
-        attn_applied = torch.bmm(attn_weights.unsqueeze(0),
-                                 encoder_outputs.unsqueeze(0))
-
+        attn_weights = Variable(torch.zeros(1, len(encoder_outputs))) # length = 1 x length of input tokens
+        for i in range(len(encoder_outputs)):
+            attn_weights[0,i] = F.softmax(self.attn(torch.cat((encoder_outputs[i,], hidden[0]), 1)))
+        attn_applied = torch.bmm(attn_weights.unsqueeze(0), encoder_outputs.unsqueeze(0)) # attn_weights size = 1 x 1 x len input tokens after unsqueeze
+ 
         output = torch.cat((embedded[0], attn_applied[0]), 1)
         output = self.attn_combine(output).unsqueeze(0)
 

@@ -3,7 +3,7 @@
 # NOTE: this is NOT tensorflow. This is PyTorch implementation, standalone of GAN.
 
 """
-question generation model baseline
+question answering model baseline
 
 code adapted from <https://github.com/spro/practical-pytorch>`_
 
@@ -14,17 +14,32 @@ input: a paragraph (aka context), and an answer, both represented by a sequence 
 output: a question, represented by a sequence of tokens
 
 """
-import sys
-workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
-sys.path.insert(0, workspace_path)
-from data_proc import *
-from util import *
-from G_baseline_model import *
-from G_train_eval import *
 
+#-----------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------#
+# requirements
+#-----------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------#
+from __future__ import unicode_literals, print_function, division
+import time
+from io import open
+import unicodedata
+import string
+import re
+import random
+
+import spacy
+from spacy.en import English
+spacynlp = English()
+
+
+
+import nltk
+import json
+import numpy as np
+import os
 
 use_cuda = torch.cuda.is_available()
-teacher_forcing_ratio = 0.5 # default in original code is 0.5
 
 #-----------------------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------------------------#
@@ -43,8 +58,8 @@ GLOVE_DIR = path_to_dataset + 'glove.6B/'
 # path for experiment outputs
 exp_name = 'QG_seq2seq_baseline'
 path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results/' + exp_name
-loss_f = 'loss_temp.txt'
-sample_out_f = 'sample_outputs_temp.txt'
+loss_f = 'loss.txt'
+sample_out_f = 'sample_outputs.txt'
 path_to_loss_f = path_to_exp_out + '/' + loss_f
 path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
 
@@ -82,23 +97,17 @@ triplets = readSQuAD(path_to_data)
 ## find all unique tokens in the data (should be a subset of the number of embeddings)
 data_tokens = []
 for triple in triplets:
-    # c = [token.string.strip() for token in spacynlp.tokenizer(triple[0])]
-    c = post_proc_tokenizer(spacynlp.tokenizer(triple[0]))
-    # q = [token.string.strip() for token in spacynlp.tokenizer(triple[1])]
-    q = post_proc_tokenizer(spacynlp.tokenizer(triple[1]))
-    # a = [token.string.strip() for token in spacynlp.tokenizer(triple[2])]
-    a = post_proc_tokenizer(spacynlp.tokenizer(triple[2]))
+    c = [token.string.strip() for token in spacynlp.tokenizer(triple[0])]
+    q = [token.string.strip() for token in spacynlp.tokenizer(triple[1])]
+    a = [token.string.strip() for token in spacynlp.tokenizer(triple[2])]
     data_tokens += c + q + a
 data_tokens = list(set(data_tokens)) # find unique
 data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens
-# print(data_tokens[0:20])
-# # experimental usage only
-# data_tokens = data_tokens[0:10000]
+print(data_tokens[0:20])
+# experimental usage only
+data_tokens = data_tokens[0:10000]
 
 num_tokens = len(data_tokens)
-effective_tokens = list(set(data_tokens).intersection(embeddings_index.keys()))
-print(effective_tokens[0:20])
-effective_num_tokens = len(effective_tokens)
 # generate some index
 # token_indices = random.sample(range(0, len(data_tokens)), 20)
 # # debugging purpose
@@ -116,12 +125,12 @@ effective_num_tokens = len(effective_tokens)
 # build word2index dictionary and index2word dictionary
 word2index = {}
 index2word = {}
-for i in range(effective_num_tokens):
-    index2word[i] = effective_tokens[i]
-    word2index[effective_tokens[i]] = i
+for i in range(0, len(data_tokens)):
+    index2word[i] = data_tokens[i]
+    word2index[data_tokens[i]] = i
 
 print('reading and preprocessing data complete.')
-print('found %s unique tokens in the intersection of corpus and word embeddings.' % effective_num_tokens)
+print('found %s unique tokens in corpus.' % len(data_tokens))
 if use_cuda:
     print('GPU ready.')
 print('')
@@ -130,15 +139,14 @@ print('')
 
 
 ######### set up model
-hidden_size1 = 256
-hidden_size2 = 256
+hidden_size1 = 64
+hidden_size2 = 64
 # context encoder
 encoder1 = EncoderRNN(embeddings_size, hidden_size1)
 # answer encoder
 encoder2 = EncoderRNN(embeddings_size, hidden_size2)
 # decoder
-attn_model ='cat'
-attn_decoder1 = AttnDecoderRNN(attn_model, embeddings_size, hidden_size1, effective_num_tokens, 
+attn_decoder1 = AttnDecoderRNN(embeddings_size, hidden_size1, num_tokens, 
                                 1, dropout_p=0.1)
 
 if use_cuda:
@@ -154,81 +162,13 @@ if use_cuda:
     print('time load decoder: ' + str(t4 - t3))
 
 
-# max_length of generated question
-max_length = 100
-
 ######### start training
-trainIters(encoder1, encoder2, attn_decoder1, embeddings_index, word2index, index2word, data_tokens, max_length, triplets, teacher_forcing_ratio,
+trainIters(encoder1, encoder2, attn_decoder1, embeddings_index, word2index, data_tokens,
             path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-            50000, print_every=1, plot_every = 1)
+            75000, print_every=1)
 
 # save the final model
-# torch.save(encoder1, path_to_exp_out+'/encoder1.pth')
-# torch.save(encoder2, path_to_exp_out+'/encoder2.pth')
-# torch.save(attn_decoder1, path_to_exp_out+'/decoder.pth')
-
-######################################################################
-#
-
-# evaluateRandomly(encoder1, encoder2, attn_decoder1)
-
-
-######################################################################
-# Visualizing Attention
-# ---------------------
-#
-# A useful property of the attention mechanism is its highly interpretable
-# outputs. Because it is used to weight specific encoder outputs of the
-# input sequence, we can imagine looking where the network is focused most
-# at each time step.
-#
-# You could simply run ``plt.matshow(attentions)`` to see attention output
-# displayed as a matrix, with the columns being input steps and rows being
-# output steps:
-#
-
-# output_words, attentions = evaluate(
-#     encoder1, attn_decoder1, "je suis trop froid .")
-# plt.matshow(attentions.numpy())
-
-
-######################################################################
-# For a better viewing experience we will do the extra work of adding axes
-# and labels:
-#
-
-def showAttention(input_sentence, output_words, attentions):
-    # Set up figure with colorbar
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    cax = ax.matshow(attentions.numpy(), cmap='bone')
-    fig.colorbar(cax)
-
-    # Set up axes
-    ax.set_xticklabels([''] + input_sentence.split(' ') +
-                       ['<EOS>'], rotation=90)
-    ax.set_yticklabels([''] + output_words)
-
-    # Show label at every tick
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-
-    plt.show()
-
-
-def evaluateAndShowAttention(input_sentence):
-    output_words, attentions = evaluate(
-        encoder1, attn_decoder1, input_sentence)
-    print('input =', input_sentence)
-    print('output =', ' '.join(output_words))
-    showAttention(input_sentence, output_words, attentions)
-
-
-# evaluateAndShowAttention("elle a cinq ans de moins que moi .")
-
-# evaluateAndShowAttention("elle est trop petit .")
-
-# evaluateAndShowAttention("je ne crains pas de mourir .")
-
-# evaluateAndShowAttention("c est un jeune directeur plein de talent .")
+torch.save(encoder1, path_to_exp_out+'/encoder1.pth')
+torch.save(encoder2, path_to_exp_out+'/encoder2.pth')
+torch.save(decoder, path_to_exp_out+'/decoder.pth')
 

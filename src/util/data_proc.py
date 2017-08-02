@@ -12,6 +12,8 @@ import spacy
 from spacy.en import English
 spacynlp = English()
 
+import torch
+
 import nltk
 import json
 import numpy as np
@@ -66,8 +68,8 @@ def readSQuAD(path_to_data):
                         ans_text = answers[a]['text']
                         # turn from unicode to ascii and lower case everything
                         ans_text = normalizeString(ans_text)
-                        ans_start_idx = answer[a]['answer_start']
-                        ans_end_idx = answer[a][ans_start_idx + len(ans_text)]
+                        ans_start_idx = answers[a]['answer_start']
+                        ans_end_idx = ans_start_idx + len(ans_text)
                         triplets.append((context, question, ans_text, ans_start_idx, ans_end_idx))
     return triplets
 
