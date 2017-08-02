@@ -37,7 +37,7 @@ teacher_forcing_ratio = 0.5 # default in original code is 0.5
 ######### set paths
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
-f_name = 'train-v1.1.json'
+f_name = 'dev-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
