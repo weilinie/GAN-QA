@@ -91,6 +91,7 @@ class AttnDecoderRNN(nn.Module):
             print(i)
             attn_input = torch.cat((encoder_outputs[i,].unsqueeze(0), hidden[0]),1)
             print('size of attn_input is" '+str(attn_input.unsqueeze(0).size()))
+            print(self.attn)
             attn_weight = self.attn(attn_input)
             print('size of attn is: '+str(attn_weight.size()))
             print(attention)
