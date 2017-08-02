@@ -28,11 +28,7 @@ class EncoderRNN(nn.Module):
     def forward(self, input, hidden, embeddings_index):
         # input is a word token
         embedded = Variable(embeddings_index[input].view(1, 1, -1))
-        # try:
-        #     embedded = Variable(embeddings_index[input].view(1, 1, -1))
-        # except KeyError:
-        #     embedded = Variable(embeddings_index['UNK'].view(1, 1, -1))
-        # embedded = input.view(1,1,-1)
+
         if use_cuda:
             embedded = embedded.cuda()
         output = embedded
@@ -52,7 +48,7 @@ class EncoderRNN(nn.Module):
 # Attention Decoder
 # ^^^^^^^^^^^^^^^^^
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, attn_model, input_size, hidden_size, output_size, 
+    def __init__(self, attn_model, input_size, hidden_size, output_size,
         n_layers=1, dropout_p=0.1):
         super(AttnDecoderRNN, self).__init__()
         self.attn_model = attn_model
@@ -61,9 +57,10 @@ class AttnDecoderRNN(nn.Module):
         self.output_size = output_size
         self.n_layers = n_layers
         self.dropout_p = dropout_p
+        self.embedding_dim = embedding_dim
         # self.embeddings_index = embeddings_index
 
-        self.attn = nn.Linear(self.input_size+self.hidden_size, 1)
+        self.attn = nn.Linear(self.embedding_dim+self.hidden_size, 1)
         self.attn_combine = nn.Linear(self.input_size+self.hidden_size, self.input_size)
         self.dropout = nn.Dropout(self.dropout_p)
         self.gru = nn.GRU(self.input_size, self.hidden_size)
@@ -89,8 +86,9 @@ class AttnDecoderRNN(nn.Module):
         print('size of encoder output: ' + str(encoder_outputs[1,].size()))
         print('size of hideden: ' + str(hidden[0].size()))
 
+
         for i in range(len(encoder_outputs)):
-            attn_weights[0,i] = F.softmax(self.attn(torch.cat((encoder_outputs[i,], hidden[0]),0).unsqueeze(0)))
+            attn_weights[0,i] = F.softmax(self.attn(torch.cat((encoder_outputs[i,], hidden[0])).unsqueeze(0)))
         attn_applied = torch.bmm(attn_weights.unsqueeze(0), encoder_outputs.unsqueeze(0)) # attn_weights size = 1 x 1 x len input tokens after unsqueeze
  
         output = torch.cat((embedded[0], attn_applied[0]), 1)

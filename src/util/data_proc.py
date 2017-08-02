@@ -119,36 +119,24 @@ def post_proc_tokenizer(tokenized_sentence):
 # test
 # x = post_proc_tokenizer(spacynlp.tokenizer(u'mid-1960s'))
 
+
 # turns a sentence into individual tokens
 def tokenizeSentence(sentence, data_tokens):
     tokenized_sentence = spacynlp.tokenizer(sentence)
     # # an additional preprocessing step to separate words and non-words when they appear together
     proc_tokenized_sentence = post_proc_tokenizer(tokenized_sentence)
-    # print(proc_tokenized_sentence)
-    # tokenized_sentence = [token.string.strip() for token in tokenized_sentence]
-    # for t in range(0, len(tokenized_sentence)):
+
     token_num = len(proc_tokenized_sentence)
-    # var = torch.FloatTensor(token_num+1, embeddings_size) #add one dimension for EOS
-    # var = torch.FloatTensor(token_num+1)
+
     var = []
-    # var[0] = embeddings_index['SOS']
+
     for t in range(0, token_num):
         # the first if loop only for experimental use to aviod large vocab size
         if proc_tokenized_sentence[t] not in data_tokens:
             var.append('UNK')
         else:
             var.append(proc_tokenized_sentence[t])
-        # try:
-        #     temp = word2index(proc_tokenized_sentence[t])
-        #     var.append()
-        # if proc_tokenized_sentence[t] in embeddings_index.keys():
-        #     # var[t] = word2index[proc_tokenized_sentence[t]]
-        #     var.append(proc_tokenized_sentence[t])
-        # else:
-        #     # var[t] = word2index['UNK']
-        #     var.append('UNK')
-    # add end of sentence token to all sentences
-    # var[-1] = word2index['EOS']
+
     var.append('EOS')
     return var
 
