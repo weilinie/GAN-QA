@@ -53,24 +53,22 @@ def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, 
 
     encoder_hiddens = torch.cat((encoder_hiddens_context, encoder_hiddens_answer))
 
-    # decoder_input = Variable(torch.LongTensor([[SOS_token]]))  # SOS
     decoder_input = 'SOS'  # Variable(embeddings_index['SOS'])
-    # decoder_input = decoder_input.cuda() if use_cuda else decoder_input
-
-    # decoder_hidden = torch.cat(encoder_hidden_context, encoder_hidden_answer)
 
     decoded_words = []
-    decoder_attentions = torch.zeros(encoder_hiddens.size()[0])
+    decoder_attentions = torch.zeros(1, encoder_hiddens.size()[0])
     if use_cuda:
         decoder_attentions = decoder_attentions.cuda()
 
+    # generate words and store attention values
     for di in range(max_length):
         decoder_output, decoder_hidden, decoder_attention = decoder(
             decoder_input, decoder_hidden, encoder_hiddens, embeddings_index)
+        print(type(decoder_attentions))
         print(type(decoder_attentions[0]))
         print(type(decoder_attention))
         print(type(decoder_attention.data))
-        decoder_attentions[di] = decoder_attention.data.cpu()
+        decoder_attentions[di] = decoder_attention.data[0]
         topv, topi = decoder_output.data.topk(1)
         ni = topi[0][0]
 
