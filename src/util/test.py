@@ -12,9 +12,6 @@ from G_baseline_model import *
 from G_eval import *
 import torch
 
-exp_name = 'QG_seq2seq_baseline'
-path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results/' + exp_name
-GLOVE_DIR = path_to_dataset + 'glove.6B/'
 
 encoder1 = torch.load(path_to_exp_out+'/encoder1')
 encoder2 = torch.load(path_to_exp_out+'/encoder2')
@@ -22,6 +19,9 @@ decoder  = torch.load(path_to_exp_out+'/decoder')
 
 
 # test these models with data
+exp_name = 'QG_seq2seq_baseline'
+path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results/' + exp_name
+GLOVE_DIR = path_to_dataset + 'glove.6B/'
 dataset = 'squad'
 f_name = 'dev-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
