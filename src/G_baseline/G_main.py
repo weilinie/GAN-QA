@@ -108,7 +108,8 @@ if use_cuda:
 max_length = 100
 
 ######### start training
-trainIters(encoder1, encoder2, attn_decoder1, embeddings_index, word2index, index2word, data_tokens, max_length, triplets, teacher_forcing_ratio,
+trainIters(encoder1, encoder2, attn_decoder1, embeddings_index, 
+            word2index, index2word, max_length, triplets, teacher_forcing_ratio,
             path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
             50000, print_every=1, plot_every = 1)
 

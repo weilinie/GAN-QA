@@ -129,7 +129,7 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
 #
 
 def trainIters(encoder1, encoder2, decoder, 
-    embeddings_index, word2index, index2word, data_tokens, max_length, triplets, teacher_forcing_ratio,
+    embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
     path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
     n_iters, print_every=10, plot_every=100, learning_rate=0.01):
 
