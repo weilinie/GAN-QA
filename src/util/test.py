@@ -6,8 +6,10 @@ import torch
 from G_baseline_model import *
 from G_eval import *
 import sys
-workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
-sys.path.insert(0, workspace_path)
+workspace_path1 = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
+workspace_path2 = '/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline/'
+sys.path.insert(0, workspace_path1)
+sys.path.insert(0, workspace_path2)
 from data_proc import *
 from util import *
 
