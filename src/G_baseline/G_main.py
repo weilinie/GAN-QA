@@ -149,4 +149,9 @@ trainIters(encoder1, encoder2, attn_decoder1, embeddings_index, word2index, inde
             path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
             50000, print_every=1, plot_every = 1)
 
+save the final model
+torch.save(encoder1, path_to_exp_out+'/encoder1_temp.pth')
+torch.save(encoder2, path_to_exp_out+'/encoder2_temp.pth')
+ torch.save(attn_decoder1, path_to_exp_out+'/decoder_temp.pth')
+
 
