@@ -67,6 +67,9 @@ def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, 
     for di in range(max_length):
         decoder_output, decoder_hidden, decoder_attention = decoder(
             decoder_input, decoder_hidden, encoder_hiddens, embeddings_index)
+        print(type(decoder_attentions))
+        print(type(decoder_attention))
+        print(type(decoder_attention.data))
         decoder_attentions[di] = decoder_attention.data
         topv, topi = decoder_output.data.topk(1)
         ni = topi[0][0]
