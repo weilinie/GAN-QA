@@ -66,35 +66,25 @@ class AttnDecoderRNN(nn.Module):
         self.out = nn.Linear(self.hidden_size, self.output_size)
 
     def forward(self, input, hidden, encoder_outputs, embeddings_index):
-
-        # because the number of input tokens varies, we move the init of attn to here
-        # instead of in __init__ function
-        # attn = nn.Linear(self.input_size+self.hidden_size, encoder_outputs.size()[0])
-        # if use_cuda:
-        #     attn = attn.cuda()
         
+        # get embedding vector of the input token
         embedded = Variable(embeddings_index[input].view(1, 1, -1))
         if use_cuda:
             embedded = embedded.cuda()
-        # embedded = self.dropout(embedded)
 
+        # init attention weights
         attn_weights = Variable(torch.zeros(1, encoder_outputs.size()[0])) # length = 1 x length of input tokens
         if use_cuda:
             attn_weights = attn_weights.cuda()
 
-        # for debugging purpose
-        print('size of encoder outputs: ' + str(encoder_outputs.size()))
-        print('size of encoder output: ' + str(encoder_outputs[1,].unsqueeze(0).size()))
-        print('size of hideden: ' + str(hidden[0].size()))
-        print('size of attn_weights: ' + str(attn_weights.size()))
-
-
+        # calculate attention weight for each encoder hidden state
         for i in range(encoder_outputs.size()[0]):
             attn_weights[0,i] = F.softmax( self.attn(torch.cat((encoder_outputs[i,].unsqueeze(0), hidden[0]),1)) )
         print('type of attn_weights: ' + str(type(attn_weights.data)))
         print('type of encoder_outputs: '+str(type(encoder_outputs.data)))
         attn_applied = torch.bmm(attn_weights.unsqueeze(0), encoder_outputs.unsqueeze(0)) # attn_weights size = 1 x 1 x len input tokens after unsqueeze
- 
+        
+        # calculate 
         output = torch.cat((embedded[0], attn_applied[0]), 1)
         output = self.attn_combine(output).unsqueeze(0)
 
