@@ -15,12 +15,12 @@ import torch
 
 # test these models with data
 f_name = 'dev-v1.1.json'
+dataset = 'squad'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 exp_name = 'QG_seq2seq_baseline'
 path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results/' + exp_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
-dataset = 'squad'
 
 encoder1 = torch.load(path_to_exp_out+'/encoder1')
 encoder2 = torch.load(path_to_exp_out+'/encoder2')
