@@ -181,3 +181,39 @@ def variablesFromTriplets(triple, embeddings_index):
     ans_end_idx  = torch.LongTensor([triple[4]])
     return (context, question, answer, ans_start_idx, ans_end_idx)
 
+
+######################################################################
+# count the number of tokens in both the word embeddings and the corpus
+def count_effective_num_tokens(triplets, embeddings_index):
+    ## find all unique tokens in the data (should be a subset of the number of embeddings)
+    data_tokens = []
+    for triple in triplets:
+        c = post_proc_tokenizer(spacynlp.tokenizer(triple[0]))
+        q = post_proc_tokenizer(spacynlp.tokenizer(triple[1]))
+        a = post_proc_tokenizer(spacynlp.tokenizer(triple[2]))
+        data_tokens += c + q + a
+    data_tokens = list(set(data_tokens)) # find unique
+    data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens
+
+    num_tokens = len(data_tokens)
+    effective_tokens = list(set(data_tokens).intersection(embeddings_index.keys()))
+    print(effective_tokens[0:20])
+    effective_num_tokens = len(effective_tokens)
+
+    return effective_tokens, effective_num_tokens
+
+
+######################################################################
+# generate word index and index word look up tables
+def generate_look_up_table(effective_tokens, effective_num_tokens):
+    word2index = {}
+    index2word = {}
+    for i in range(effective_num_tokens):
+        index2word[i] = effective_tokens[i]
+        word2index[effective_tokens[i]] = i
+    return word2index, index2word
+
+
+
+
+

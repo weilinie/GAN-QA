@@ -64,27 +64,10 @@ triplets = readSQuAD(path_to_data)
 # words that do not appear in embeddings, etc
 
 ## find all unique tokens in the data (should be a subset of the number of embeddings)
-data_tokens = []
-for triple in triplets:
-    c = post_proc_tokenizer(spacynlp.tokenizer(triple[0]))
-    q = post_proc_tokenizer(spacynlp.tokenizer(triple[1]))
-    a = post_proc_tokenizer(spacynlp.tokenizer(triple[2]))
-    data_tokens += c + q + a
-data_tokens = list(set(data_tokens)) # find unique
-data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens
-
-num_tokens = len(data_tokens)
-effective_tokens = list(set(data_tokens).intersection(embeddings_index.keys()))
-print(effective_tokens[0:20])
-effective_num_tokens = len(effective_tokens)
-
+effective_tokens, effective_num_tokens = count_effective_num_tokens(triplets, embeddings_index)
 
 # build word2index dictionary and index2word dictionary
-word2index = {}
-index2word = {}
-for i in range(effective_num_tokens):
-    index2word[i] = effective_tokens[i]
-    word2index[effective_tokens[i]] = i
+word2index, index2word = generate_look_up_table(effective_tokens, effective_num_tokens)
 
 
 print('reading and preprocessing data complete.')
