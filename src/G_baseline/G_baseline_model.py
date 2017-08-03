@@ -79,6 +79,8 @@ class AttnDecoderRNN(nn.Module):
         # embedded = self.dropout(embedded)
 
         attn_weights = Variable(torch.zeros(1, encoder_outputs.size()[0])) # length = 1 x length of input tokens
+        if use_cuda:
+            attn_weights = attn_weights.cuda()
 
         # for debugging purpose
         print('size of encoder outputs: ' + str(encoder_outputs.size()))
