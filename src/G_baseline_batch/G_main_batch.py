@@ -16,12 +16,14 @@ output: a question, represented by a sequence of tokens
 """
 import sys
 workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
+workspace_path2 = '/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline_batch/'
 sys.path.insert(0, workspace_path)
+sys.path.insert(0, workspace_path2)
 from util import *
 from data_proc import *
-from G_baseline_model import *
-from G_train import *
-from G_eval import *
+from G_baseline_model_batch import *
+from G_train_batch import *
+from G_eval_batch import *
 
 
 use_cuda = torch.cuda.is_available()
@@ -59,7 +61,7 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 triplets = readSQuAD(path_to_data, embeddings_index)
 
 # find max length of context, question, answer, respectively
-max_len_c, max_len_q, max_len_a = max_len(triplets)
+max_len_c, max_len_q, max_len_a = max_length(triplets)
 
 ######### corpus preprocessing
 # words that do not appear in embeddings, etc

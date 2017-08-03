@@ -15,7 +15,7 @@ workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
 sys.path.insert(0, workspace_path)
 from data_proc import *
 from util import *
-from G_eval import *
+from G_eval_batch import *
 
 use_cuda = torch.cuda.is_available()
 

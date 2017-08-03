@@ -202,10 +202,7 @@ def count_effective_num_tokens(triplets, embeddings_index):
     ## find all unique tokens in the data (should be a subset of the number of embeddings)
     data_tokens = []
     for triple in triplets:
-        c = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[0]))
-        q = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[1]))
-        a = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[2]))
-        data_tokens += c + q + a
+        data_tokens += triple[0] + triple[1] + triple[2]
     data_tokens = list(set(data_tokens)) # find unique
     data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens
 
