@@ -26,7 +26,7 @@ class EncoderRNN(nn.Module):
         self.gru = nn.GRU(input_size, hidden_size)
 
     def forward(self, input, hidden, embeddings_index):
-        # input is a word token
+        # input is a word token, not the index of this word token
         embedded = Variable(embeddings_index[input].view(1, 1, -1))
 
         if use_cuda:
