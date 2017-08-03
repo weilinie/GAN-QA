@@ -44,7 +44,7 @@ def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, 
     for ei in range(input_length_context):
         encoder_output_context, encoder_hidden_context = encoder1(context_var[ei],
                                                  encoder_hidden_context, embeddings_index)
-        encoder_hiddens_context[ei] = encoder_hidens_context[ei] + encoder_hidden_context[0][0]
+        encoder_hiddens_context[ei] = encoder_hiddens_context[ei] + encoder_hidden_context[0][0]
 
     for ei in range(input_length_answer):
         encoder_output_answer, encoder_hidden_answer = encoder2(ans_var[ei],

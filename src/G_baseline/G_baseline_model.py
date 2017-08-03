@@ -80,8 +80,6 @@ class AttnDecoderRNN(nn.Module):
         # calculate attention weight for each encoder hidden state
         for i in range(encoder_outputs.size()[0]):
             attn_weights[0,i] = F.softmax( self.attn(torch.cat((encoder_outputs[i,].unsqueeze(0), hidden[0]),1)) )
-        print('type of attn_weights: ' + str(type(attn_weights.data)))
-        print('type of encoder_outputs: '+str(type(encoder_outputs.data)))
         attn_applied = torch.bmm(attn_weights.unsqueeze(0), encoder_outputs.unsqueeze(0)) # attn_weights size = 1 x 1 x len input tokens after unsqueeze
         
         # calculate 
