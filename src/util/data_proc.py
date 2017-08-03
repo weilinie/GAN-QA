@@ -206,7 +206,6 @@ def count_effective_num_tokens(triplets, embeddings_index):
     data_tokens = list(set(data_tokens)) # find unique
     data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens
 
-    num_tokens = len(data_tokens)
     effective_tokens = list(set(data_tokens).intersection(embeddings_index.keys()))
     print(effective_tokens[0:20])
     effective_num_tokens = len(effective_tokens)
