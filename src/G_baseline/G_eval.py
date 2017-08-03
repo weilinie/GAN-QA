@@ -51,7 +51,7 @@ def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, 
                                                  encoder_hidden_answer, embeddings_index)
         encoder_hiddens_answer[ei] = encoder_hiddens_answer[ei] + encoder_hidden_answer[0][0]
 
-    encoder_hiddens = torch.cat((encoder_outputs_context, encoder_hiddens_answer))
+    encoder_hiddens = torch.cat((encoder_hiddens_context, encoder_hiddens_answer))
 
     # decoder_input = Variable(torch.LongTensor([[SOS_token]]))  # SOS
     decoder_input = 'SOS'  # Variable(embeddings_index['SOS'])
