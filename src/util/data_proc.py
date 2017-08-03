@@ -74,7 +74,7 @@ def readGlove(path_to_data):
 ######################################################################
 # read data specific for SQUAD dataset
 
-def readSQuAD(path_to_data):
+def readSQuAD(path_to_data, embeddings_index):
     # output (context, question, answer, ans_start_idx, ans_end_idx) triplets
     print("Reading dataset...")
     triplets = []
@@ -87,6 +87,7 @@ def readSQuAD(path_to_data):
                 context = samples[p]['context']
                 # turn from unicode to ascii and lower case everything
                 context = normalizeString(context)
+                context = tokenize_sentence(context, embeddings_index)
                 qas = samples[p]['qas']
                 for i in range(0, len(qas)):
                 # print('current s,p,i are: ' + str(s)+str(p)+str(i))
@@ -94,19 +95,42 @@ def readSQuAD(path_to_data):
                     question = qas[i]['question']
                     # turn from unicode to ascii and lower case everything
                     question = normalizeString(question)
+                    question = tokenize_sentence(question, embeddings_index)
                     for a in range(0, len(answers)):
                         ans_text = answers[a]['text']
                         # turn from unicode to ascii and lower case everything
                         ans_text = normalizeString(ans_text)
-                        ans_start_idx = answers[a]['answer_start']
-                        ans_end_idx = ans_start_idx + len(ans_text)
+                        ans_text = tokenize_sentence(ans_text, embeddings_index)
+                        ans_start_idx = torch.LongTensor(answers[a]['answer_start'])
+                        ans_end_idx = torch.LongTensor(ans_start_idx + len(ans_text))
                         triplets.append((context, question, ans_text, ans_start_idx, ans_end_idx))
     return triplets
 
 
+# turns a sentence into individual tokens
+def tokenize_sentence(sentence, data_tokens):
+    tokenized_sentence = spacynlp.tokenizer(sentence)
+    # # an additional preprocessing step to separate words and non-words when they appear together
+    proc_tokenized_sentence = post_proc_tokenize_sentence(tokenized_sentence)
+
+    token_num = len(proc_tokenized_sentence)
+
+    var = []
+
+    for t in range(0, token_num):
+        # the first if loop only for experimental use to aviod large vocab size
+        if proc_tokenized_sentence[t] not in data_tokens:
+            var.append('UNK')
+        else:
+            var.append(proc_tokenized_sentence[t])
+
+    var.append('EOS')
+    return var
+
+
 # helper function for post processing tokenizer 
 # outputs a list of strings
-def post_proc_tokenizer(tokenized_sentence):
+def post_proc_tokenize_sentence(tokenized_sentence):
     proc_tokenized_sentence = []
     for t in range(0, len(tokenized_sentence)):
         token = tokenized_sentence[t].string.strip()
@@ -150,36 +174,26 @@ def post_proc_tokenizer(tokenized_sentence):
 # x = post_proc_tokenizer(spacynlp.tokenizer(u'mid-1960s'))
 
 
-# turns a sentence into individual tokens
-def tokenizeSentence(sentence, data_tokens):
-    tokenized_sentence = spacynlp.tokenizer(sentence)
-    # # an additional preprocessing step to separate words and non-words when they appear together
-    proc_tokenized_sentence = post_proc_tokenizer(tokenized_sentence)
+# find the max length of context, answer, and question
+def max_length(triplets):
 
-    token_num = len(proc_tokenized_sentence)
+    max_len_c = 0
+    max_len_q = 0
+    max_len_a = 0
 
-    var = []
+    for triple in triplets:
+        len_c = len(triple[0])
+        len_q = len(triple[1])
+        len_a = len(triple[2])
+        if len_c > max_len_c:
+            max_len_c = len_c
+        if len_q > max_len_q:
+            max_len_q = len_q
+        if len_a > max_len_a:
+            max_len_a = len_a
 
-    for t in range(0, token_num):
-        # the first if loop only for experimental use to aviod large vocab size
-        if proc_tokenized_sentence[t] not in data_tokens:
-            var.append('UNK')
-        else:
-            var.append(proc_tokenized_sentence[t])
+    return max_len_c, max_len_q, max_len_a
 
-    var.append('EOS')
-    return var
-
-
-# change these to pytorch variables to prepare as input to the model
-# each context, question, answer is a list of indices
-def variablesFromTriplets(triple, embeddings_index):
-    context = tokenizeSentence(triple[0], embeddings_index)
-    answer = tokenizeSentence(triple[2], embeddings_index)
-    question = tokenizeSentence(triple[1], embeddings_index)
-    ans_start_idx = torch.LongTensor([triple[3]])
-    ans_end_idx  = torch.LongTensor([triple[4]])
-    return (context, question, answer, ans_start_idx, ans_end_idx)
 
 
 ######################################################################
@@ -188,9 +202,9 @@ def count_effective_num_tokens(triplets, embeddings_index):
     ## find all unique tokens in the data (should be a subset of the number of embeddings)
     data_tokens = []
     for triple in triplets:
-        c = post_proc_tokenizer(spacynlp.tokenizer(triple[0]))
-        q = post_proc_tokenizer(spacynlp.tokenizer(triple[1]))
-        a = post_proc_tokenizer(spacynlp.tokenizer(triple[2]))
+        c = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[0]))
+        q = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[1]))
+        a = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[2]))
         data_tokens += c + q + a
     data_tokens = list(set(data_tokens)) # find unique
     data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens

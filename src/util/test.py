@@ -51,9 +51,9 @@ embeddings_index['UNK'] = UNK_token
 
 data_tokens = []
 for triple in triplets:
-    c = post_proc_tokenizer(spacynlp.tokenizer(triple[0]))
-    q = post_proc_tokenizer(spacynlp.tokenizer(triple[1]))
-    a = post_proc_tokenizer(spacynlp.tokenizer(triple[2]))
+    c = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[0]))
+    q = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[1]))
+    a = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[2]))
     data_tokens += c + q + a
 data_tokens = list(set(data_tokens)) # find unique
 data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens
