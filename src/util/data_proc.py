@@ -41,6 +41,36 @@ def normalizeString(s):
     return s
 
 
+
+######################################################################
+# read GLOVE word embeddings
+def readGlove(path_to_data):
+    embeddings_index = {}
+    f = open(path_to_data)
+    for line in f:
+        values = line.split()
+        word = values[0]
+        coefs = np.asarray(values[1:], dtype='float32')
+        coefs = torch.from_numpy(coefs)
+        embeddings_index[word] = coefs
+    f.close()
+
+    print('Found %s word vectors.' % len(embeddings_index))
+
+    # get dimension from a random sample in the dict
+    embeddings_size = random.sample( embeddings_index.items(), 1 )[0][1].size(-1)
+    print('dimension of word embeddings: ' + str(embeddings_size))
+    SOS_token = -torch.ones(embeddings_size) # start of sentence token, all zerons
+    EOS_token = torch.ones(embeddings_size) # end of sentence token, all ones
+    UNK_token = torch.ones(embeddings_size) + torch.ones(embeddings_size) # these choices are pretty random
+    # add special tokens to the embeddings
+    embeddings_index['SOS'] = SOS_token
+    embeddings_index['EOS'] = EOS_token
+    embeddings_index['UNK'] = UNK_token
+
+    return embeddings_index, embeddings_size
+
+
 ######################################################################
 # read data specific for SQUAD dataset
 

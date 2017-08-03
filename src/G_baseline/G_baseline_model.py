@@ -48,10 +48,9 @@ class EncoderRNN(nn.Module):
 # Attention Decoder
 # ^^^^^^^^^^^^^^^^^
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, attn_model, input_size, hidden_size, output_size,
+    def __init__(self, input_size, hidden_size, output_size,
         n_layers=1, dropout_p=0.1):
         super(AttnDecoderRNN, self).__init__()
-        self.attn_model = attn_model
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size

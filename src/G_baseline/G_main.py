@@ -49,29 +49,10 @@ sample_out_f = 'sample_outputs_temp.txt'
 path_to_loss_f = path_to_exp_out + '/' + loss_f
 path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
 
+
 ######### first load the pretrained word embeddings
-embeddings_index = {}
-f = open(os.path.join(GLOVE_DIR, 'glove.6B.100d.txt'))
-for line in f:
-    values = line.split()
-    word = values[0]
-    coefs = np.asarray(values[1:], dtype='float32')
-    coefs = torch.from_numpy(coefs)
-    embeddings_index[word] = coefs
-f.close()
-
-print('Found %s word vectors.' % len(embeddings_index))
-
-# get dimension from a random sample in the dict
-embeddings_size = random.sample( embeddings_index.items(), 1 )[0][1].size(-1)
-print('dimension of word embeddings: ' + str(embeddings_size))
-SOS_token = -torch.ones(embeddings_size) # start of sentence token, all zerons
-EOS_token = torch.ones(embeddings_size) # end of sentence token, all ones
-UNK_token = torch.ones(embeddings_size) + torch.ones(embeddings_size) # these choices are pretty random
-# add special tokens to the embeddings
-embeddings_index['SOS'] = SOS_token
-embeddings_index['EOS'] = EOS_token
-embeddings_index['UNK'] = UNK_token
+path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
+embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
 ######### read corpus
@@ -124,8 +105,7 @@ encoder1 = EncoderRNN(embeddings_size, hidden_size1)
 # answer encoder
 encoder2 = EncoderRNN(embeddings_size, hidden_size2)
 # decoder
-attn_model ='cat'
-attn_decoder1 = AttnDecoderRNN(attn_model, embeddings_size, hidden_size1, effective_num_tokens, 
+attn_decoder1 = AttnDecoderRNN(embeddings_size, hidden_size1, effective_num_tokens, 
                                 1, dropout_p=0.1)
 
 if use_cuda:
