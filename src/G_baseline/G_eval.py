@@ -56,7 +56,7 @@ def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, 
     decoder_input = 'SOS'  # Variable(embeddings_index['SOS'])
 
     decoded_words = []
-    decoder_attentions = torch.zeros(encoder_hiddens.size()[0])
+    decoder_attentions = torch.zeros(max_length, encoder_hiddens.size()[0])
     if use_cuda:
         decoder_attentions = decoder_attentions.cuda()
 
@@ -68,7 +68,7 @@ def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, 
         print(type(decoder_attentions[0]))
         print(decoder_attention.size())
         print(type(decoder_attention.data[0]))
-        decoder_attentions[di] = decoder_attention.data[0]
+        decoder_attentions[di,] = decoder_attention.data[0]
         topv, topi = decoder_output.data.topk(1)
         ni = topi[0][0]
 
@@ -77,6 +77,7 @@ def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, 
 
         if ni == word2index['EOS']:
             decoded_words.append('EOS')
+            decoder_attentions = decoder_attentions[0:di+1,]
             break
         else:
             decoded_words.append(index2word[ni])
