@@ -13,11 +13,6 @@ from G_eval import *
 import torch
 
 
-encoder1 = torch.load(path_to_exp_out+'/encoder1')
-encoder2 = torch.load(path_to_exp_out+'/encoder2')
-decoder  = torch.load(path_to_exp_out+'/decoder')
-
-
 # test these models with data
 exp_name = 'QG_seq2seq_baseline'
 path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results/' + exp_name
@@ -26,6 +21,10 @@ dataset = 'squad'
 f_name = 'dev-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
+
+encoder1 = torch.load(path_to_exp_out+'/encoder1')
+encoder2 = torch.load(path_to_exp_out+'/encoder2')
+decoder  = torch.load(path_to_exp_out+'/decoder')
 
 triplets = readSQuAD(path_to_data)
 
