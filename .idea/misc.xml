@@ -1,25 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 2.7.12 (sftp://weili@10.28.3.169:22/usr/bin/python)" project-jdk-type="Python SDK" />
-  <component name="PyConsoleOptionsProvider">
-    <option name="myPythonConsoleState">
-      <console-settings sdk-home="sftp://weili@10.28.3.18:22/usr/bin/python">
-        <envs>
-          <env key="CUDA_HOME" value="/usr/local/cuda" />
-          <env key="DISPLAY" value="localhost:10.0" />
-          <env key="LD_LIBRARY_PATH" value="$LD_LIBRARY_PATH:/usr/local/cuda/lib64" />
-        </envs>
-        <option name="mySdkHome" value="sftp://weili@10.28.3.18:22/usr/bin/python" />
-        <option name="myEnvs">
-          <map>
-            <entry key="CUDA_HOME" value="/usr/local/cuda" />
-            <entry key="DISPLAY" value="localhost:10.0" />
-            <entry key="LD_LIBRARY_PATH" value="$LD_LIBRARY_PATH:/usr/local/cuda/lib64" />
-          </map>
-        </option>
-      </console-settings>
-    </option>
-    <option name="myShowDebugConsoleByDefault" value="true" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 2.7.12 (/usr/bin/python2.7)" project-jdk-type="Python SDK" />
+  <component name="PythonCompatibilityInspectionAdvertiser">
+    <option name="version" value="1" />
   </component>
   <component name="masterDetails">
     <states>

@@ -5,7 +5,8 @@
 # Plotting is done with matplotlib, using the array of loss values
 # ``plot_losses`` saved while training.
 #
-
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np

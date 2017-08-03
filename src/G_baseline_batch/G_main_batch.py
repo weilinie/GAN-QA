@@ -17,8 +17,8 @@ output: a question, represented by a sequence of tokens
 import sys
 workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
 sys.path.insert(0, workspace_path)
-from data_proc import *
 from util import *
+from data_proc import *
 from G_baseline_model import *
 from G_train import *
 from G_eval import *
@@ -59,8 +59,7 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 triplets = readSQuAD(path_to_data, embeddings_index)
 
 # find max length of context, question, answer, respectively
-
-
+max_len_c, max_len_q, max_len_a = max_len(triplets)
 
 ######### corpus preprocessing
 # words that do not appear in embeddings, etc
