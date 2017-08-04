@@ -128,7 +128,7 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
 # of examples, time so far, estimated time) and average loss.
 #
 
-def trainIters(encoder1, encoder2, decoder, 
+def trainIters(encoder1, encoder2, decoder, batch_size, embeddings_size,
     embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
     path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
     n_iters, print_every=10, plot_every=100, learning_rate=0.01):
@@ -152,11 +152,13 @@ def trainIters(encoder1, encoder2, decoder,
     print()
 
     for iter in range(1, n_iters + 1):
-        # training_triple = training_triplets[iter - 1]
-        training_triple = random.choice(triplets)
-        context_var = training_triple[0]
-        ans_var = training_triple[2]
-        question_var = training_triple[1]
+
+        # prepare batch
+        training_batch, seq_lens = get_random_batch(triplets, batch_size, word2index)
+        training_batch = prepare_batch_var(training_batch, seq_lens, batch_size, embeddings_index, embeddings_size)
+        context_ans_batch_var = training_batch[0]
+        question_batch_var = training_batch[1]
+
         
         start = time.time()
         loss = train(context_var, ans_var, question_var, embeddings_index, word2index, index2word, teacher_forcing_ratio,

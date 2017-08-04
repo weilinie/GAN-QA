@@ -26,12 +26,13 @@ class EncoderRNN(nn.Module):
         self.gru = nn.GRU(input_size, hidden_size)
 
     def forward(self, input, hidden, embeddings_index):
-        # input is a word token, not the index of this word token
-        embedded = Variable(embeddings_index[input].view(1, 1, -1))
+        # input is matrix of size [batch size x 1 x embedding dimension]
 
-        if use_cuda:
-            embedded = embedded.cuda()
-        output = embedded
+        # embedded = Variable(embeddings_index[input].view(1, 1, -1))
+        # if use_cuda:
+        #     embedded = embedded.cuda()
+
+        output = input
         for i in range(self.n_layers):
             output, hidden = self.gru(output, hidden)
         return output, hidden

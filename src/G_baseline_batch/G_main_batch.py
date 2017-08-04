@@ -58,7 +58,8 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
 ######### read corpus
-triplets = readSQuAD(path_to_data, embeddings_index)
+raw_triplets = read_raw_squad(path_to_data)
+triplets = tokenize_squad(raw_triplets, embeddings_index)
 
 # find max length of context, question, answer, respectively
 max_len_c, max_len_q, max_len_a = max_length(triplets)
