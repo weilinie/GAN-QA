@@ -10,6 +10,10 @@ import torch.nn.functional as F
 
 use_cuda = torch.cuda.is_available()
 
+
+
+
+
 ######################################################################
 # The Encoder
 # -----------
@@ -108,7 +112,7 @@ class AttnDecoderRNN(nn.Module):
         # hidden states size: (seq_len, batch, hidden_size * num_directions)
         # transpose hidden state size: (batch, seq len, hidden_size * num_directions)
         # output size: (batch size, 1, hidden_size * num_directions)
-        context= torch.bmm(attn_weights.unsqueeze(1), encoder_outputs.transpose(0,1))
+        context = torch.bmm(attn_weights.unsqueeze(1), encoder_outputs.transpose(0,1))
 
         # calculate 
         output = torch.cat((input, context.squeeze(1)), 1)

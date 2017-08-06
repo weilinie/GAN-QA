@@ -21,7 +21,7 @@ sys.path.insert(0, workspace_path)
 sys.path.insert(0, workspace_path2)
 from util import *
 from data_proc import *
-from G_baseline_model_batch import *
+from model_zoo import *
 from G_train_batch import *
 from G_eval_batch import *
 
