@@ -14,11 +14,9 @@ input: a paragraph (aka context), and an answer, both represented by a sequence 
 output: a question, represented by a sequence of tokens
 
 """
-import sys
-workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
-sys.path.insert(0, workspace_path)
-from data_proc import *
-from util import *
+
+from ..util.data_proc import *
+from ..util import *
 from G_baseline_model import *
 from G_train import *
 from G_eval import *
