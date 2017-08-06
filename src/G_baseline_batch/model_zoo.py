@@ -70,11 +70,9 @@ class AttnDecoderRNN(nn.Module):
 
         # attention mechanism
         if encoder.num_directions:
-            self.attn = nn.Linear(2 * encoder.hidden_size, self.hidden_size)
-            self.attn_combine = nn.Linear(self.input_size + encoder.num_directions * encoder.hidden_size, self.input_size)
+            self.attn = nn.Linear(self.hidden_size + encoder.num_directions * encoder.hidden_size, self.hidden_size)
         else:
             self.attn = nn.Linear(self.hidden_size + encoder.hidden_size, self.hidden_size)
-            self.attn_combine = nn.Linear(self.input_size + encoder.hidden_size, self.input_size)
 
     # forward for each time step.
     # need to do this because of teacher forcing at each time step
@@ -102,7 +100,7 @@ class AttnDecoderRNN(nn.Module):
         for b in range(encoder_outputs.size(1)):
             # copy the decoder output at the present time step to N rows, where N = num encoder outputs
             # first dimension of append = first dimension of encoder_outputs[:,b] = seq_len of encoder
-            append = decoder_output[i, b].repeat(encoder_outputs.size(0),1)
+            append = decoder_output[:, b].repeat(encoder_outputs.size(0),1)
             # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
             scores = torch.mm( decoder_output[i, b].unsqueeze(0), self.attn(torch.cat(append, encoder_outputs[:, b]), 1) )
             attn_weights[b] = scores
