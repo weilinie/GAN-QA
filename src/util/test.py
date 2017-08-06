@@ -1,15 +1,11 @@
 # various test cases
 
 # load model
-import sys
-workspace_path1 = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
-workspace_path2 = '/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline/'
-sys.path.insert(0, workspace_path1)
-sys.path.insert(0, workspace_path2)
+
 from data_proc import *
 from util import *
-from G_baseline_model import *
-from G_eval import *
+from ..D_baseline.D_baseline_model import *
+from ..D_baseline.G_eval import *
 import torch
 
 

@@ -32,7 +32,7 @@ import spacy
 from spacy.en import English
 spacynlp = English()
 
-
+import torch
 
 import nltk
 import json

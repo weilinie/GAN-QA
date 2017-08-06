@@ -3,6 +3,8 @@
 # training and evaluation
 #-----------------------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------------------------#
+from __future__ import print_function
+from __future__ import division
 import torch
 import torch.nn as nn
 from torch import optim
@@ -10,11 +12,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import time
 
-import sys
-workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
-sys.path.insert(0, workspace_path)
-from data_proc import *
-from util import *
+from ..util.data_proc import *
 from G_eval_batch import *
 
 use_cuda = torch.cuda.is_available()

@@ -5,10 +5,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import time
 
-import sys
-workspace_path = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
-sys.path.insert(0, workspace_path)
-from data_proc import *
+from ..util.data_proc import *
 
 use_cuda = torch.cuda.is_available()
 
@@ -37,7 +34,7 @@ def train(context_var, question_var, train_triple_raw,
 
     input_length_context = len(context_var)
     num_char_context = len(train_triple_raw[0]) # which is the untokenized version of the context
-    input_length_question = len(qeustion_var)
+    input_length_question = len(question_var)
     
     encoder_hiddens_context = Variable(torch.zeros(input_length_context, encoder1.hidden_size))
     encoder_hiddens_context = encoder_outputs_context.cuda() if use_cuda else encoder_outputs_context

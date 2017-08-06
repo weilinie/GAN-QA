@@ -1,8 +1,8 @@
-#-----------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------------------------#
 # the baseline model
-#-----------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------------------------#
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -11,14 +11,11 @@ import torch.nn.functional as F
 use_cuda = torch.cuda.is_available()
 
 
-
-
-
 ######################################################################
 # The Encoder
 # -----------
 class EncoderRNN(nn.Module):
-	# output is the same dimension as input (dimension defined by externalword embedding model)
+    # output is the same dimension as input (dimension defined by externalword embedding model)
     def __init__(self, input_size, hidden_size, n_layers=1, num_directions=1):
         super(EncoderRNN, self).__init__()
         self.n_layers = n_layers
@@ -54,7 +51,7 @@ class EncoderRNN(nn.Module):
 # Attention Decoder
 # ^^^^^^^^^^^^^^^^^
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, encoder, n_layers=1, num_directions = 1, dropout_p=0.1):
+    def __init__(self, input_size, hidden_size, output_size, encoder, n_layers=1, num_directions=1, dropout_p=0.1):
         super(AttnDecoderRNN, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -71,7 +68,6 @@ class AttnDecoderRNN(nn.Module):
         elif encoder.num_directions == 1:
             self.out = nn.Linear(self.hidden_size + encoder.hidden_size, self.output_size)
         else:
-            raise Exception('encoder number_directions should be either 1 or 2')
 
         # attention mechanism
         if encoder.num_directions == 2:
@@ -107,11 +103,11 @@ class AttnDecoderRNN(nn.Module):
         for b in range(encoder_outputs.size(1)):
             # copy the decoder output at the present time step to N rows, where N = num encoder outputs
             # first dimension of append = first dimension of encoder_outputs[:,b] = seq_len of encoder
-            append = output[:, b].repeat(encoder_outputs.size(0),1)
+
+            append = decoder_output[:, b].repeat(encoder_outputs.size(0), 1)
             # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
-            scores = torch.mm( output[:, b],
-                               self.attn(Variable(torch.cat((append, encoder_outputs[:, b]), 1)) ).data.t() )
-            attn_weights[b] = scores
+            scores = torch.mm(decoder_output[:, b],
+                              self.attn(Variable(torch.cat((append, encoder_outputs[:, b]), 1))).data.t())
 
         attn_weights = F.softmax(attn_weights)
 
@@ -119,8 +115,8 @@ class AttnDecoderRNN(nn.Module):
         # weights size: (batch size, 1, seq_len)
         # hidden states size: (seq_len, batch, hidden_size * num_directions)
         # transpose hidden state size: (batch, seq len, hidden_size * num_directions)
-        # context size: (batch size, 1, hidden_size * num_directions)
-        context = torch.bmm(attn_weights.data.unsqueeze(1), encoder_outputs.transpose(0,1))
+        # output size: (batch size, 1, hidden_size * num_directions)
+        context = torch.bmm(attn_weights.data.unsqueeze(1), encoder_outputs.transpose(0, 1))
 
         # calculate 
         decoder_output = torch.cat((input, context.squeeze(1)), 1)
