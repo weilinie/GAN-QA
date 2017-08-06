@@ -58,14 +58,18 @@ def train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
     # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
     encoder_hiddens, encoder_hidden = encoder(context_ans_batch_var, None)
 
-    decoder_input = 'SOS' # Variable(embeddings_index['SOS'])
+    # decoder
+    # prepare decoder inputs as word embeddings in a batch
+    # decoder_input size: (1, batch size, embedding size); first dim is 1 because only one time step;
+    # nee to have a 3D tensor for input to nn.GRU module
+    decoder_input = Variable( embeddings_index['SOS'].repeat(batch_size, 1).unsqueeze(0) )
 
     use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
 
     if use_teacher_forcing:
         # Teacher forcing: Feed the target as the next input
         for di in range(q_lens):
-            decoder_output, decoder_attention = decoder(
+            decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, encoder_hiddens, embeddings_index)
 
 

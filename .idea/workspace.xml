@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="f9ea85a3-5cef-4c19-a462-b9db063ecc13" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_baseline_batch/G_train_batch.py" afterPath="$PROJECT_DIR$/src/G_baseline_batch/G_train_batch.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_baseline_batch/model_zoo.py" afterPath="$PROJECT_DIR$/src/G_baseline_batch/model_zoo.py" />
     </list>
     <ignored path="GAN-QA.iws" />
@@ -69,21 +70,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="model_zoo.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="model_zoo.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/G_baseline_batch/model_zoo.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="268">
-              <caret line="73" column="12" selection-start-line="73" selection-start-column="12" selection-end-line="73" selection-end-column="12" />
+              <caret line="89" column="39" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="39" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="G_train_batch.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="G_train_batch.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/G_baseline_batch/G_train_batch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="708">
-              <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
+            <state relative-caret-position="308">
+              <caret line="63" column="56" selection-start-line="63" selection-start-column="56" selection-end-line="63" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -117,11 +118,11 @@
         <option value="$PROJECT_DIR$/src/util/util.py" />
         <option value="$PROJECT_DIR$/src/G_baseline_batch/G_main_batch.py" />
         <option value="$PROJECT_DIR$/src/util/data_proc.py" />
-        <option value="$PROJECT_DIR$/src/G_baseline_batch/G_train_batch.py" />
         <option value="$PROJECT_DIR$/src/G_baseline_batch/G_baseline_model_batch.py" />
         <option value="$PROJECT_DIR$/src/G_baseline_batch/G_model.py" />
         <option value="$PROJECT_DIR$/src/GAN_model/GAN_model.py" />
         <option value="$PROJECT_DIR$/src/G_baseline_batch/model_zoo.py" />
+        <option value="$PROJECT_DIR$/src/G_baseline_batch/G_train_batch.py" />
       </list>
     </option>
   </component>
@@ -499,7 +500,14 @@
       <option name="project" value="LOCAL" />
       <updated>1502037056049</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="clean up">
+      <created>1502038497226</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1502038497226</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -655,14 +663,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/G_baseline_batch/G_train_batch.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="708">
-          <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/G_baseline_batch/G_model.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -674,7 +674,15 @@
     <entry file="file://$PROJECT_DIR$/src/G_baseline_batch/model_zoo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="268">
-          <caret line="73" column="12" selection-start-line="73" selection-start-column="12" selection-end-line="73" selection-end-column="12" />
+          <caret line="89" column="39" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/G_baseline_batch/G_train_batch.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="63" column="56" selection-start-line="63" selection-start-column="56" selection-end-line="63" selection-end-column="56" />
           <folding />
         </state>
       </provider>
