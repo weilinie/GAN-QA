@@ -21,7 +21,7 @@ use_cuda = torch.cuda.is_available()
 # attention outputs for display later.
 #
 # max_length constrains the maximum length of the generated question
-def evaluate(encoder1, encoder2, decoder, triple, embeddings_index, word2index, index2word, max_length):
+def evaluate(encoder, decoder, triple, embeddings_index, word2index, index2word, max_length):
     triple_var = variablesFromTriplets(triple, embeddings_index)
     context_var = triple_var[0]
     ans_var = triple_var[2]

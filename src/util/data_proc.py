@@ -230,7 +230,7 @@ def count_effective_num_tokens(triplets, embeddings_index):
 
 ######################################################################
 # generate word index and index word look up tables
-def generate_look_up_table(effective_tokens, effective_num_tokens):
+def generate_look_up_table(effective_tokens, effective_num_tokens, use_cuda = True):
     word2index = {}
     index2word = {}
     for i in range(effective_num_tokens):
@@ -315,8 +315,8 @@ def prepare_batch_var(batch, seq_lens, batch_size, embeddings_index, embeddings_
                 question_var[j, i,] = embeddings_index[question_batch[i][j]]
             else:
                 question_var[j, i] = question_batch[i][j]
-    if use_cuda:
-         question_var = Variable(question_var.cuda())
+    # if use_cuda:
+    #      question_var = Variable(question_var.cuda())
 
     return (context_answer_var, question_var)
 

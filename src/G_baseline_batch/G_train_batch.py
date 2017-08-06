@@ -32,7 +32,7 @@ use_cuda = torch.cuda.is_available()
 # instability 
 
 # context = input_variable
-def train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
+def train(context_ans_batch_var, question_batch_var, batch_size,
           embeddings_index, word2index, index2word, teacher_forcing_ratio,
           encoder, decoder, encoder_optimizer, decoder_optimizer, criterion):
 
@@ -45,8 +45,9 @@ def train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
 
     # get lengths of each (context + answer) and question in each batch
     # (by simply read one of the inputs to this function)
-    c_a_lens = seq_lens[0]
-    q_lens = seq_lens[1]
+    # TODO figure out if the below two lines are needed
+    # c_a_lens = seq_lens[0]
+    # q_lens = seq_lens[1]
 
     loss = 0
 
@@ -62,42 +63,44 @@ def train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
     # nee to have a 3D tensor for input to nn.GRU module
     decoder_input = Variable( embeddings_index['SOS'].repeat(batch_size, 1).unsqueeze(0) )
 
+    # use teacher forcing to step through each token in the decoder sequence
     use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
 
     if use_teacher_forcing:
         # Teacher forcing: Feed the target as the next input
-        for di in range(q_lens):
+        for di in range(max_q_len):
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, encoder_hiddens, embeddings_index)
 
+            # accumulate loss
+            loss += criterion(decoder_output[0], Variable(question_batch_var[di]))
 
-
-            loss += criterion(decoder_output[0], target)
-            
-            decoder_input = question_var[di] # Variable(embeddings_index[question_var[di]])  # Teacher forcing
+            # change next time step input to current target output, in embedding format
+            for b in range(batch_size):
+                decoder_input[1, b] = Variable(embeddings_index[index2word[question_batch_var[di, b]]].cuda) if use_cuda else\
+                                      Variable(embeddings_index[index2word[question_batch_var[di, b]]])# Teacher forcing
 
     else:
         # Without teacher forcing: use its own predictions as the next input
-        for di in range(target_length):
+        for di in range(max_q_len):
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, encoder_hiddens, embeddings_index)
             topv, topi = decoder_output.data.topk(1)
             ni = topi[0][0]
             
-            decoder_input = index2word[di] # Variable(embeddings_index[index2word[ni]])
-            
+            decoder_input = Variable(embeddings_index[index2word[di]].cuda()) if use_cuda else \
+                            Variable(embeddings_index[index2word[di]])
 
-
-            loss += criterion(decoder_output[0], target)
+            # accumulate loss
+            loss += criterion(decoder_output[0], Variable(question_batch_var[di]))
             if ni == word2index['EOS']:
                 break
 
     loss.backward()
-    encoder_optimizer1.step()
-    encoder_optimizer2.step()
+    encoder_optimizer.step()
     decoder_optimizer.step()
 
-    return loss.data[0] / target_length
+    return loss.data[0] / ( float(max_q_len) * float(batch_size) )
 
 
 
@@ -113,7 +116,7 @@ def train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
 # of examples, time so far, estimated time) and average loss.
 #
 
-def trainIters(encoder1, encoder2, decoder, batch_size, embeddings_size,
+def trainIters(encoder, decoder, batch_size, embeddings_size,
     embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
     path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
     n_iters, print_every=10, plot_every=100, learning_rate=0.01):
@@ -128,9 +131,8 @@ def trainIters(encoder1, encoder2, decoder, batch_size, embeddings_size,
     print_loss_total = 0  # Reset every print_every
     plot_loss_total = 0  # Reset every plot_every
 
-    encoder_optimizer1 = optim.SGD(encoder1.parameters(), lr=learning_rate)
-    encoder_optimizer2 = optim.SGD(encoder2.parameters(), lr=learning_rate)
-    decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
+    encoder_optimizer = optim.Adam(encoder.parameters(), lr=learning_rate)
+    decoder_optimizer = optim.Adam(decoder.parameters(), lr=learning_rate)
 
     criterion = nn.NLLLoss()
 
@@ -141,18 +143,16 @@ def trainIters(encoder1, encoder2, decoder, batch_size, embeddings_size,
         # prepare batch
         training_batch, seq_lens = get_random_batch(triplets, batch_size, word2index)
         training_batch = prepare_batch_var(training_batch, seq_lens, batch_size, embeddings_index, embeddings_size)
-        context_ans_batch_var = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dimension]
+        context_ans_batch_var = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dim]
         question_batch_var = training_batch[1] # represented as indices, size = [seq len x batch size]
 
         # prepare encoder input
-        # TODO: might not need to pack
         context_ans_batch_var = nn.utils.rnn.pack_padded_sequence(context_ans_batch_var, seq_lens[0])
         
         start = time.time()
         loss = train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
                      embeddings_index, word2index, index2word, teacher_forcing_ratio,
-                     encoder1, encoder2, decoder, encoder_optimizer1, encoder_optimizer2, 
-                     decoder_optimizer, criterion)
+                     encoder, decoder, encoder_optimizer, decoder_optimizer, criterion)
         end = time.time()
 
 
