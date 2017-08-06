@@ -1,8 +1,8 @@
-#-----------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------------------------#
 # the baseline model
-#-----------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------------------------#
+# -----------------------------------------------------------------------------------------------#
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -11,14 +11,11 @@ import torch.nn.functional as F
 use_cuda = torch.cuda.is_available()
 
 
-
-
-
 ######################################################################
 # The Encoder
 # -----------
 class EncoderRNN(nn.Module):
-	# output is the same dimension as input (dimension defined by externalword embedding model)
+    # output is the same dimension as input (dimension defined by externalword embedding model)
     def __init__(self, input_size, hidden_size, n_layers=1, num_directions=1):
         super(EncoderRNN, self).__init__()
         self.n_layers = n_layers
@@ -53,7 +50,7 @@ class EncoderRNN(nn.Module):
 # Attention Decoder
 # ^^^^^^^^^^^^^^^^^
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, encoder, n_layers=1, num_directions = 1, dropout_p=0.1):
+    def __init__(self, input_size, hidden_size, output_size, encoder, n_layers=1, num_directions=1, dropout_p=0.1):
         super(AttnDecoderRNN, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -65,7 +62,8 @@ class AttnDecoderRNN(nn.Module):
 
         if encoder.bidirec:
             self.attn = nn.Linear(2 * encoder.hidden_size, self.hidden_size)
-            self.attn_combine = nn.Linear(self.input_size + encoder.num_directions * encoder.hidden_size, self.input_size)
+            self.attn_combine = nn.Linear(self.input_size + encoder.num_directions * encoder.hidden_size,
+                                          self.input_size)
         else:
             self.attn = nn.Linear(self.hidden_size + encoder.hidden_size, self.hidden_size)
             self.attn_combine = nn.Linear(self.input_size + encoder.hidden_size, self.input_size)
@@ -100,9 +98,9 @@ class AttnDecoderRNN(nn.Module):
         for b in range(encoder_outputs.size(1)):
             # copy the decoder output at the present time step to N rows, where N = num encoder outputs
             # first dimension of append = first dimension of encoder_outputs[:,b] = seq_len of encoder
-            append = decoder_output[i, b].repeat(encoder_outputs.size(0),1)
+            append = decoder_output[i, b].repeat(encoder_outputs.size(0), 1)
             # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
-            scores = torch.mm( decoder_output[i, b].unsqueeze(0), self.attn(torch.cat(append, encoder_outputs[:, b]), 1) )
+            scores = torch.mm(decoder_output[i, b].unsqueeze(0), self.attn(torch.cat(append, encoder_outputs[:, b]), 1))
             attn_weights[b] = scores
 
         attn_weights = F.softmax(attn_weights)
@@ -112,7 +110,7 @@ class AttnDecoderRNN(nn.Module):
         # hidden states size: (seq_len, batch, hidden_size * num_directions)
         # transpose hidden state size: (batch, seq len, hidden_size * num_directions)
         # output size: (batch size, 1, hidden_size * num_directions)
-        context = torch.bmm(attn_weights.unsqueeze(1), encoder_outputs.transpose(0,1))
+        context = torch.bmm(attn_weights.unsqueeze(1), encoder_outputs.transpose(0, 1))
 
         # calculate 
         output = torch.cat((input, context.squeeze(1)), 1)
