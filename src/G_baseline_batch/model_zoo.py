@@ -66,12 +66,17 @@ class AttnDecoderRNN(nn.Module):
         # recurrent model
         self.dropout = nn.Dropout(self.dropout_p)
         self.gru = nn.GRU(self.input_size, self.hidden_size)
-        self.out = nn.Linear(self.hidden_size, self.output_size)
+        if encoder.num_directions == 2:
+            self.out = nn.Linear(self.hidden_size + encoder.num_directions * encoder.hidden_size, self.output_size)
+        elif encoder.num_directions == 1:
+            self.out = nn.Linear(self.hidden_size + encoder.hidden_size, self.output_size)
+        else:
+
 
         # attention mechanism
-        if encoder.num_directions:
+        if encoder.num_directions == 2:
             self.attn = nn.Linear(self.hidden_size + encoder.num_directions * encoder.hidden_size, self.hidden_size)
-        else:
+        elif encoder.num_directions == 1:
             self.attn = nn.Linear(self.hidden_size + encoder.hidden_size, self.hidden_size)
 
     # forward for each time step.
@@ -102,7 +107,8 @@ class AttnDecoderRNN(nn.Module):
             # first dimension of append = first dimension of encoder_outputs[:,b] = seq_len of encoder
             append = decoder_output[:, b].repeat(encoder_outputs.size(0),1)
             # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
-            scores = torch.mm( decoder_output[i, b].unsqueeze(0), self.attn(torch.cat(append, encoder_outputs[:, b]), 1) )
+            scores = torch.mm( decoder_output[:, b],
+                               self.attn(Variable(torch.cat((append, encoder_outputs[:, b]), 1)) ).data.t() )
             attn_weights[b] = scores
 
         attn_weights = F.softmax(attn_weights)
@@ -112,7 +118,7 @@ class AttnDecoderRNN(nn.Module):
         # hidden states size: (seq_len, batch, hidden_size * num_directions)
         # transpose hidden state size: (batch, seq len, hidden_size * num_directions)
         # output size: (batch size, 1, hidden_size * num_directions)
-        context = torch.bmm(attn_weights.unsqueeze(1), encoder_outputs.transpose(0,1))
+        context = torch.bmm(attn_weights.data.unsqueeze(1), encoder_outputs.transpose(0,1))
 
         # calculate 
         output = torch.cat((input, context.squeeze(1)), 1)
