@@ -288,7 +288,7 @@ def pad_sequence(s, max_len, word2index, mode = 'word'):
 # - the last two with size [batch size].
 # - seq_lens contains lengths of the first three sequences, each of size [batch size]
 # - the output would be matrices of size [max seq len x batch size x embedding size]
-# - if question is represented as index, then its size is [max seq len x batch size] --> this is transpose of the output
+# - if question is represented as index, then its size is [max seq len x batch size] --> this is transpose of the input
 #   from get_random_batch in order to fit NLLLoss function (indexing and selecting the whole batch of a single token) is
 #   easier. e.g. you can do question[i] which selects the whole sequence of the first dimension
 def prepare_batch_var(batch, seq_lens, batch_size, embeddings_index, embeddings_size, use_cuda=1, question_mode = 'index'):

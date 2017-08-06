@@ -34,44 +34,29 @@ use_cuda = torch.cuda.is_available()
 # instability 
 
 # context = input_variable
-def train(context_var, ans_var, question_var, embeddings_index, word2index, index2word, teacher_forcing_ratio,
-    encoder1, encoder2, decoder, encoder_optimizer1, encoder_optimizer2, 
-    decoder_optimizer, criterion):
-    encoder_hidden_context = encoder1.initHidden()
-    encoder_hidden_answer = encoder2.initHidden()
-    decoder_hidden = decoder.initHidden()
+def train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
+          embeddings_index, word2index, index2word, teacher_forcing_ratio,
+          encoder, decoder, encoder_optimizer, decoder_optimizer, criterion):
 
-    encoder_optimizer1.zero_grad()
-    encoder_optimizer2.zero_grad()
+    encoder_optimizer.zero_grad()
     decoder_optimizer.zero_grad()
 
-    input_length_context = len(context_var)
-    input_length_answer = len(ans_var)
-    target_length = len(question_var)
-    
-    encoder_hiddens_context = Variable(torch.zeros(input_length_context, encoder1.hidden_size))
-    encoder_hiddens_context = encoder_hiddens_context.cuda() if use_cuda else encoder_hiddens_context
+    # get max lengths of (context + answer) and question
+    max_c_a_len = context_ans_batch_var.size(0) # max seq length of context + ans combined
+    max_q_len = question_batch_var.size(0) # max seq length of question
 
-    encoder_hiddens_answer = Variable(torch.zeros(input_length_answer, encoder2.hidden_size))
-    encoder_hiddens_answer = encoder_hiddens_answer.cuda() if use_cuda else encoder_hiddens_answer
-   
+    # get lengths of each (context + answer) and question in each batch
+    # (by simply read one of the inputs to this function)
+    c_a_lens = seq_lens[0]
+    q_lens = seq_lens[1]
+
     loss = 0
 
     # context encoding
-    time1 = time.time()
-    for ei in range(input_length_context):
-    	encoder_output_context, encoder_hidden_context = encoder1(
-        	context_var[ei], encoder_hidden_context, embeddings_index)
-    	encoder_hiddens_context[ei] = encoder_hidden_context[0][0]
-
-    # answer encoding
-    for ei in range(input_length_answer):
-        encoder_output_answer, encoder_hidden_answer = encoder2(
-            ans_var[ei], encoder_hidden_answer, embeddings_index)
-        encoder_hiddens_answer[ei] = encoder_hidden_answer[0][0]
-
-    # concat the context encoding and answer encoding
-    encoder_hiddens = torch.cat((encoder_hiddens_context, encoder_hiddens_answer),0)
+    # output size: (seq_len, batch, hidden_size)
+    # hidden size: (num_layers, batch, hidden_size)
+    # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
+    encoder_hiddens, encoder_hidden = encoder(context_ans_batch_var, None)
 
     decoder_input = 'SOS' # Variable(embeddings_index['SOS'])
 
@@ -79,12 +64,11 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
 
     if use_teacher_forcing:
         # Teacher forcing: Feed the target as the next input
-        for di in range(target_length):
-            decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, decoder_hidden, encoder_hiddens, embeddings_index)
+        for di in range(q_lens):
+            decoder_output, decoder_attention = decoder(
+                decoder_input, encoder_hiddens, embeddings_index)
 
-            target = Variable(torch.LongTensor([word2index[question_var[di]]]))
-            target = target.cuda() if use_cuda else target
+
 
             loss += criterion(decoder_output[0], target)
             
@@ -94,14 +78,13 @@ def train(context_var, ans_var, question_var, embeddings_index, word2index, inde
         # Without teacher forcing: use its own predictions as the next input
         for di in range(target_length):
             decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, decoder_hidden, encoder_hiddens, embeddings_index)
+                decoder_input, encoder_hiddens, embeddings_index)
             topv, topi = decoder_output.data.topk(1)
             ni = topi[0][0]
             
             decoder_input = index2word[di] # Variable(embeddings_index[index2word[ni]])
             
-            target = Variable(torch.LongTensor([word2index[question_var[di]]]))
-            target = target.cuda() if use_cuda else target
+
 
             loss += criterion(decoder_output[0], target)
             if ni == word2index['EOS']:
@@ -156,12 +139,16 @@ def trainIters(encoder1, encoder2, decoder, batch_size, embeddings_size,
         # prepare batch
         training_batch, seq_lens = get_random_batch(triplets, batch_size, word2index)
         training_batch = prepare_batch_var(training_batch, seq_lens, batch_size, embeddings_index, embeddings_size)
-        context_ans_batch_var = training_batch[0]
-        question_batch_var = training_batch[1]
+        context_ans_batch_var = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dimension]
+        question_batch_var = training_batch[1] # represented as indices, size = [seq len x batch size]
 
+        # prepare encoder input
+        # TODO: might not need to pack
+        context_ans_batch_var = nn.utils.rnn.pack_padded_sequence(context_ans_batch_var, seq_lens[0])
         
         start = time.time()
-        loss = train(context_var, ans_var, question_var, embeddings_index, word2index, index2word, teacher_forcing_ratio,
+        loss = train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
+                     embeddings_index, word2index, index2word, teacher_forcing_ratio,
                      encoder1, encoder2, decoder, encoder_optimizer1, encoder_optimizer2, 
                      decoder_optimizer, criterion)
         end = time.time()
