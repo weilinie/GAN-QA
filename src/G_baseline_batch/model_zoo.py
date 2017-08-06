@@ -68,11 +68,14 @@ class AttnDecoderRNN(nn.Module):
         elif encoder.num_directions == 1:
             self.out = nn.Linear(self.hidden_size + encoder.hidden_size, self.output_size)
         else:
-            # attention mechanism
-            if encoder.num_directions == 2:
-                self.attn = nn.Linear(self.hidden_size + encoder.num_directions * encoder.hidden_size, self.hidden_size)
-            elif encoder.num_directions == 1:
-                self.attn = nn.Linear(self.hidden_size + encoder.hidden_size, self.hidden_size)
+
+        # attention mechanism
+        if encoder.num_directions == 2:
+            self.attn = nn.Linear(self.hidden_size + encoder.num_directions * encoder.hidden_size, self.hidden_size)
+        elif encoder.num_directions == 1:
+            self.attn = nn.Linear(self.hidden_size + encoder.hidden_size, self.hidden_size)
+        else:
+            raise Exception('encoder number_directions should be either 1 or 2')
 
     # forward for each time step.
     # need to do this because of teacher forcing at each time step
@@ -80,7 +83,7 @@ class AttnDecoderRNN(nn.Module):
 
         # get the output
         # hidden: (num_layers * num_directions, batch, hidden_size)
-        decoder_output, hidden = self.gru(input, hidden)
+        output, hidden = self.gru(input, hidden)
 
         # # unpack the sequence
         # # decoder_outputs size (seq len, batch, hidden_size * num_directions)
@@ -100,11 +103,11 @@ class AttnDecoderRNN(nn.Module):
         for b in range(encoder_outputs.size(1)):
             # copy the decoder output at the present time step to N rows, where N = num encoder outputs
             # first dimension of append = first dimension of encoder_outputs[:,b] = seq_len of encoder
+
             append = decoder_output[:, b].repeat(encoder_outputs.size(0), 1)
             # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
             scores = torch.mm(decoder_output[:, b],
                               self.attn(Variable(torch.cat((append, encoder_outputs[:, b]), 1))).data.t())
-            attn_weights[b] = scores
 
         attn_weights = F.softmax(attn_weights)
 
@@ -116,8 +119,8 @@ class AttnDecoderRNN(nn.Module):
         context = torch.bmm(attn_weights.data.unsqueeze(1), encoder_outputs.transpose(0, 1))
 
         # calculate 
-        output = torch.cat((input, context.squeeze(1)), 1)
-        output = self.out(output).unsqueeze(0)
+        decoder_output = torch.cat((input, context.squeeze(1)), 1)
+        decoder_output = self.out(decoder_output).unsqueeze(0)
 
-        output = F.log_softmax(self.out(output[0]))
-        return output, attn_weights
+        decoder_output = F.log_softmax(self.out(decoder_output[0]))
+        return decoder_output, hidden, attn_weights
