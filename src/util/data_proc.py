@@ -8,11 +8,12 @@ from io import open
 import unicodedata
 import random
 
-import spacy
+# import spacy
 from spacy.en import English
 spacynlp = English()
 
 import torch
+from torch.autograd import Variable
 
 import nltk
 import json
@@ -298,11 +299,11 @@ def prepare_batch_var(batch, seq_lens, batch_size, embeddings_index, embeddings_
     # init variable matrices
     context_answer_var = torch.zeros(max(seq_lens[0]), batch_size, embeddings_size)
     if question_mode != 'index':
-        question_var = torch.zeros(max(seq_lens[1]), batch_size, embeddings_size)
+        question_var = torch.LongTensor(max(seq_lens[1]), batch_size, embeddings_size)
     else:
-        question_var = torch.zeros(max(seq_lens[1]), batch_size)
+        question_var = torch.LongTensor(max(seq_lens[1]), batch_size)
 
-    # TODO very stupid embedded for loop implementation
+    # FIXME: very stupid embedded for loop implementation
     for i in range(batch_size):
         for j in range(max(seq_lens[0])):
             context_answer_var[j, i, ] = embeddings_index[context_answer_batch[i][j]]

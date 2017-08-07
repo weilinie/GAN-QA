@@ -12,7 +12,14 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import time
 
-from ..util.data_proc import *
+# from ..util.data_proc import *
+
+import sys
+sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/util')
+sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline_batch')
+from data_proc import *
+from util import *
+
 from G_eval_batch import *
 
 use_cuda = torch.cuda.is_available()
@@ -32,22 +39,16 @@ use_cuda = torch.cuda.is_available()
 # instability 
 
 # context = input_variable
-def train(context_ans_batch_var, question_batch_var, batch_size,
-          embeddings_index, word2index, index2word, teacher_forcing_ratio,
+def train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
+          embeddings_index, embeddings_size, word2index, index2word, teacher_forcing_ratio,
           encoder, decoder, encoder_optimizer, decoder_optimizer, criterion):
 
     encoder_optimizer.zero_grad()
     decoder_optimizer.zero_grad()
 
     # get max lengths of (context + answer) and question
-    max_c_a_len = context_ans_batch_var.size(0) # max seq length of context + ans combined
-    max_q_len = question_batch_var.size(0) # max seq length of question
-
-    # get lengths of each (context + answer) and question in each batch
-    # (by simply read one of the inputs to this function)
-    # TODO figure out if the below two lines are needed
-    # c_a_lens = seq_lens[0]
-    # q_lens = seq_lens[1]
+    max_c_a_len = max(seq_lens[0]) # max seq length of context + ans combined
+    max_q_len = max(seq_lens[1]) # max seq length of question
 
     loss = 0
 
@@ -55,13 +56,15 @@ def train(context_ans_batch_var, question_batch_var, batch_size,
     # output size: (seq_len, batch, hidden_size)
     # hidden size: (num_layers, batch, hidden_size)
     # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
-    encoder_hiddens, encoder_hidden = encoder(context_ans_batch_var, None)
+    encoder_hiddens, encoder_hidden = encoder(context_ans_batch_var, seq_lens[0], None)
 
     # decoder
     # prepare decoder inputs as word embeddings in a batch
     # decoder_input size: (1, batch size, embedding size); first dim is 1 because only one time step;
     # nee to have a 3D tensor for input to nn.GRU module
     decoder_input = Variable( embeddings_index['SOS'].repeat(batch_size, 1).unsqueeze(0) )
+    if use_cuda:
+        decoder_input = decoder_input.cuda()
 
     # use teacher forcing to step through each token in the decoder sequence
     use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
@@ -73,34 +76,48 @@ def train(context_ans_batch_var, question_batch_var, batch_size,
                 decoder_input, encoder_hiddens, embeddings_index)
 
             # accumulate loss
-            loss += criterion(decoder_output[0], Variable(question_batch_var[di]))
+            targets = Variable(question_batch_var[di].cuda()) if use_cuda else Variable(question_batch_var[di])
+            loss += criterion(decoder_output, targets)
 
             # change next time step input to current target output, in embedding format
+            decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
+                            Variable(torch.FloatTensor(1, batch_size, embeddings_size))
             for b in range(batch_size):
-                decoder_input[1, b] = Variable(embeddings_index[index2word[question_batch_var[di, b]]].cuda) if use_cuda else\
-                                      Variable(embeddings_index[index2word[question_batch_var[di, b]]])# Teacher forcing
+                decoder_input[0, b] = embeddings_index[index2word[question_batch_var[di, b]]].cuda() \
+                                      if use_cuda else\
+                                      embeddings_index[index2word[question_batch_var[di, b]]] # Teacher forcing
 
     else:
         # Without teacher forcing: use its own predictions as the next input
         for di in range(max_q_len):
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, encoder_hiddens, embeddings_index)
+
+            # top value and index of every batch
+            # size of both topv, topi = (batch size, 1)
             topv, topi = decoder_output.data.topk(1)
-            ni = topi[0][0]
-            
-            decoder_input = Variable(embeddings_index[index2word[di]].cuda()) if use_cuda else \
-                            Variable(embeddings_index[index2word[di]])
+
+            # get the output word for every batch
+            decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
+                            Variable(torch.FloatTensor(1, batch_size, embeddings_size))
+            for b in range(batch_size):
+                decoder_input[0, b] = embeddings_index[index2word[topi[0][0]]].cuda() if use_cuda else \
+                                      embeddings_index[index2word[topi[0][0]]]
 
             # accumulate loss
-            loss += criterion(decoder_output[0], Variable(question_batch_var[di]))
-            if ni == word2index['EOS']:
-                break
+            # FIXME: in this batch version decoder, loss is accumulated for all <EOS> symbols even if
+            # FIXME: the sentence has already ended. not sure if this is the right thing to do
+            targets = Variable(question_batch_var[di].cuda()) if use_cuda else Variable(question_batch_var[di])
+            loss += criterion(decoder_output, targets)
+
 
     loss.backward()
     encoder_optimizer.step()
     decoder_optimizer.step()
 
-    return loss.data[0] / ( float(max_q_len) * float(batch_size) )
+    # return loss
+    # FIXME: figure out if loss need to be divided by batch_size
+    return loss.data[0] / float(batch_size)
 
 
 
@@ -146,13 +163,14 @@ def trainIters(encoder, decoder, batch_size, embeddings_size,
         context_ans_batch_var = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dim]
         question_batch_var = training_batch[1] # represented as indices, size = [seq len x batch size]
 
-        # prepare encoder input
-        context_ans_batch_var = nn.utils.rnn.pack_padded_sequence(context_ans_batch_var, seq_lens[0])
-        
         start = time.time()
-        loss = train(context_ans_batch_var, question_batch_var, seq_lens, batch_size,
-                     embeddings_index, word2index, index2word, teacher_forcing_ratio,
+        # def train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
+        #           embeddings_index,embeddings_size,  word2index, index2word, teacher_forcing_ratio,
+        #           encoder, decoder, encoder_optimizer, decoder_optimizer, criterion)
+        loss = train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
+                     embeddings_index, embeddings_size, word2index, index2word, teacher_forcing_ratio,
                      encoder, decoder, encoder_optimizer, decoder_optimizer, criterion)
+
         end = time.time()
 
 
@@ -167,7 +185,8 @@ def trainIters(encoder, decoder, batch_size, embeddings_size,
             print('time for one training iteration: ' + str(end - start))
             print('---sample generated question---')
             # sample a triple and print the generated question
-            evaluateRandomly(encoder1, encoder2, decoder, triplets, embeddings_index, word2index, index2word, max_length, n=1)
+            _, _ = evaluate(encoder, decoder, triplets, embeddings_index,
+                           embeddings_size, word2index, index2word, max_length)
             print('-------------------------------')
             print('-------------------------------')
             print()

@@ -4,7 +4,7 @@
 
 from data_proc import *
 from util import *
-from ..D_baseline.D_baseline_model import *
+from ..D_baseline.model_zoo import *
 from ..D_baseline.G_eval import *
 import torch
 

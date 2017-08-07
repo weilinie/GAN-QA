@@ -14,15 +14,19 @@ input: a paragraph (aka context), and an answer, both represented by a sequence 
 output: a question, represented by a sequence of tokens
 
 """
-
 from __future__ import print_function
 from __future__ import division
 
-from ..util.data_proc import *
+import sys
+sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/util')
+sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline_batch')
+from data_proc import *
+
+# from ..util.data_proc import *
 from model_zoo import *
 from G_train_batch import *
-from G_eval_batch import *
-
+# from G_eval_batch import *
+import os
 
 use_cuda = torch.cuda.is_available()
 teacher_forcing_ratio = 0.5 # default in original code is 0.5
@@ -35,15 +39,16 @@ teacher_forcing_ratio = 0.5 # default in original code is 0.5
 
 
 ######### set paths
+# TODO: to run properly, change the following paths and filenames
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
-f_name = 'dev-v1.1.json'
+f_name = 'train-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
 # path for experiment outputs
-exp_name = 'QG_seq2seq_baseline'
-path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results/' + exp_name
+# exp_name = 'QG_seq2seq_baseline'
+path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
 loss_f = 'loss_temp.txt'
 sample_out_f = 'sample_outputs_temp.txt'
 path_to_loss_f = path_to_exp_out + '/' + loss_f
@@ -84,40 +89,39 @@ print('')
 ######### set up model
 hidden_size1 = 256
 hidden_size2 = 256
-batch_size = 200
+batch_size = 100
 # context encoder
-encoder1 = EncoderRNN(embeddings_size, hidden_size1)
-# answer encoder
-encoder2 = EncoderRNN(embeddings_size, hidden_size2)
+encoder = EncoderRNN(embeddings_size, hidden_size1, batch_size)
 # decoder
-attn_decoder1 = AttnDecoderRNN(embeddings_size, hidden_size1, effective_num_tokens, 
-                                1, dropout_p=0.1)
+# input_size, hidden_size, output_size, encoder, n_layers=1, num_directions=1, dropout_p=0.1
+attn_decoder = AttnDecoderRNN(embeddings_size, hidden_size2, effective_num_tokens,
+                                encoder, n_layers=1, num_directions=1, dropout_p=0.1)
 
 if use_cuda:
     t1 = time.time()
-    encoder1 = encoder1.cuda()
+    encoder = encoder.cuda()
     t2 = time.time()
-    print('time load encoder 1: ' + str(t2 - t1))
-    encoder2 = encoder2.cuda()
+    print('time load encoder: ' + str(t2 - t1))
+    attn_decoder = attn_decoder.cuda()
     t3 = time.time()
-    print('time load encoder 2: ' + str(t3 - t2))
-    attn_decoder1 = attn_decoder1.cuda()
-    t4 = time.time()
-    print('time load decoder: ' + str(t4 - t3))
+    print('time load decoder: ' + str(t3 - t2))
 
 
 # max_length of generated question
 max_length = 100
 
 ######### start training
-trainIters(encoder1, encoder2, attn_decoder1, embeddings_index, 
-            word2index, index2word, max_length, triplets, teacher_forcing_ratio,
-            path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-            1, print_every=1, plot_every = 1)
+# trainIters(encoder, decoder, batch_size, embeddings_size,
+#     embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
+#     path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
+#     n_iters, print_every=10, plot_every=100, learning_rate=0.01)
+trainIters(encoder, attn_decoder, batch_size, embeddings_size,
+           embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
+           path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
+           n_iters=10000, print_every=1, plot_every=1, learning_rate=0.001)
 
 # save the final model
-torch.save(encoder1, path_to_exp_out+'/encoder1_temp.pth')
-torch.save(encoder2, path_to_exp_out+'/encoder2_temp.pth')
-torch.save(attn_decoder1, path_to_exp_out+'/decoder_temp.pth')
+torch.save(encoder, path_to_exp_out+'/encoder_temp.pth')
+torch.save(attn_decoder, path_to_exp_out+'/decoder_temp.pth')
 
 
