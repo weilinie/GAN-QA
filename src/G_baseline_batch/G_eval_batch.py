@@ -60,7 +60,7 @@ def evaluate(encoder, decoder, triplets, embeddings_index, embeddings_size, word
         # get the word token and add to the list of words
         if (ni == word2index['EOS']) or (ni == word2index['PAD']):
             decoded_words.append('EOS')
-            decoder_attentions[di] = decoder_attention[0]
+            decoder_attentions[di] = decoder_attention[0].data
             break
         else:
             decoded_words.append(index2word[ni])

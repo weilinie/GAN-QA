@@ -27,6 +27,7 @@ from model_zoo import *
 from G_train_batch import *
 # from G_eval_batch import *
 import os
+import numpy as np
 
 use_cuda = torch.cuda.is_available()
 teacher_forcing_ratio = 0.5 # default in original code is 0.5
@@ -72,7 +73,8 @@ max_len_c, max_len_q, max_len_a = max_length(triplets)
 
 ## find all unique tokens in the data (should be a subset of the number of embeddings)
 effective_tokens, effective_num_tokens = count_effective_num_tokens(triplets, embeddings_index)
-
+print('effective number of tokens: ' + str(effective_num_tokens))
+print('expected initial loss: ' + str(-np.log(1/float(effective_num_tokens))) + '\n')
 # build word2index dictionary and index2word dictionary
 word2index, index2word = generate_look_up_table(effective_tokens, effective_num_tokens)
 
@@ -89,7 +91,7 @@ print('')
 ######### set up model
 hidden_size1 = 256
 hidden_size2 = 256
-batch_size = 100
+batch_size = 50
 # context encoder
 encoder = EncoderRNN(embeddings_size, hidden_size1, batch_size)
 # decoder
@@ -118,7 +120,7 @@ max_length = 100
 trainIters(encoder, attn_decoder, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
            path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-           n_iters=10000, print_every=1, plot_every=1, learning_rate=0.001)
+           n_iters=10000, print_every=100, plot_every=10, learning_rate=0.001)
 
 # save the final model
 torch.save(encoder, path_to_exp_out+'/encoder_temp.pth')

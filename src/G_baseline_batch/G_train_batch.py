@@ -170,6 +170,7 @@ def trainIters(encoder, decoder, batch_size, embeddings_size,
         loss = train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
                      embeddings_index, embeddings_size, word2index, index2word, teacher_forcing_ratio,
                      encoder, decoder, encoder_optimizer, decoder_optimizer, criterion)
+        print('loss at iteration ' + str(iter) + ' is: ' + str(loss))
 
         end = time.time()
 
