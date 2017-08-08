@@ -244,6 +244,9 @@ def generate_look_up_table(effective_tokens, effective_num_tokens, use_cuda = Tr
 # prepare minibatch of data
 # output is (contexts, questions, answers, answer_start_idxs, answer_end_idxs)
 # each is of dimension [batch_size x their respective max length]
+# TODO: add functionality to put context and answer to 2 different variables
+# TODO: (cont.) 2 different encoders for context and answer, do attention on context, and stack
+# TODO: (cont.) the weighted averaged context vector and the last hidden state of answer as "context"
 def get_random_batch(triplets, batch_size, word2index):
 
     # init values
@@ -292,6 +295,7 @@ def pad_sequence(s, max_len, word2index, mode = 'word'):
 # - if question is represented as index, then its size is [max seq len x batch size] --> this is transpose of the input
 #   from get_random_batch in order to fit NLLLoss function (indexing and selecting the whole batch of a single token) is
 #   easier. e.g. you can do question[i] which selects the whole sequence of the first dimension
+# TODO: see TODO of the function get_random_batch
 def prepare_batch_var(batch, seq_lens, batch_size, embeddings_index, embeddings_size, use_cuda=1, question_mode = 'index'):
     context_answer_batch = batch[0]  # size = [max seq len x batch size].
     question_batch = batch[1]

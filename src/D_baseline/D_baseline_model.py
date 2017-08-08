@@ -49,32 +49,5 @@ class EncoderRNN(nn.Module):
             return result
 
 
-######################################################################
-# multi-layer perceptron
-# ^^^^^^^^^^^^^^^^^^^^^^
-# code adapted from pytorch tutorial
-class MLP(nn.Module):
 
-    def __init__(self, input_size, hidden_size, output_size):
-        # maximum input length it can take (for attention mechanism)
-        super(Net, self).__init__()
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        # self.max_input_len = max_input_len
-        
-        self.layer1 = nn.Linear(self.input_size, self.hidden_size)
-        self.layer2 = nn.Linear(self.hidden_size, self.output_size)
-        self.relu = nn.ReLU()
-
-        self.attn = nn.Tanh( nn.Linear(self.input_size+self.hidden_size, 1) )
-        self.attn_combine = nn.Linear(self.input_size+self.hidden_size, self.input_size)
-
-    def forward(self, inputs):
-        # inputs is a matrix of size (number of tokens in input senquence) * (embedding_dimension)
-        attn_weights = F.softmax( attn(inputs) ) # dim = (num of tokens) * 1
-        attn_applied = torch.bmm( attn_weights.t().unsqueeze, inputs.unsqueeze(0) ) # new context vector
-        out = self.layer1(attn_applied)
-        out = self.relu(out)
-        out = self.layer2(attn_applied)
-        return out
 
