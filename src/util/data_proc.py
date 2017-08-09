@@ -15,6 +15,9 @@ spacynlp = English()
 import torch
 from torch.autograd import Variable
 
+from spacy.en import English
+spacynlp = English()
+
 import nltk
 import json
 import numpy as np
