@@ -57,7 +57,7 @@ path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
 
 
 ######### first load the pretrained word embeddings
-path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
+path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.50d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
