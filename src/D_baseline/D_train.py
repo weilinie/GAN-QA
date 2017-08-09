@@ -23,7 +23,7 @@ from data_proc import *
 from util import *
 
 from D_baseline_model import *
-from D_eval_batch import *
+from D_eval import *
 
 use_cuda = torch.cuda.is_available()
 
@@ -42,16 +42,16 @@ use_cuda = torch.cuda.is_available()
 # instability
 
 # context = input_variable
-def train(context_ans_batch_var, batch_size, seq_lens, true_labels,
+def train(train_batch, batch_size, seq_lens, true_labels,
           embeddings_index, embeddings_size, word2index, index2word,
-          encoder, decoder, encoder_optimizer, decoder_optimizer, criterion):
+          encoder, mlp, encoder_optimizer, mlp_optimizer, criterion):
 
     encoder_optimizer.zero_grad()
-    decoder_optimizer.zero_grad()
+    mlp_optimizer.zero_grad()
 
     # get max lengths of (context + answer) and question
-    max_c_a_len = max(seq_lens[0]) # max seq length of context + ans combined
-    max_q_len = max(seq_lens[1]) # max seq length of question
+    #max_c_a_len = max(seq_lens[0]) # max seq length of context + ans combined
+    #max_q_len = max(seq_lens[1]) # max seq length of question
 
     loss = 0
 
@@ -59,9 +59,9 @@ def train(context_ans_batch_var, batch_size, seq_lens, true_labels,
     # output size: (seq_len, batch, hidden_size)
     # hidden size: (num_layers, batch, hidden_size)
     # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
-    encoder_hiddens, encoder_hidden = encoder(context_ans_batch_var, seq_lens[0], None)
+    encoder_hiddens, encoder_hidden = encoder(train_batch, seq_lens[0], None)
 
-    outputs = mlp(encoder_hiddens)
+    outputs = F.sigmoid(mlp(encoder_hiddens))
 
     # pred_targets = torch.zeros(otuputs.size())
     # for i in range(outputs.size(0)):
@@ -112,7 +112,8 @@ def trainIters(encoder, mlp, batch_size, embeddings_size,
     encoder_optimizer = optim.Adam(encoder.parameters(), lr=learning_rate)
     mlp_optimizer = optim.Adam(mlp.parameters(), lr=learning_rate)
 
-    criterion = nn.BCEWithLogitsLoss() # binary loss
+    #criterion = nn.BCEWithLogitsLoss() # binary loss
+    criterion = nn.BCELoss() 
 
     print()
 
