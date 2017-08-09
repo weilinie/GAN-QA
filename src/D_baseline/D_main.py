@@ -26,7 +26,6 @@ from __future__ import division
 import sys
 import os
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
-# print(os.path.abspath(__file__ + '/../../../../')+'/util')
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline_batch')
 from data_proc import *
 
