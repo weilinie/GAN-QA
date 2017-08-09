@@ -19,6 +19,7 @@ import nltk
 import json
 import numpy as np
 import os
+import time
 
 
 ######################################################################
@@ -244,48 +245,39 @@ def generate_look_up_table(effective_tokens, effective_num_tokens, use_cuda = Tr
 # prepare minibatch of data
 # output is (contexts, questions, answers, answer_start_idxs, answer_end_idxs)
 # each is of dimension [batch_size x their respective max length]
-# TODO: add functionality to put context and answer to 2 different variables
-# TODO: (cont.) 2 different encoders for context and answer, do attention on context, and stack
-# TODO: (cont.) the weighted averaged context vector and the last hidden state of answer as "context"
-def get_random_batch(triplets, batch_size, word2index):
+def get_random_batch(triplets, batch_size, with_fake = False):
 
     # init values
+    contexts = []
     questions = []
-    contexts_answers = []
+    answers = []
     ans_start_idxs = []
     ans_end_idxs = []
 
     # inside this forloop, all word tokens are turned into their respective index according to word2index lookup table
     for i in range(batch_size):
         triple = random.choice(triplets)
+        contexts.append(triple[0])
         questions.append( triple[1] )
-        contexts_answers.append(triple[0] + triple[2])
+        answers.append(triple[2])
         ans_start_idxs.append( triple[3] )
         ans_end_idxs.append( triple[4] )
 
-    # zip and sort by (ascending order) context lengths
-    # NOTE: set reverse to be true to satisfy the requirement for a particular pytorch function for mini batch input
-    #       preparation. see http://pytorch.org/docs/master/nn.html#torch.nn.utils.rnn.pack_padded_sequence
-    seq_triplets = sorted(zip(contexts_answers, questions, ans_start_idxs, ans_end_idxs), key=lambda p: len(p[0]), reverse=True)
-    contexts_answers, questions, ans_start_idxs, ans_end_idxs = zip(*seq_triplets)
-
     # get lengths of each context, question, answer in their respective arrays
+    context_lens = [len(s) for s in contexts]
     question_lens = [len(s) for s in questions]
-    context_answer_lens = [len(s) for s in contexts_answers]
+    answer_lens = [len(s) for s in answers]
 
-    # pad each context, question, answer to their respective max length
-    questions = [pad_sequence(s, max(question_lens), word2index, mode='index') for s in questions]
-    contexts_answers = [pad_sequence(s, max(context_answer_lens), word2index) for s in contexts_answers]
+    if with_fake:
+        idx = int(batch_size/2)
+        return [contexts[:idx], questions[:idx], answers[:idx], ans_start_idxs[:idx], ans_end_idxs[:idx]], \
+               [context_lens[:idx], question_lens[:idx], answer_lens[:idx]],\
+               [contexts[idx:], questions, answers[idx:], ans_start_idxs[idx:], ans_end_idxs[idx:]], \
+               [context_lens[idx:], question_lens[idx:], answer_lens[idx:]]
+    else:
+        return [contexts, questions, answers, ans_start_idxs, ans_end_idxs], \
+               [context_lens, question_lens, answer_lens]
 
-    return (contexts_answers, questions, ans_start_idxs, ans_end_idxs), (context_answer_lens, question_lens)
-
-
-# helper function to zero pad context, question, answer to their respective maximum length
-def pad_sequence(s, max_len, word2index, mode = 'word'):
-    if mode == 'word':
-        return s + ['PAD' for i in range(max_len - len(s))]
-    elif mode == 'index':
-        return [word2index[i] for i in s] + [word2index['PAD'] for i in range(max_len - len(s))]
 
 # - prepare batch training data
 # - training_batch contains five pieces of data. The first three with size [batch size x max seq len],
@@ -295,35 +287,128 @@ def pad_sequence(s, max_len, word2index, mode = 'word'):
 # - if question is represented as index, then its size is [max seq len x batch size] --> this is transpose of the input
 #   from get_random_batch in order to fit NLLLoss function (indexing and selecting the whole batch of a single token) is
 #   easier. e.g. you can do question[i] which selects the whole sequence of the first dimension
-# TODO: see TODO of the function get_random_batch
-def prepare_batch_var(batch, seq_lens, batch_size, embeddings_index, embeddings_size, use_cuda=1, question_mode = 'index'):
-    context_answer_batch = batch[0]  # size = [max seq len x batch size].
-    question_batch = batch[1]
+def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
+                      batch_size, word2index, embeddings_index, embeddings_size,
+                      use_cuda=1, mode = ('word', 'word', 'index'), concat_opt = None, with_fake = False):
 
-    # init variable matrices
-    context_answer_var = torch.zeros(max(seq_lens[0]), batch_size, embeddings_size)
-    if question_mode != 'index':
-        question_var = torch.LongTensor(max(seq_lens[1]), batch_size, embeddings_size)
+    batch_vars = []
+    batch_var_orig = []
+
+    if with_fake:
+        batch_size = int(batch_size/2)
+        fake_q = fake_batch[1]
+        fake_q_lens = fake_seq_lens[1]
+        # fake_label = [0] * batch_size
+        # true_label = [1] * batch_size
+
+    #TODO (for different applications): change the below code (before for loop) to concat different portions of the batch_triplets
+    if concat_opt == None:
+        pass
+
+    elif concat_opt == 'ca':
+        ca = []
+        ca_len = []
+        for b in range(batch_size):
+            ca.append(batch[0][b] + batch[2][b])
+            ca_len.append(len(batch[0][b] + batch[2][b]))
+        batch = [ca, batch[1], batch[3], batch[4]]
+        seq_lens =  [ca_len] + seq_lens
+        # print(len(seq_lens))
+
+    elif concat_opt == 'qa':
+        pass
+
+    # FIXME: only this following elif implemented fake question
+    elif concat_opt == 'cqa':
+        cqa = []
+        cqa_len = []
+        labels = []
+        for b in range(batch_size):
+            cqa.append(batch[0][b] + batch[1][b] + batch[2][b]) # append real
+            cqa_len.append(len(batch[0][b] + batch[1][b] + batch[2][b])) # append real
+            labels.append(torch.FloatTensor([1]))
+            if with_fake: # append fake
+                fake_q_sample = random.sample(fake_q,1)[0]
+                cqa.append(batch[0][b] + fake_q_sample + batch[2][b])
+                cqa_len.append(len(batch[0][b] + fake_q_sample + batch[2][b]))
+                labels.append(torch.FloatTensor([0]))
+        # print(len(max(cqa, key=len)))
+        # print(max(cqa_len))
+        if with_fake:
+            batch = [cqa, batch[3]+fake_batch[3], batch[4]+fake_batch[4], labels]
+        else:
+            batch = [cqa, batch[3], batch[4]]
+        # seq_lens =  [cqa_len] + seq_lens
+        seq_lens = [cqa_len]
+    elif concat_opt == 'qca':
+        pass
+
     else:
-        question_var = torch.LongTensor(max(seq_lens[1]), batch_size)
+        raise ValueError('not a valid concat option.')
 
-    # FIXME: very stupid embedded for loop implementation
-    for i in range(batch_size):
-        for j in range(max(seq_lens[0])):
-            context_answer_var[j, i, ] = embeddings_index[context_answer_batch[i][j]]
-    if use_cuda:
-        context_answer_var = Variable(context_answer_var.cuda())
+    # sort this batch_var in descending order according to the values of the lengths of the first element in batch
+    num_batch = len(batch)
+    all = batch + seq_lens
+    all = sorted(zip(*all), key=lambda p: len(p[0]), reverse=True)
+    all = zip(*all)
+    batch = all[0:num_batch]
+    seq_lens = all[num_batch:]
+    batch_orig = batch
 
-    for i in range(batch_size):
-        for j in range(max(seq_lens[1])):
-            if question_mode != 'index':
-                question_var[j, i,] = embeddings_index[question_batch[i][j]]
+    # from here batch size is the orignal batch size again
+    if with_fake:
+        batch_size = int(batch_size * 2)
+
+    for b in range(len(batch)):
+
+        batch_var = batch[b]
+
+        # if element in batch is float, i.e. indices, then do nothing
+        if isinstance(batch_var[0][0], float):
+            # print('in numeric values')
+            # print(b)
+            pass
+        else:
+            # print('in token values')
+            # print(b)
+            # pad each context, question, answer to their respective max length
+            if mode[b]  == 'index':
+                batch_padded = [pad_sequence(s, max(seq_lens[b]), word2index, mode='index') for s in batch_var]
             else:
-                question_var[j, i] = question_batch[i][j]
-    # if use_cuda:
-    #      question_var = Variable(question_var.cuda())
+                batch_padded = [pad_sequence(s, max(seq_lens[b]), word2index) for s in batch_var]
 
-    return (context_answer_var, question_var)
+            # init variable matrices
+            if mode[b] != 'index':
+                batch_var = torch.FloatTensor(max(seq_lens[b]), batch_size, embeddings_size)
+            else:
+                batch_var = torch.FloatTensor(max(seq_lens[b]), batch_size)
+
+            # FIXME: very stupid embedded for loop implementation
+            for i in range(batch_size):
+                # print(i)
+                # print(type(i))
+                for j in range(max(seq_lens[b])):
+                    # print(j)
+                    # print(type(j))
+                    if mode[b] != 'index':
+                        batch_var[j, i,] = embeddings_index[batch_padded[i][j]]
+                    else:
+                        batch_var[j, i] = batch_padded[i][j]
+
+            batch_var = Variable(batch_var.cuda()) if use_cuda else Variable(batch_var)
+
+        batch_vars.append(batch_var)
+
+    # the second output is for debugging purpose
+    return batch_vars, batch_orig, seq_lens
+
+
+# helper function to zero pad context, question, answer to their respective maximum length
+def pad_sequence(s, max_len, word2index, mode = 'word'):
+    if mode == 'word':
+        return s + ['PAD' for i in range(max_len - len(s))]
+    elif mode == 'index':
+        return [word2index[i] for i in s] + [word2index['PAD'] for i in range(max_len - len(s))]
 
 # # test and time
 # # to run this test, you need to have these things ready:
@@ -332,18 +417,30 @@ def prepare_batch_var(batch, seq_lens, batch_size, embeddings_index, embeddings_
 # # 3) a mini batch processed by get_random_batch
 # batch_size = 500
 # start = time.time()
-# batch, seq_lens = get_random_batch(triplets, batch_size)
-# temp = prepare_batch_var(batch, seq_lens, batch_size, embeddings_index, embeddings_size)
+# batch, seq_lens, fake_batch, fake_seq_lens = get_random_batch(triplets, batch_size, with_fake=True)
+#
+# temp, temp_orig, seq_lens_cqa = prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size,
+#                                                   mode = ['word', 'index'], concat_opt='cqa', with_fake=True)
 # end = time.time()
 # print('time elapsed: ' + str(end-start))
 # # the following check if the batched data matches with the original data
 # batch_idx = random.choice(range(batch_size))
 # print(batch_idx)
-# seq_idx = random.choice(range(max(seq_lens[0])))
+#
+# print('context  > ', ' '.join(temp_orig[0][batch_idx]))
+# print('question > ', ' '.join(temp_orig[1][batch_idx]))
+# print('answer   > ', ' '.join(temp_orig[2][batch_idx]))
+#
+# idx = batch[0].index(temp_orig[0][batch_idx])
+# print('context  > ', ' '.join(batch[0][idx]))
+# print('question > ', ' '.join(batch[1][idx]))
+# print('answer   > ', ' '.join(batch[2][idx]))
+
+# seq_idx = random.choice(range(min(seq_lens[0])))
 # print(seq_idx)
-# word1 = embeddings_index[batch[0][batch_idx][seq_idx]]
+# word1 = embeddings_index[batch[0][seq_lens[0].index(heapq.nlargest(batch_idx, seq_lens[0])[-1])][seq_idx]]
 # word2 = temp[0][seq_idx, batch_idx,]
-# set(word1) == set(word2)
+# set(word1) == set(word2.data.cpu())
 
 
 

@@ -1,3 +1,10 @@
+#-----------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------#
+# training and evaluation
+#-----------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------#
+from __future__ import print_function
+from __future__ import division
 import torch
 import torch.nn as nn
 from torch import optim
@@ -5,87 +12,71 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import time
 
-from ..util.data_proc import *
+# from ..util.data_proc import *
+
+import sys
+sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/util')
+sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline_batch')
+from data_proc import *
+from util import *
+
+from D_baseline_model import *
+from D_eval_batch import *
 
 use_cuda = torch.cuda.is_available()
-
-#-----------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------#
-# training and evaluation
-#-----------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------#
-
 
 ######################################################################
 # Training the Model
 # ------------------
-
+# To train we run the input sentence through the encoder, and keep track
+# of every output and the latest hidden state. Then the decoder is given
+# the ``<SOS>`` token as its first input, and the last hidden state of the
+# encoder as its first hidden state.
+#
+# "Teacher forcing" is the concept of using the real target outputs as
+# each next input, instead of using the decoder's guess as the next input.
+# Using teacher forcing causes it to converge faster but `when the trained
+# network is exploited, it may exhibit
+# instability
 
 # context = input_variable
-def train(context_var, question_var, train_triple_raw, 
-    embeddings_index, word2index, ans_start_idx, ans_end_idx,
-    encoder1, encoder2, MLP, encoder_optimizer1, encoder_optimizer2, MLP_optimizer, criterion):
-    encoder_hidden_context = encoder1.initHidden()
-    encoder_hidden_question = encoder2.initHidden()
+def train(context_ans_batch_var, batch_size, seq_lens, true_labels,
+          embeddings_index, embeddings_size, word2index, index2word,
+          encoder, decoder, encoder_optimizer, decoder_optimizer, criterion):
 
-    encoder_optimizer1.zero_grad()
-    encoder_optimizer2.zero_grad()
-    MLP_optimizer.zero_grad()
+    encoder_optimizer.zero_grad()
+    decoder_optimizer.zero_grad()
 
-    input_length_context = len(context_var)
-    num_char_context = len(train_triple_raw[0]) # which is the untokenized version of the context
-    input_length_question = len(question_var)
-    
-    encoder_hiddens_context = Variable(torch.zeros(input_length_context, encoder1.hidden_size))
-    encoder_hiddens_context = encoder_outputs_context.cuda() if use_cuda else encoder_outputs_context
+    # get max lengths of (context + answer) and question
+    max_c_a_len = max(seq_lens[0]) # max seq length of context + ans combined
+    max_q_len = max(seq_lens[1]) # max seq length of question
 
-    encoder_hiddens_question = Variable(torch.zeros(input_length_question, encoder2.hidden_size))
-    encoder_hiddens_question = encoder_outputs_question.cuda() if use_cuda else encoder_outputs_question
-   
     loss = 0
 
     # context encoding
-    time1 = time.time()
-    for ei in range(input_length_context):
-        encoder_output_context, encoder_hidden_context = encoder1(
-            context_var[ei], encoder_hidden_context, embeddings_index)
-        encoder_hiddens_context[ei] = encoder_hidden_context[0][0]
-    time2 = time.time()
-    print('encoder 1 one pass time: ' + str(time2 - time1))
-    
-    # question encoding
-    for ei in range(input_length_question):
-        encoder_output_question, encoder_hidden_question = encoder2(
-            question_var[ei], encoder_hidden_question, embeddings_index)
-        encoder_hiddens_question[ei] = encoder_hidden_question[0][0]
-    time3 = time.time()
-    print('encoder 2 one pass time: ' + str(time3 - time2))
-    
-    # concat the context encoding and question encoding
-    output = MLP( torch.cat((encoder_hiddens_context, encoder_hiddens_question),0) )
-    output = output[0:num_char_context]
+    # output size: (seq_len, batch, hidden_size)
+    # hidden size: (num_layers, batch, hidden_size)
+    # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
+    encoder_hiddens, encoder_hidden = encoder(context_ans_batch_var, seq_lens[0], None)
 
-    pred_ans_start_idx = sfmx1(output)
-    pred_ans_end_idx = sfmx2(output)
+    outputs = mlp(encoder_hiddens)
 
-    loss += criterion(pred_ans_start_idx, ans_start_idx) + criterion(pred_ans_end_idx, ans_end_idx)
+    # pred_targets = torch.zeros(otuputs.size())
+    # for i in range(outputs.size(0)):
+    #     if F.tanh(outputs[i]) < 0:
+    #         pred_targets[i] = 0
+    #     else:
+    #         pred_targets[i] = 1
 
-    
-    # time4 = time.time()
-    # print('decoder one pass time: ' + str(time4 - time3))
+    loss += criterion(true_labels, outputs)
+
     loss.backward()
-    # time5 = time.time()
-    # print('backprop one pass time: ' + str(time5 - time4))
-    encoder_optimizer1.step()
-    # time6 = time.time()
-    # print('encoder 1 optimization one pass step time: ' + str(time6 - time5))
-    encoder_optimizer2.step()
-    # time7 = time.time()
-    # print('encoder 2 optimization one pass step time: ' + str(time7 - time6))
+    encoder_optimizer.step()
     decoder_optimizer.step()
-    # time8 = time.time()
-    # print('decoder optimization one pass step time: ' + str(time8 - time7))
-    return loss.data[0] / target_length
+
+    # return loss
+    # FIXME: figure out if loss need to be divided by batch_size
+    return loss.data[0] / float(batch_size)
 
 
 
@@ -101,40 +92,51 @@ def train(context_var, question_var, train_triple_raw,
 # of examples, time so far, estimated time) and average loss.
 #
 
-def trainIters(encoder1, encoder2, MLP, embeddings_index, word2index, data_tokens, triplets,
+def trainIters(encoder, mlp, batch_size, embeddings_size,
+    embeddings_index, word2index, index2word, triplets,
     path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-    n_iters, print_every=1000, plot_every=100, learning_rate=0.01):
+    n_iters, print_every=10, plot_every=100, learning_rate=0.01):
+
+    begin_time = time.time()
 
     # open the files
-    loss_f = open(path_to_loss_f,'w+') 
+    loss_f = open(path_to_loss_f,'w+')
     sample_out_f = open(path_to_sample_out_f, 'w+')
 
     # plot_losses = []
     print_loss_total = 0  # Reset every print_every
     plot_loss_total = 0  # Reset every plot_every
 
-    encoder_optimizer1 = optim.SGD(encoder1.parameters(), lr=learning_rate)
-    encoder_optimizer2 = optim.SGD(encoder2.parameters(), lr=learning_rate)
-    MLP_optimizer = optim.SGD(MLP.parameters(), lr=learning_rate)
+    encoder_optimizer = optim.Adam(encoder.parameters(), lr=learning_rate)
+    mlp_optimizer = optim.Adam(mlp.parameters(), lr=learning_rate)
 
-    start = time.time()
-    
-    end = time.time()
-    print('time spent prepare data: ' + str(end - start))
-    criterion = nn.NLLLoss()
+    criterion = nn.BCEWithLogitsLoss() # binary loss
+
+    print()
 
     for iter in range(1, n_iters + 1):
-        train_triple_raw = random.choice(triplets)
-        training_triple = variablesFromTriplets(train_triple_raw, embeddings_index)
-        context_var = training_triple[0]
-        ans_var = training_triple[2]
-        question_var = training_triple[1]
-        ans_start_idx = training_triple[3]
-        ans_end_idx = training_triple[4]
-        
-        loss = train(context_var, question_var, train_triple_raw, 
-                        embeddings_index, word2index, ans_start_idx, ans_end_idx,
-                        encoder1, encoder2, MLP, encoder_optimizer1, encoder_optimizer2, MLP_optimizer, criterion):
+
+        # prepare batch
+        # do not need the answer location for now (the second output from get_random_batch)
+        training_batch, seq_lens, fake_training_batch, fake_seq_lens = get_random_batch(triplets, batch_size, with_fake=True)
+        # c_a_q = list(training_batch[0])
+        # concat the context_ans batch with the question batch
+        # each element in the training batch is context + question + answer
+        training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, fake_training_batch, fake_seq_lens,
+                                                        batch_size, word2index, embeddings_index, embeddings_size,
+                                                        mode = ['word', 'index'], concat_opt='cqa', with_fake=True)
+        train_input = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dim]
+        train_label = training_batch[-1]
+
+        start = time.time()
+
+        loss = train(train_input, batch_size, seq_lens, train_label,
+                     embeddings_index, embeddings_size, word2index, index2word,
+                     encoder, mlp, encoder_optimizer, mlp_optimizer, criterion)
+        # print('loss at iteration ' + str(iter) + ' is: ' + str(loss))
+
+        end = time.time()
+
 
         print_loss_total += loss
         plot_loss_total += loss
@@ -142,19 +144,26 @@ def trainIters(encoder1, encoder2, MLP, embeddings_index, word2index, data_token
         if iter % print_every == 0:
             print_loss_avg = print_loss_total / print_every
             print_loss_total = 0
-            print('%s (%d %d%%) %.4f' % (timeSince(start, iter / n_iters),
+            print('%s (%d %d%%) %.4f' % (timeSince(begin_time, iter / float(n_iters)),
                                          iter, iter / n_iters * 100, print_loss_avg))
-            print('---sample answer prediction---')
+            print('time for one training iteration: ' + str(end - start))
+            print('---sample generated question---')
             # sample a triple and print the generated question
-            evaluateRandomly(encoder1, encoder2, MLP, triplets, n=1)
+            _, _ = evaluate(encoder, decoder, triplets, embeddings_index,
+                           embeddings_size, word2index, index2word, max_length)
+            print('-------------------------------')
+            print('-------------------------------')
             print()
 
         if iter % plot_every == 0:
             plot_loss_avg = plot_loss_total / plot_every
             # plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
-            loss_f.write(str(plot_loss_avg))
-            loss_f.write('\n')
+            loss_f.write(unicode(plot_loss_avg))
+            loss_f.write(unicode('\n'))
 
     # showPlot(plot_losses)
+    loss_f.close()
+
+
 
