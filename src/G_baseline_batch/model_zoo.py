@@ -54,6 +54,7 @@ class EncoderRNN(nn.Module):
 ######################################################################
 # Attention Decoder
 # ^^^^^^^^^^^^^^^^^
+# TODO: take another look at the attn implementation; there might be some errors
 class AttnDecoderRNN(nn.Module):
     def __init__(self, input_size, hidden_size, output_size, encoder, n_layers=1, num_directions=1, dropout_p=0.1):
         super(AttnDecoderRNN, self).__init__()
@@ -116,6 +117,7 @@ class AttnDecoderRNN(nn.Module):
 
         # calculate 
         decoder_output = torch.cat((hidden.squeeze(0), context.squeeze(1)), 1)
+        # hidden =
 
         # output size: (batch size, vocab size)
         decoder_output = F.log_softmax(self.out(decoder_output))
@@ -131,46 +133,39 @@ class AttnDecoderRNN(nn.Module):
 # FIXME: what should be a good output size?
 # output size: same as input
 class MLP(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, encoder, num_attn_weights, use_attn = True):
+    # FIXME: the number of attention weights here is hard coded for tensor multiplication instead of using for loops
+    def __init__(self, hidden_size, output_size, encoder, num_attn_weights, use_attn = True):
         # maximum input length it can take (for attention mechanism)
         super(MLP, self).__init__()
-        self.input_size = input_size
         self.hidden_size = hidden_size
         self.use_attn = use_attn
         self.num_attn_weights = num_attn_weights
 
         # fully connected layers (2) and non-linearity
-        self.layer1 = nn.Linear(self.input_size, self.hidden_size)
+        self.layer1 = nn.Linear(encoder.num_directions * encoder.hidden_size, self.hidden_size)
         self.relu = nn.ReLU()
         self.layer2 = nn.Linear(self.hidden_size, self.output_size)
 
         # attention
         if self.use_attn:
-            self.attn = nn.Tanh(nn.Linear(self.input_size, self.num_attn_weights))
+            self.attn = nn.Tanh(nn.Bottle(nn.Linear(encoder.hidden_size*encoder.num_directions, self.num_attn_weights)))
 
     def forward(self, inputs):
-        # inputs is a matrix of size (number of tokens in input senquence) * (embedding_dimension)
+        # inputs size (seq len, batch size, hidden size * num directions)
         # if use attention, the output vector is a weighted combination of input hidden states
         # if not use attention, the output vector is simply a feedforward network operated on input's last hidden state
         if self.use_attn:
-            # attn_weights size = (batch_size, encoder output len)
-            attn_weights = Variable(torch.zeros(inputs.size(1), inputs.size(0)))
-            if use_cuda:
-                attn_weights = attn_weights.cuda()
-
-            for b in range(inputs.size(1)):
-                # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
-                attn_weights[b] = torch.mm(inputs[:, b],
-                                           self.attn(inputs[:, b]).t())
-
-            attn_weights = F.softmax(attn_weights)
-
-            attn_weights = F.softmax(attn(inputs))  # dim = (num of tokens) * 1
-            attn_applied = torch.bmm(attn_weights.t().unsqueeze, inputs.unsqueeze(0))  # new context vector
-            inputs = attn_applied
+            # attn_weights size = (batch_size, encoder output len, num_attn_weights)
+            attn_weights = self.attn(inputs).transpose(0,1)
+            for b in range(attn_weights.size(0)):
+                attn_weights[b] = F.softmax(attn_weights[b])
+            # context size = (batch size, hidden size * num directions)
+            context = torch.sum( torch.bmm(attn_weights, inputs.transpose(0,1)), 1 ).squeeze(1)
+        else:
+            context = torch.sum( inputs.transpose(0,1), 1 ).squeeze(1)
 
         # feedforward
-        out = self.layer1(inputs)
+        out = self.layer1(context)
         out = self.relu(out)
         out = self.layer2(out)
 

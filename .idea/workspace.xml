@@ -3,13 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f9ea85a3-5cef-4c19-a462-b9db063ecc13" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/D_baseline/D_baseline_model.py" afterPath="$PROJECT_DIR$/src/D_baseline/D_baseline_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/D_baseline/D_main.py" afterPath="$PROJECT_DIR$/src/D_baseline/D_main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/D_baseline/D_train.py" afterPath="$PROJECT_DIR$/src/D_baseline/D_train.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_baseline_batch/G_main_batch.py" afterPath="$PROJECT_DIR$/src/G_baseline_batch/G_main_batch.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_baseline_batch/model_zoo.py" afterPath="$PROJECT_DIR$/src/G_baseline_batch/model_zoo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/data_proc.py" afterPath="$PROJECT_DIR$/src/util/data_proc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/util.py" afterPath="$PROJECT_DIR$/src/util/util.py" />
     </list>
     <ignored path="GAN-QA.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -798,7 +793,21 @@
       <option name="project" value="LOCAL" />
       <updated>1502163349670</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="updates for batch seq2seq discriminator">
+      <created>1502298581979</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1502298581979</updated>
+    </task>
+    <task id="LOCAL-00017" summary="updates for batch seq2seq generator model">
+      <created>1502298600458</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1502298600458</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -821,7 +830,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="WINDOWED" visible="true" show_stripe_button="true" weight="0.23590814" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" x="65" y="24" width="1855" height="1056" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
@@ -871,7 +880,9 @@
     <MESSAGE value="clean up" />
     <MESSAGE value="minor update" />
     <MESSAGE value="updates for batch seq2seq question generator" />
-    <option name="LAST_COMMIT_MESSAGE" value="updates for batch seq2seq question generator" />
+    <MESSAGE value="updates for batch seq2seq discriminator" />
+    <MESSAGE value="updates for batch seq2seq generator model" />
+    <option name="LAST_COMMIT_MESSAGE" value="updates for batch seq2seq generator model" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
