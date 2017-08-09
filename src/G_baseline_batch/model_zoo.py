@@ -140,6 +140,7 @@ class MLP(nn.Module):
         self.hidden_size = hidden_size
         self.use_attn = use_attn
         self.num_attn_weights = num_attn_weights
+        self.output_size = output_size
 
         # fully connected layers (2) and non-linearity
         self.layer1 = nn.Linear(encoder.num_directions * encoder.hidden_size, self.hidden_size)
@@ -148,15 +149,29 @@ class MLP(nn.Module):
 
         # attention
         if self.use_attn:
-            self.attn = nn.Tanh(nn.Bottle(nn.Linear(encoder.hidden_size*encoder.num_directions, self.num_attn_weights)))
+            self.attn = nn.Linear(encoder.hidden_size*encoder.num_directions, self.num_attn_weights)
 
     def forward(self, inputs):
         # inputs size (seq len, batch size, hidden size * num directions)
         # if use attention, the output vector is a weighted combination of input hidden states
         # if not use attention, the output vector is simply a feedforward network operated on input's last hidden state
         if self.use_attn:
+
+            # reshape input to be 2D tensor instead of 3D
+	    seq_len = inputs.size(0)
+            batch_size = inputs.size(1)
+	    print('input size: ' + str(inputs.size()))
+	    inputs = inputs.view(-1, inputs.size(-1))
+	    print('reshaped input size: ' + str(inputs.size())) 
+
             # attn_weights size = (batch_size, encoder output len, num_attn_weights)
-            attn_weights = self.attn(inputs).transpose(0,1)
+            attn_weights = F.tanh(self.attn(inputs))
+
+	    # get back the dimension
+	    attn_weights = attn_weights.view(seq_len, batch_size, attn_weights.size(-1))
+	    attn_weights = attn_weights.transpose(0,1)
+	    print('size of attn_weights after linear layer: ' + str(attn_weights.size()))
+
             for b in range(attn_weights.size(0)):
                 attn_weights[b] = F.softmax(attn_weights[b])
             # context size = (batch size, hidden size * num directions)
