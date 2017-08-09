@@ -5,8 +5,11 @@
 #-----------------------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------------------------#
 import sys
-sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/util')
-sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline_batch')
+import os
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+# print(os.path.abspath(__file__ + '/../../../../')+'/util')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline_batch')
+
 from data_proc import *
 from model_zoo import *
 from util import *

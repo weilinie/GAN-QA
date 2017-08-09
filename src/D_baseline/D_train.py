@@ -15,8 +15,10 @@ import time
 # from ..util.data_proc import *
 
 import sys
-sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/util')
-sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline_batch')
+import os
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+# print(os.path.abspath(__file__ + '/../../../../')+'/util')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline_batch')
 from data_proc import *
 from util import *
 
@@ -95,7 +97,7 @@ def train(context_ans_batch_var, batch_size, seq_lens, true_labels,
 def trainIters(encoder, mlp, batch_size, embeddings_size,
     embeddings_index, word2index, index2word, triplets,
     path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-    n_iters, print_every=10, plot_every=100, learning_rate=0.01):
+    n_iters=10, print_every=10, plot_every=100, learning_rate=0.01):
 
     begin_time = time.time()
 

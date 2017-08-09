@@ -24,15 +24,16 @@ from __future__ import print_function
 from __future__ import division
 
 import sys
-sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/util')
-sys.path.append('/home/jack/Documents/QA_QG/GAN-QA/src/G_baseline_batch')
+import os
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+# print(os.path.abspath(__file__ + '/../../../../')+'/util')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline_batch')
 from data_proc import *
 
 # from ..util.data_proc import *
 from model_zoo import *
 from G_train_batch import *
 # from G_eval_batch import *
-import os
 import numpy as np
 
 use_cuda = torch.cuda.is_available()
@@ -43,12 +44,12 @@ use_cuda = torch.cuda.is_available()
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
 f_name = 'dev-v1.1.json'
-path_to_dataset = '/home/jack/Documents/QA_QG/data/'
+path_to_dataset = os.path.abspath(__file__ + '/../../../../') + '/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
 # path for experiment outputs
 # exp_name = 'QG_seq2seq_baseline'
-path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
+path_to_exp_out = os.path.abspath(__file__ + '/../../../../') + '/exp_results_temp/'
 loss_f = 'loss_temp.txt'
 sample_out_f = 'sample_outputs_temp.txt'
 path_to_loss_f = path_to_exp_out + '/' + loss_f
@@ -91,15 +92,12 @@ mlp = MLP(mlp_hidden_size, output_size, encoder, num_attn_weights)
 
 if use_cuda:
     t1 = time.time()
-    encoder1 = encoder1.cuda()
+    encoder = encoder.cuda()
     t2 = time.time()
     print('time load encoder 1: ' + str(t2 - t1))
-    encoder2 = encoder2.cuda()
+    mlp = mlp.cuda()
     t3 = time.time()
-    print('time load encoder 2: ' + str(t3 - t2))
-    attn_decoder1 = attn_decoder1.cuda()
-    t4 = time.time()
-    print('time load decoder: ' + str(t4 - t3))
+    print('time load decoder: ' + str(t3 - t2))
 
 
 ######### start training
@@ -112,4 +110,8 @@ trainIters(encoder, mlp, batch_size, embeddings_size,
 torch.save(encoder1, path_to_exp_out+'/encoder1.pth')
 torch.save(encoder2, path_to_exp_out+'/encoder2.pth')
 torch.save(decoder, path_to_exp_out+'/decoder.pth')
+
+
+
+
 

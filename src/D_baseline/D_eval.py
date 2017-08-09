@@ -5,6 +5,12 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import time
 
+import sys
+import os
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+# print(os.path.abspath(__file__ + '/../../../../')+'/util')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline_batch')
+
 from ..util.data_proc import *
 
 use_cuda = torch.cuda.is_available()
