@@ -156,7 +156,7 @@ def trainIters(encoder, mlp, batch_size, embeddings_size,
             print('time for one training iteration: ' + str(end - start))
             print('---sample generated question---')
             # sample a triple and print the generated question
-            evaluate(encoder, mlp, triplets, word2index, embeddings_index, embeddings_size, eval_batch_size=10)
+            evaluate(encoder, mlp, triplets, word2index, embeddings_index, embeddings_size, eval_batch_size=100)
             print('-------------------------------')
             print('-------------------------------')
             print()

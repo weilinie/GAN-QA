@@ -48,7 +48,7 @@ path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
 # path for experiment outputs
 # exp_name = 'QG_seq2seq_baseline'
-path_to_exp_out = os.path.abspath(__file__ + '/../../../../') + '/exp_results_temp/'
+path_to_exp_out = os.path.abspath(__file__ + '/../../../../') + '/exp_results_D_temp/'
 loss_f = 'loss_temp.txt'
 sample_out_f = 'sample_outputs_temp.txt'
 path_to_loss_f = path_to_exp_out + '/' + loss_f
@@ -103,7 +103,7 @@ if use_cuda:
 trainIters(encoder, mlp, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, triplets,
            path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-           n_iters=5, print_every=1, plot_every=1, learning_rate=0.001)
+           n_iters=50000, print_every=500, plot_every=10, learning_rate=0.001)
 
 # save the final model
 torch.save(encoder, path_to_exp_out+'/encoder.pth')
