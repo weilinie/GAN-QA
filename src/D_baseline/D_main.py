@@ -31,8 +31,8 @@ from data_proc import *
 
 # from ..util.data_proc import *
 from model_zoo import *
-from G_train_batch import *
-# from G_eval_batch import *
+from D_train import *
+from D_eval import *
 import numpy as np
 
 use_cuda = torch.cuda.is_available()
@@ -103,12 +103,11 @@ if use_cuda:
 trainIters(encoder, mlp, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, triplets,
            path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-           n_iters = 5, print_every=1, plot_every=1, learning_rate=0.001)
+           n_iters=5, print_every=1, plot_every=1, learning_rate=0.001)
 
 # save the final model
-torch.save(encoder1, path_to_exp_out+'/encoder1.pth')
-torch.save(encoder2, path_to_exp_out+'/encoder2.pth')
-torch.save(decoder, path_to_exp_out+'/decoder.pth')
+torch.save(encoder, path_to_exp_out+'/encoder.pth')
+torch.save(mlp, path_to_exp_out+'/mlp.pth')
 
 
 
