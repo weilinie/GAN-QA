@@ -10,7 +10,6 @@ import torch.nn.functional as F
 
 use_cuda = torch.cuda.is_available()
 
-
 ######################################################################
 # The Encoder
 # -----------
@@ -146,9 +145,11 @@ class MLP(nn.Module):
         self.layer1 = nn.Linear(encoder.num_directions * encoder.hidden_size, self.hidden_size)
         self.relu = nn.ReLU()
         self.layer2 = nn.Linear(self.hidden_size, self.output_size)
+        self.sigmoid = nn.Sigmoid()
 
         # attention
         if self.use_attn:
+            self.tanh = nn.Tanh()
             self.attn = nn.Linear(encoder.hidden_size*encoder.num_directions, self.num_attn_weights)
 
     def forward(self, inputs):
@@ -158,24 +159,55 @@ class MLP(nn.Module):
         if self.use_attn:
 
             # reshape input to be 2D tensor instead of 3D
-	    seq_len = inputs.size(0)
+            seq_len = inputs.size(0)
             batch_size = inputs.size(1)
-	    print('input size: ' + str(inputs.size()))
-	    inputs = inputs.view(-1, inputs.size(-1))
-	    print('reshaped input size: ' + str(inputs.size())) 
+            inputs_for_attn_calc = inputs.view(-1, inputs.size(-1))
 
             # attn_weights size = (batch_size, encoder output len, num_attn_weights)
-            attn_weights = F.tanh(self.attn(inputs))
+            # attn_weights = self.tanh(self.attn(inputs_for_attn_calc))
+            # # get back the dimension
+            # attn_weights = attn_weights.view(seq_len, batch_size, attn_weights.size(-1))
+            # attn_weights = attn_weights.transpose(0,1)
+            # only get attention weights of the first encoder output len
+            # of the last dimension of attn_weights
+            # attn_weights = attn_weights[:, :, 0:seq_len]
 
-	    # get back the dimension
-	    attn_weights = attn_weights.view(seq_len, batch_size, attn_weights.size(-1))
-	    attn_weights = attn_weights.transpose(0,1)
-	    print('size of attn_weights after linear layer: ' + str(attn_weights.size()))
+            # append a bunch of zeros to inputs for context calculation
+            # to match the attn_length dimension of attn_weights
+            # append = Variable(torch.zeros(self.num_attn_weights - seq_len, batch_size, inputs.size(-1)))
+            # if use_cuda:
+            #     append = append.cuda()
+            # inputs_for_context_calc = torch.cat((inputs, append), 0)
+            # print(inputs_for_context_calc.size())
 
-            for b in range(attn_weights.size(0)):
-                attn_weights[b] = F.softmax(attn_weights[b])
+            # for b in range(attn_weights.size(0)):
+            #     attn_weights[b] = F.softmax(attn_weights[b])
             # context size = (batch size, hidden size * num directions)
-            context = torch.sum( torch.bmm(attn_weights, inputs.transpose(0,1)), 1 ).squeeze(1)
+            # context = torch.sum( torch.bmm(attn_weights, inputs.transpose(0,1)), 1 ).squeeze(1)
+
+            # init attention weights
+            # length = batch_size x encoder output lens
+
+            attn_weights = Variable(torch.zeros(inputs.size(1), inputs.size(0)))
+            if use_cuda:
+                attn_weights = attn_weights.cuda()
+
+            # calculate attention weight for each output time step
+            # remember encoder_outputs size: (seq_len, batch, hidden_size * num_directions)
+            # for each token in the decoder output sequences:
+
+            for b in range(inputs.size(1)):
+                # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
+                attn_weights[b] = self.attn(inputs[:, b]).t()
+
+            attn_weights = F.softmax(attn_weights)
+
+            # input to bmm:
+            # weights size: (batch size, 1, seq_len)
+            # hidden states size: (seq_len, batch, hidden_size * num_directions)
+            # transpose hidden state size: (batch, seq len, hidden_size * num_directions)
+            # output size: (batch size, 1, hidden_size * num_directions)
+            context = torch.bmm(attn_weights.unsqueeze(1), inputs.transpose(0, 1)).squeeze(1)
         else:
             context = torch.sum( inputs.transpose(0,1), 1 ).squeeze(1)
 
@@ -183,5 +215,6 @@ class MLP(nn.Module):
         out = self.layer1(context)
         out = self.relu(out)
         out = self.layer2(out)
+        out = self.sigmoid(out)
 
         return out

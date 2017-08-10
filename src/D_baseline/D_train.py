@@ -59,26 +59,24 @@ def train(train_batch, batch_size, seq_lens, true_labels,
     # output size: (seq_len, batch, hidden_size)
     # hidden size: (num_layers, batch, hidden_size)
     # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
-    encoder_hiddens, encoder_hidden = encoder(train_batch, seq_lens[0], None)
+    # print(train_batch.size())
+    # print(len(seq_lens))
+    # print(type(seq_lens))
+    # print(seq_lens)
+    encoder_hiddens, encoder_hidden = encoder(train_batch, seq_lens, None)
 
-    outputs = F.sigmoid(mlp(encoder_hiddens))
+    # outputs = F.sigmoid(mlp(encoder_hiddens))
+    outputs = mlp(encoder_hiddens)
 
-    # pred_targets = torch.zeros(otuputs.size())
-    # for i in range(outputs.size(0)):
-    #     if F.tanh(outputs[i]) < 0:
-    #         pred_targets[i] = 0
-    #     else:
-    #         pred_targets[i] = 1
-
-    loss += criterion(true_labels, outputs)
+    loss += criterion(outputs, true_labels)
 
     loss.backward()
     encoder_optimizer.step()
-    decoder_optimizer.step()
+    mlp_optimizer.step()
 
     # return loss
     # FIXME: figure out if loss need to be divided by batch_size
-    return loss.data[0] / float(batch_size)
+    return loss.data[0] # did not divide by batch size for now
 
 
 
@@ -128,12 +126,18 @@ def trainIters(encoder, mlp, batch_size, embeddings_size,
         training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, fake_training_batch, fake_seq_lens,
                                                         batch_size, word2index, embeddings_index, embeddings_size,
                                                         mode = ['word', 'index'], concat_opt='cqa', with_fake=True)
-        train_input = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dim]
-        train_label = training_batch[-1]
+
+        # prints for debug use
+        # print(training_batch[0].size())
+        # print(type(seq_lens[0]))
+        # print(seq_lens[0])
+
+        train_input = Variable(training_batch[0].cuda()) if use_cuda else Variable(training_batch[0]) # embeddings vectors, size = [seq len x batch size x embedding dim]
+        train_label = Variable(torch.FloatTensor(training_batch[-1]).cuda()) if use_cuda else Variable(torch.FloatTensor(training_batch[-1]))
 
         start = time.time()
 
-        loss = train(train_input, batch_size, seq_lens, train_label,
+        loss = train(train_input, batch_size, seq_lens[0], train_label,
                      embeddings_index, embeddings_size, word2index, index2word,
                      encoder, mlp, encoder_optimizer, mlp_optimizer, criterion)
         # print('loss at iteration ' + str(iter) + ' is: ' + str(loss))
@@ -152,8 +156,7 @@ def trainIters(encoder, mlp, batch_size, embeddings_size,
             print('time for one training iteration: ' + str(end - start))
             print('---sample generated question---')
             # sample a triple and print the generated question
-            _, _ = evaluate(encoder, decoder, triplets, embeddings_index,
-                           embeddings_size, word2index, index2word, max_length)
+            evaluate(encoder, mlp, triplets, word2index, embeddings_index, embeddings_size, eval_batch_size=10)
             print('-------------------------------')
             print('-------------------------------')
             print()

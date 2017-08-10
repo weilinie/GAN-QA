@@ -121,8 +121,8 @@ def tokenize_squad(raw_squad, embeddings_index):
         tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index),
                                      tokenize_sentence(triple[1], embeddings_index),
                                      tokenize_sentence(triple[2], embeddings_index),
-                                     torch.FloatTensor([triple[3]]),
-                                     torch.FloatTensor([triple[4]]) ) )
+                                     triple[3],
+                                     triple[4] ) )
     return tokenized_triplets
 
 # turns a sentence into individual tokens
@@ -329,12 +329,12 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
         for b in range(batch_size):
             cqa.append(batch[0][b] + batch[1][b] + batch[2][b]) # append real
             cqa_len.append(len(batch[0][b] + batch[1][b] + batch[2][b])) # append real
-            labels.append(torch.FloatTensor([1]))
+            labels.append(1)
             if with_fake: # append fake
                 fake_q_sample = random.sample(fake_q,1)[0]
                 cqa.append(batch[0][b] + fake_q_sample + batch[2][b])
                 cqa_len.append(len(batch[0][b] + fake_q_sample + batch[2][b]))
-                labels.append(torch.FloatTensor([0]))
+                labels.append(0)
         # print(len(max(cqa, key=len)))
         # print(max(cqa_len))
         if with_fake:
@@ -343,11 +343,22 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
             batch = [cqa, batch[3], batch[4]]
         # seq_lens =  [cqa_len] + seq_lens
         seq_lens = [cqa_len]
+        # print(len(seq_lens[0]))
     elif concat_opt == 'qca':
         pass
 
     else:
         raise ValueError('not a valid concat option.')
+
+    # print('len of first element in batch before zip: ' + str(len(batch[0])))
+    # print('len of second elemenet in batch before zip ' + str(len(batch[1])))
+    # print('len of third element in batch before zip ' + str(len(batch[2])))
+    # print('len of fourth element in batch before zip ' + str(len(batch[3])))
+    #
+    # print('type of first element in batch before zip: ' + str(type(batch[0])) + '; ' + str(type(batch[0][0])))
+    # print('type of second elemenet in batch before zip ' + str(type(batch[1])) + '; ' + str(type(batch[1][0])))
+    # print('type of third element in batch before zip ' + str(type(batch[2])) + '; ' + str(type(batch[2][0])))
+    # print('type of fourth element in batch before zip ' + str(type(batch[3])) + '; ' + str(type(batch[3][0])))
 
     # sort this batch_var in descending order according to the values of the lengths of the first element in batch
     num_batch = len(batch)
@@ -358,18 +369,29 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
     seq_lens = all[num_batch:]
     batch_orig = batch
 
-    # from here batch size is the orignal batch size again
+    # get bacth size back to 2x if with fake
     if with_fake:
-        batch_size = int(batch_size * 2)
+        batch_size = batch_size * 2
 
-    for b in range(len(batch)):
+    # print('len of first element in batch after zip: ' + str(len(batch_orig[0])))
+    # print('len of second elemenet in batch after zip ' + str(len(batch_orig[1])))
+    # print('len of third element in batch after zip ' + str(len(batch_orig[2])))
+    # print('len of fourth element in batch after zip ' + str(len(batch_orig[3])))
+    #
+    # print('type of first element in batch after zip: ' + str(type(batch_orig[0])) + '; ' + str(type(batch_orig[0][0])))
+    # print('type of second elemenet in batch after zip ' + str(type(batch_orig[1])) + '; ' + str(type(batch_orig[1][0])))
+    # print('type of third element in batch after zip ' + str(type(batch_orig[2])) + '; ' + str(type(batch_orig[2][0])))
+    # print('type of fourth element in batch after zip ' + str(type(batch_orig[3])) + '; ' + str(type(batch_orig[3][0])))
+
+    for b in range(num_batch):
 
         batch_var = batch[b]
 
         # if element in batch is float, i.e. indices, then do nothing
-        if isinstance(batch_var[0][0], float):
+        if isinstance(batch_var[0], int):
             # print('in numeric values')
             # print(b)
+            batch_var = list(batch_var)
             pass
         else:
             # print('in token values')
@@ -398,9 +420,14 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
                     else:
                         batch_var[j, i] = batch_padded[i][j]
 
-            batch_var = Variable(batch_var.cuda()) if use_cuda else Variable(batch_var)
+            # batch_var = Variable(batch_var.cuda()) if use_cuda else Variable(batch_var)
 
         batch_vars.append(batch_var)
+
+    # print(type(seq_lens[-1][0]))
+    # print(type(seq_lens[-1]))
+    # print(batch_vars[-1][0:10])
+    # print(batch_vars[-1].size())
 
     # the second output is for debugging purpose
     return batch_vars, batch_orig, seq_lens

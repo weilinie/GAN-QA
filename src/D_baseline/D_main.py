@@ -79,11 +79,11 @@ word2index, index2word = generate_look_up_table(effective_tokens, effective_num_
 
 
 ######### set up model
-enc_hidden_size = 64
+enc_hidden_size = 256
 mlp_hidden_size = 64
 output_size = 1
-num_attn_weights = 1000
-batch_size = 40
+num_attn_weights = 1 # 1000
+batch_size = 100
 # context encoder
 encoder = EncoderRNN(embeddings_size, enc_hidden_size, batch_size)
 # decoder
