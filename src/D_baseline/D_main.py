@@ -8,10 +8,12 @@ sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 from data_proc import *
 
-from model_zoo import *
+from D_model import *
 from D_train import *
 from D_eval import *
 import numpy as np
+
+from torch import optim
 
 use_cuda = torch.cuda.is_available()
 
@@ -58,30 +60,38 @@ word2index, index2word = generate_look_up_table(effective_tokens, effective_num_
 
 ######### set up model
 enc_hidden_size = 256
+enc_n_layers = 1
+num_directions = 1
 mlp_hidden_size = 64
-output_size = 1
+mlp_output_size = 1
 num_attn_weights = 1 # 1000
+use_attn = True
 batch_size = 100
-# context encoder
-encoder = EncoderRNN(embeddings_size, enc_hidden_size, batch_size)
-# decoder
-mlp = MLP(mlp_hidden_size, output_size, encoder, num_attn_weights)
-
+enc_lr = 0.01
+mlp_lr = 0.01
+learning_rate = 0.001
+discriminator = D(embeddings_size, enc_hidden_size, enc_n_layers, num_directions,
+                  mlp_hidden_size, num_attn_weights, mlp_output_size, use_attn,
+                  batch_size)
 if use_cuda:
-    encoder = encoder.cuda()
-    mlp = mlp.cuda()
+    discriminator = discriminator.cuda()
+
+criterion = nn.BCELoss()
+optimizer = optim.Adam(discriminator.parameters(), lr=learning_rate)
 
 
 ######### start training
-trainIters(encoder, mlp, batch_size, embeddings_size,
+to_file = False
+train(discriminator, criterion, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, triplets,
-           path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-           n_iters=50000, print_every=500, plot_every=10, learning_rate=0.001)
+           to_file, path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
+           n_iters=3000, print_every=100, plot_every=1)
 
 
 # save the final model
-torch.save(encoder, path_to_exp_out+'/encoder.pth')
-torch.save(mlp, path_to_exp_out+'/mlp.pth')
+# if to_file:
+#     torch.save(encoder, path_to_exp_out+'/encoder.pth')
+#     torch.save(mlp, path_to_exp_out+'/mlp.pth')
 
 
 

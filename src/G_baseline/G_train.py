@@ -4,7 +4,7 @@ from __future__ import division
 
 import sys
 import os
-sys.path.append(os.path.abspath(__file__ + "/../../")
+sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 from data_proc import *
 from util import *
@@ -35,68 +35,70 @@ def train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
 
     loss = 0
 
-    # context encoding
-    # output size: (seq_len, batch, hidden_size)
-    # hidden size: (num_layers, batch, hidden_size)
-    # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
-    encoder_hiddens, encoder_hidden = encoder(context_ans_batch_var, seq_lens[0], None)
-
-    # decoder
-    # prepare decoder inputs as word embeddings in a batch
-    # decoder_input size: (1, batch size, embedding size); first dim is 1 because only one time step;
-    # nee to have a 3D tensor for input to nn.GRU module
-    decoder_input = Variable( embeddings_index['SOS'].repeat(batch_size, 1).unsqueeze(0) )
-    if use_cuda:
-        decoder_input = decoder_input.cuda()
-
-    # use teacher forcing to step through each token in the decoder sequence
-    use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
-
-    if use_teacher_forcing:
-        # Teacher forcing: Feed the target as the next input
-        for di in range(max_q_len):
-            decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, encoder_hiddens, embeddings_index)
-
-            # accumulate loss
-            targets = Variable(question_batch_var[di].cuda()) if use_cuda else Variable(question_batch_var[di])
-            loss += criterion(decoder_output, targets)
-
-            # change next time step input to current target output, in embedding format
-            decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
-                            Variable(torch.FloatTensor(1, batch_size, embeddings_size))
-            for b in range(batch_size):
-                decoder_input[0, b] = embeddings_index[index2word[question_batch_var[di, b]]].cuda() \
-                                      if use_cuda else\
-                                      embeddings_index[index2word[question_batch_var[di, b]]] # Teacher forcing
-
-    else:
-        # Without teacher forcing: use its own predictions as the next input
-        for di in range(max_q_len):
-            decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, encoder_hiddens, embeddings_index)
-
-            # top value and index of every batch
-            # size of both topv, topi = (batch size, 1)
-            topv, topi = decoder_output.data.topk(1)
-
-            # get the output word for every batch
-            decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
-                            Variable(torch.FloatTensor(1, batch_size, embeddings_size))
-            for b in range(batch_size):
-                decoder_input[0, b] = embeddings_index[index2word[topi[0][0]]].cuda() if use_cuda else \
-                                      embeddings_index[index2word[topi[0][0]]]
-
-            # accumulate loss
-            # FIXME: in this batch version decoder, loss is accumulated for all <EOS> symbols even if
-            # FIXME: the sentence has already ended. not sure if this is the right thing to do
-            targets = Variable(question_batch_var[di].cuda()) if use_cuda else Variable(question_batch_var[di])
-            loss += criterion(decoder_output, targets)
 
 
-    loss.backward()
-    encoder_optimizer.step()
-    decoder_optimizer.step()
+    # # context encoding
+    # # output size: (seq_len, batch, hidden_size)
+    # # hidden size: (num_layers, batch, hidden_size)
+    # # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
+    # encoder_hiddens, encoder_hidden = encoder(context_ans_batch_var, seq_lens[0], None)
+    #
+    # # decoder
+    # # prepare decoder inputs as word embeddings in a batch
+    # # decoder_input size: (1, batch size, embedding size); first dim is 1 because only one time step;
+    # # nee to have a 3D tensor for input to nn.GRU module
+    # decoder_input = Variable( embeddings_index['SOS'].repeat(batch_size, 1).unsqueeze(0) )
+    # if use_cuda:
+    #     decoder_input = decoder_input.cuda()
+    #
+    # # use teacher forcing to step through each token in the decoder sequence
+    # use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
+    #
+    # if use_teacher_forcing:
+    #     # Teacher forcing: Feed the target as the next input
+    #     for di in range(max_q_len):
+    #         decoder_output, decoder_hidden, decoder_attention = decoder(
+    #             decoder_input, encoder_hiddens, embeddings_index)
+    #
+    #         # accumulate loss
+    #         targets = Variable(question_batch_var[di].cuda()) if use_cuda else Variable(question_batch_var[di])
+    #         loss += criterion(decoder_output, targets)
+    #
+    #         # change next time step input to current target output, in embedding format
+    #         decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
+    #                         Variable(torch.FloatTensor(1, batch_size, embeddings_size))
+    #         for b in range(batch_size):
+    #             decoder_input[0, b] = embeddings_index[index2word[question_batch_var[di, b]]].cuda() \
+    #                                   if use_cuda else\
+    #                                   embeddings_index[index2word[question_batch_var[di, b]]] # Teacher forcing
+    #
+    # else:
+    #     # Without teacher forcing: use its own predictions as the next input
+    #     for di in range(max_q_len):
+    #         decoder_output, decoder_hidden, decoder_attention = decoder(
+    #             decoder_input, encoder_hiddens, embeddings_index)
+    #
+    #         # top value and index of every batch
+    #         # size of both topv, topi = (batch size, 1)
+    #         topv, topi = decoder_output.data.topk(1)
+    #
+    #         # get the output word for every batch
+    #         decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
+    #                         Variable(torch.FloatTensor(1, batch_size, embeddings_size))
+    #         for b in range(batch_size):
+    #             decoder_input[0, b] = embeddings_index[index2word[topi[0][0]]].cuda() if use_cuda else \
+    #                                   embeddings_index[index2word[topi[0][0]]]
+    #
+    #         # accumulate loss
+    #         # FIXME: in this batch version decoder, loss is accumulated for all <EOS> symbols even if
+    #         # FIXME: the sentence has already ended. not sure if this is the right thing to do
+    #         targets = Variable(question_batch_var[di].cuda()) if use_cuda else Variable(question_batch_var[di])
+    #         loss += criterion(decoder_output, targets)
+
+
+    # loss.backward()
+    # encoder_optimizer.step()
+    # decoder_optimizer.step()
 
     # return loss
     # FIXME: figure out if loss need to be divided by batch_size
@@ -138,9 +140,12 @@ def trainIters(encoder, decoder, batch_size, embeddings_size,
         question_batch_var = training_batch[1] # represented as indices, size = [seq len x batch size]
 
         start = time.time()
-        loss = train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
-                     embeddings_index, embeddings_size, word2index, index2word, teacher_forcing_ratio,
-                     encoder, decoder, encoder_optimizer, decoder_optimizer, criterion)
+
+        generator.forward()
+
+        # loss = train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
+        #              embeddings_index, embeddings_size, word2index, index2word, teacher_forcing_ratio,
+        #              encoder, decoder, encoder_optimizer, decoder_optimizer, criterion)
         end = time.time()
 
 

@@ -4,7 +4,7 @@ from __future__ import division
 import sys
 import os
 sys.path.append(os.path.abspath(__file__ + "/../../")
-sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util'))
 
 from model_zoo import *
 from G_train import *

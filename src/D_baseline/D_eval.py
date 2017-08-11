@@ -5,19 +5,15 @@ sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 
 from data_proc import *
-from model_zoo import *
+from D_model import *
 
 import torch
-import torch.nn as nn
-from torch import optim
 from torch.autograd import Variable
-import torch.nn.functional as F
-import time
 
 use_cuda = torch.cuda.is_available()
 
 
-def evaluate(encoder, mlp, triplets,
+def evaluate(discriminator, triplets,
              word2index, embeddings_index, embeddings_size,
              eval_batch_size=10):
     
@@ -36,8 +32,7 @@ def evaluate(encoder, mlp, triplets,
         torch.FloatTensor(training_batch[-1]))
 
     # pass through discriminator model
-    encoder_hiddens, encoder_hidden = encoder(train_input, seq_lens[0], None)
-    outputs = mlp(encoder_hiddens)
+    outputs = discriminator.forward(train_input, true_labels, seq_lens[0])
 
     # get label predictions from model & compare the number of correct predictions
     pred_labels = torch.zeros(outputs.size())

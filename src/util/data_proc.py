@@ -18,11 +18,8 @@ from torch.autograd import Variable
 from spacy.en import English
 spacynlp = English()
 
-import nltk
 import json
 import numpy as np
-import os
-import time
 
 
 ######################################################################
