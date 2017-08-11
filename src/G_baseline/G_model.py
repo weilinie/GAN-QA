@@ -2,7 +2,10 @@ import sys
 import os
 import random
 sys.path.append(os.path.abspath(__file__ + "/../../"))
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+
 from model_zoo import *
+from masked_cross_entropy import *
 import torch
 from torch.autograd import Variable
 
@@ -32,21 +35,22 @@ class G(nn.Module):
         # decoder_input size: (1, batch size, embedding size); first dim is 1 because only one time step;
         # nee to have a 3D tensor for input to nn.GRU module
         decoder_input = Variable(embeddings_index['SOS'].repeat(batch_size, 1).unsqueeze(0))
+        # init all decoder outputs
+        all_decoder_outputs = Variable(torch.zeros(max_q_len, batch_size, self.decoder.output_size))
         if use_cuda:
             decoder_input = decoder_input.cuda()
+            all_decoder_outputs = all_decoder_outputs.cuda()
 
         # use teacher forcing to step through each token in the decoder sequence
         use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
-
+        
         if use_teacher_forcing:
             # Teacher forcing: Feed the target as the next input
             for di in range(max_q_len):
                 decoder_output, decoder_hidden, decoder_attention = self.decoder(
                     decoder_input, encoder_hiddens, embeddings_index)
 
-                # accumulate loss
-                targets = Variable(inputs_q[di].cuda()) if use_cuda else Variable(inputs_q[di])
-                # loss += criterion(decoder_output, targets)
+                all_decoder_outputs[di] = decoder_output
 
                 # change next time step input to current target output, in embedding format
                 decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
@@ -73,17 +77,16 @@ class G(nn.Module):
                     decoder_input[0, b] = embeddings_index[index2word[topi[0][0]]].cuda() if use_cuda else \
                         embeddings_index[index2word[topi[0][0]]]
 
-                # accumulate loss
-                # FIXME: in this batch version decoder, loss is accumulated for all <EOS> symbols even if
-                # FIXME: the sentence has already ended. not sure if this is the right thing to do
-                targets = Variable(inputs_q[di].cuda()) if use_cuda else Variable(inputs_q[di])
-                # loss += criterion(decoder_output, targets)
 
         return decoder_output, targets
 
 
     def backward(self, out, labels, criterion, optimizer):
-        loss = criterion(out, labels)
+        loss = masked_cross_entropy(
+        out.transpose(0, 1).contiguous(), # -> batch x seq
+        target_batches.transpose(0, 1).contiguous(), # -> batch x seq
+        target_lengths
+    )
         loss.backward()
         optimizer.step()
         return loss
