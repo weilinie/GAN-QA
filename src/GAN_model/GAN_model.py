@@ -24,6 +24,7 @@ class GAN_model(nn.Module):
         pass
 
     def test(self):
+
         pass
 
     # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
