@@ -1,35 +1,13 @@
-# -*- coding: utf-8 -*-
 
-# NOTE: this is NOT tensorflow. This is PyTorch implementation, standalone of GAN.
-
-"""
-question answering model baseline
-
-code adapted from <https://github.com/spro/practical-pytorch>`_
-
-made use of seq2seq learning <http://arxiv.org/abs/1409.3215>
-and attention mechanism <https://arxiv.org/abs/1409.0473>
-
-input: a paragraph (aka context), and an answer, both represented by a sequence of tokens
-output: a question, represented by a sequence of tokens
-
-"""
-
-#-----------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------#
-# requirements
-#-----------------------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------------------------------#
 from __future__ import print_function
 from __future__ import division
 
 import sys
 import os
+sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
-sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline_batch')
 from data_proc import *
 
-# from ..util.data_proc import *
 from model_zoo import *
 from D_train import *
 from D_eval import *
@@ -90,13 +68,8 @@ encoder = EncoderRNN(embeddings_size, enc_hidden_size, batch_size)
 mlp = MLP(mlp_hidden_size, output_size, encoder, num_attn_weights)
 
 if use_cuda:
-    t1 = time.time()
     encoder = encoder.cuda()
-    t2 = time.time()
-    print('time load encoder 1: ' + str(t2 - t1))
     mlp = mlp.cuda()
-    t3 = time.time()
-    print('time load decoder: ' + str(t3 - t2))
 
 
 ######### start training
@@ -104,6 +77,7 @@ trainIters(encoder, mlp, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, triplets,
            path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
            n_iters=50000, print_every=500, plot_every=10, learning_rate=0.001)
+
 
 # save the final model
 torch.save(encoder, path_to_exp_out+'/encoder.pth')
