@@ -70,7 +70,7 @@ enc_num_directions = 1
 dec_hidden_size = 256
 dec_n_layers = 1
 dec_num_directions = 1
-batch_size = 5
+batch_size = 20
 learning_rate = 0.0005
 
 generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
