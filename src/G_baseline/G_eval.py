@@ -20,7 +20,7 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
 
     # prepare test input
     batch_size = 1
-    training, seq_lens = get_random_batch(triplets, batch_size, word2index)
+    training, seq_lens = get_random_batch(triplets, batch_size)
     context_words = training[0]
     training, _, seq_lens = prepare_batch_var(training, seq_lens, batch_size, embeddings_index, embeddings_size)
     inputs_ca = training[0]  # embeddings vectors, size = [seq len x batch size x embedding dim]
