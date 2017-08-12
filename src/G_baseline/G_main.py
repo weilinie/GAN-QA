@@ -18,7 +18,7 @@ teacher_forcing_ratio = 0.5 # default in original code is 0.5
 # TODO: to run properly, change the following paths and filenames
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
-f_name = 'dev-v1.1.json'
+f_name = 'train-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
@@ -32,7 +32,7 @@ path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
 
 
 ######### first load the pretrained word embeddings
-path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.50d.txt')
+path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
@@ -70,7 +70,7 @@ enc_num_directions = 1
 dec_hidden_size = 256
 dec_n_layers = 1
 dec_num_directions = 1
-batch_size = 1
+batch_size = 20
 learning_rate = 0.0005
 
 generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
@@ -104,7 +104,7 @@ to_file = False
 trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
            to_file, path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-           n_iters = 50, print_every=10, plot_every=100)
+           n_iters = 100, print_every=5, plot_every=100)
 
 # save the final model
 # if to_file:
