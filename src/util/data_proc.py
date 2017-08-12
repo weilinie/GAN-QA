@@ -403,7 +403,7 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
             if mode[b] != 'index':
                 batch_var = torch.FloatTensor(max(seq_lens[b]), batch_size, embeddings_size)
             else:
-                batch_var = torch.FloatTensor(max(seq_lens[b]), batch_size)
+                batch_var = torch.LongTensor(max(seq_lens[b]), batch_size) # long tensor for module loss criterion
 
             # FIXME: very stupid embedded for loop implementation
             for i in range(batch_size):
