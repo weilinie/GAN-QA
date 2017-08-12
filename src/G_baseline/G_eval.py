@@ -84,6 +84,10 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     # print results
     print('context              > ' + ' '.join(context_words[0]))
     print('answer               > ' + ' '.join(answer_words[0]))
+    c_a = []
+    for i in range(seq_lens[0][0]):
+        c_a.append(index2word[inputs_ca[i][0].data[0]])
+    print('context + answer     > ' + ' '.join(c_a))
     print('question             > ' + ' '.join(question_words[0]))
     true_q = []
     for i in range(seq_lens[1][0]):
