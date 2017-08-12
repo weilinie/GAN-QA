@@ -109,25 +109,26 @@ def train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
 ######################################################################
 
 
-def trainIters(encoder, decoder, batch_size, embeddings_size,
+def trainIters(generator, criterion, optimizer, batch_size, embeddings_size,
     embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
-    path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-    n_iters, print_every=10, plot_every=100, learning_rate=0.01):
+    to_file, path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
+    n_iters, print_every=10, plot_every=100):
 
     begin_time = time.time()
 
     # open the files
-    loss_f = open(path_to_loss_f,'w+') 
-    sample_out_f = open(path_to_sample_out_f, 'w+')
+    if to_file:
+        loss_f = open(path_to_loss_f,'w+')
+        sample_out_f = open(path_to_sample_out_f, 'w+')
 
     # plot_losses = []
     print_loss_total = 0  # Reset every print_every
     plot_loss_total = 0  # Reset every plot_every
 
-    encoder_optimizer = optim.Adam(encoder.parameters(), lr=learning_rate)
-    decoder_optimizer = optim.Adam(decoder.parameters(), lr=learning_rate)
+    # encoder_optimizer = optim.Adam(encoder.parameters(), lr=learning_rate)
+    # decoder_optimizer = optim.Adam(decoder.parameters(), lr=learning_rate)
 
-    criterion = nn.NLLLoss()
+    # criterion = nn.NLLLoss()
 
     print()
 
@@ -135,33 +136,37 @@ def trainIters(encoder, decoder, batch_size, embeddings_size,
 
         # prepare batch
         training_batch, seq_lens = get_random_batch(triplets, batch_size, word2index)
-        training_batch = prepare_batch_var(training_batch, seq_lens, batch_size, embeddings_index, embeddings_size)
-        context_ans_batch_var = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dim]
-        question_batch_var = training_batch[1] # represented as indices, size = [seq len x batch size]
+        training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, batch_size, embeddings_index, embeddings_size)
+        inputs_ca = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dim]
+        inputs_q = training_batch[1] # represented as indices, size = [seq len x batch size]
 
-        start = time.time()
+        max_c_a_len = max(seq_lens[0])  # max seq length of context + ans combined
+        max_q_len = max(seq_lens[1])  # max seq length of question
 
-        generator.forward()
+        # start = time.time()
+        loss = 0
+        all_decoder_outputs = generator.forward(inputs_ca, inputs_q, seq_lens[0], batch_size, max_q_len,
+                                                embeddings_index, embeddings_size, word2index, index2word,
+                                                teacher_forcing_ratio)
+        loss += generator.backward(all_decoder_outputs, inputs_q, seq_lens[1], optimizer)
 
         # loss = train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
         #              embeddings_index, embeddings_size, word2index, index2word, teacher_forcing_ratio,
         #              encoder, decoder, encoder_optimizer, decoder_optimizer, criterion)
-        end = time.time()
+        # end = time.time()
 
-
-        print_loss_total += loss
-        plot_loss_total += loss
+        print_loss_total += loss.data[0]
+        plot_loss_total += loss.data[0]
 
         if iter % print_every == 0:
             print_loss_avg = print_loss_total / print_every
             print_loss_total = 0
             print('%s (%d %d%%) %.4f' % (timeSince(begin_time, iter / float(n_iters)),
                                          iter, iter / n_iters * 100, print_loss_avg))
-            print('time for one training iteration: ' + str(end - start))
+            # print('time for one training iteration: ' + str(end - begin_time))
             print('---sample generated question---')
             # sample a triple and print the generated question
-            _, _ = evaluate(encoder, decoder, triplets, embeddings_index,
-                           embeddings_size, word2index, index2word, max_length)
+            evaluate(generator, triplets, embeddings_index, embeddings_size, word2index, index2word, max_length)
             print('-------------------------------')
             print('-------------------------------')
             print()
@@ -170,11 +175,13 @@ def trainIters(encoder, decoder, batch_size, embeddings_size,
             plot_loss_avg = plot_loss_total / plot_every
             # plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
-            loss_f.write(unicode(plot_loss_avg))
-            loss_f.write(unicode('\n'))
+            if to_file:
+                loss_f.write(unicode(plot_loss_avg))
+                loss_f.write(unicode('\n'))
 
     # showPlot(plot_losses)
-    loss_f.close()
+    if to_file:
+        loss_f.close()
 
 
 

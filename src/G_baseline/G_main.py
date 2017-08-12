@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 
-from model_zoo import *
+from G_model import *
 from G_train import *
 import numpy as np
 
@@ -64,37 +64,52 @@ print('')
 
 
 ######### set up model
-hidden_size1 = 256
-hidden_size2 = 256
-batch_size = 25
+enc_hidden_size = 256
+enc_n_layers = 1
+enc_num_directions = 1
+dec_hidden_size = 256
+dec_n_layers = 1
+dec_num_directions = 1
+batch_size = 50
+learning_rate = 0.0005
+
+generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
+                 embeddings_size, dec_hidden_size, effective_num_tokens, dec_n_layers, dec_num_directions,
+                 batch_size)
+
 # context encoder
-encoder = EncoderRNN(embeddings_size, hidden_size1, batch_size)
+# encoder = EncoderRNN(embeddings_size, hidden_size1, batch_size)
 # decoder
 # input_size, hidden_size, output_size, encoder, n_layers=1, num_directions=1, dropout_p=0.1
-attn_decoder = AttnDecoderRNN(embeddings_size, hidden_size2, effective_num_tokens,
-                                encoder, n_layers=1, num_directions=1, dropout_p=0.1)
+# attn_decoder = AttnDecoderRNN(embeddings_size, hidden_size2, effective_num_tokens,
+#                                 encoder, n_layers=1, num_directions=1, dropout_p=0.1)
 
 if use_cuda:
-    t1 = time.time()
-    encoder = encoder.cuda()
-    t2 = time.time()
-    print('time load encoder: ' + str(t2 - t1))
-    attn_decoder = attn_decoder.cuda()
-    t3 = time.time()
-    print('time load decoder: ' + str(t3 - t2))
+    generator = generator.cuda()
+    # t1 = time.time()
+    # encoder = encoder.cuda()
+    # t2 = time.time()
+    # print('time load encoder: ' + str(t2 - t1))
+    # attn_decoder = attn_decoder.cuda()
+    # t3 = time.time()
+    # print('time load decoder: ' + str(t3 - t2))
 
+optimizer = optim.Adam(generator.parameters(), lr=learning_rate)
+criterion = nn.NLLLoss()
 
 # max_length of generated question
 max_length = 100
+to_file = False
 
-
-trainIters(encoder, attn_decoder, batch_size, embeddings_size,
+trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
-           path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-           n_iters=20000, print_every=100, plot_every=10, learning_rate=0.0005)
+           to_file, path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
+           n_iters = 5, print_every=10, plot_every=100)
 
 # save the final model
-torch.save(encoder, path_to_exp_out+'/encoder_temp.pth')
-torch.save(attn_decoder, path_to_exp_out+'/decoder_temp.pth')
+if to_file:
+    # torch.save(generator, path_to_exp_out+'/generator_temp.pth')
+    # torch.save(encoder, path_to_exp_out+'/encoder_temp.pth')
+    # torch.save(attn_decoder, path_to_exp_out+'/decoder_temp.pth')
 
 

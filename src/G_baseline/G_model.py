@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 from model_zoo import *
 from masked_cross_entropy import *
 import torch
+import torch.nn as nn
 from torch.autograd import Variable
 
 use_cuda = torch.cuda.is_available()
@@ -28,7 +29,7 @@ class G(nn.Module):
         # output size: (seq_len, batch, hidden_size)
         # hidden size: (num_layers, batch, hidden_size)
         # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
-        encoder_hiddens, encoder_hidden = self.encoder(inputs, seq_lens, None)
+        encoder_hiddens, encoder_hidden = self.encoder(inputs_ca, seq_lens, None)
 
         # decoder
         # prepare decoder inputs as word embeddings in a batch
@@ -56,15 +57,16 @@ class G(nn.Module):
                 decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
                     Variable(torch.FloatTensor(1, batch_size, embeddings_size))
                 for b in range(batch_size):
-                    decoder_input[0, b] = embeddings_index[index2word[inputs_q[di, b]]].cuda() \
-                        if use_cuda else \
-                        embeddings_index[index2word[inputs_q[di, b]]]  # Teacher forcing
+                    decoder_input[0, b] = embeddings_index[index2word[inputs_q[di, b]]].cuda() if use_cuda else \
+                                          embeddings_index[index2word[inputs_q[di, b]]]  # Teacher forcing
 
         else:
             # Without teacher forcing: use its own predictions as the next input
             for di in range(max_q_len):
                 decoder_output, decoder_hidden, decoder_attention = self.decoder(
                     decoder_input, encoder_hiddens, embeddings_index)
+
+                all_decoder_outputs[di] = decoder_output
 
                 # top value and index of every batch
                 # size of both topv, topi = (batch size, 1)
@@ -77,16 +79,15 @@ class G(nn.Module):
                     decoder_input[0, b] = embeddings_index[index2word[topi[0][0]]].cuda() if use_cuda else \
                         embeddings_index[index2word[topi[0][0]]]
 
+        return all_decoder_outputs
 
-        return decoder_output, targets
 
-
-    def backward(self, out, labels, criterion, optimizer):
+    def backward(self, out, labels, true_lens, optimizer):
         loss = masked_cross_entropy(
-        out.transpose(0, 1).contiguous(), # -> batch x seq
-        target_batches.transpose(0, 1).contiguous(), # -> batch x seq
-        target_lengths
-    )
+            out.transpose(0, 1).contiguous(), # -> batch x seq
+            labels.transpose(0, 1).contiguous(), # -> batch x seq
+            true_lens
+        )
         loss.backward()
         optimizer.step()
         return loss
