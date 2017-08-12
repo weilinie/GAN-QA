@@ -107,7 +107,7 @@ class AttnDecoderRNN(nn.Module):
             # print(append.size())
             # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
                 for i in range(encoder_outputs.size(0)):
-                    attn_weights[i,b] = hidden[:,b].squeeze(0).dot(self.attn(torch.cat((hidden[:,b], encoder_outputs[i,b]), 1)).t())
+                    attn_weights[b,i] = hidden[:,b].squeeze(0).dot(self.attn(torch.cat((hidden[:,b], encoder_outputs[i,b]), 1)).t())
                     # attn_weights[i,b] = torch.mm(hidden[:, b],
                     #                     self.attn(torch.cat((append, encoder_outputs[:, b]), 1)).t())
 
