@@ -22,7 +22,9 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     batch_size = 1
     training, seq_lens = get_random_batch(triplets, batch_size)
     context_words = training[0]
-    training, _, seq_lens = prepare_batch_var(training, seq_lens, batch_size, embeddings_index, embeddings_size)
+    fake_batch = None
+    fake_seq_lens = None
+    training, _, seq_lens = prepare_batch_var(training, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size, mode=['word', 'index'], concat_opt='ca')
     inputs_ca = training[0]  # embeddings vectors, size = [seq len x batch size x embedding dim]
     inputs_q = training[1]  # represented as indices, size = [seq len x batch size]
 
