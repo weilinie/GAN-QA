@@ -83,7 +83,7 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     print('context and question > ' + ' '.join(context_words[0]))
     true_q = []
     for i in range(seq_lens[1][0]):
-        true_q.append(index2word[question_var[i][0]])
+        true_q.append(index2word[inputs_q[i][0]])
     print('question             > ' + ' '.join(true_q))
     print('generated question   > ' + ' '.join(decoded_words))
 
