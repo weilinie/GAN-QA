@@ -22,6 +22,8 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     batch_size = 1
     training, seq_lens = get_random_batch(triplets, batch_size)
     context_words = training[0]
+    answer_words = training[2]
+    question_words = training[1]
     fake_batch = None
     fake_seq_lens = None
     training, _, seq_lens = prepare_batch_var(training, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size, mode=['word', 'index'], concat_opt='ca')
@@ -80,11 +82,13 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     #                           embeddings_index[index2word[topi[0][0]]]
 
     # print results
-    print('context and question > ' + ' '.join(context_words[0]))
+    print('context              > ' + ' '.join(context_words[0]))
+    print('answer               > ' + ' '.join(answer_words[0]))
+    print('question             > ' + ' '.join(question_words[0]))
     true_q = []
     for i in range(seq_lens[1][0]):
         true_q.append(index2word[inputs_q[i][0].data[0]])
-    print('question             > ' + ' '.join(true_q))
+    print('question with padding> ' + ' '.join(true_q))
     print('generated question   > ' + ' '.join(decoded_words))
 
     # return decoded_words, decoder_attentions
