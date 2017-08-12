@@ -100,6 +100,7 @@ class AttnDecoderRNN(nn.Module):
         for b in range(encoder_outputs.size(1)):
             # copy the decoder output at the present time step to N rows, where N = num encoder outputs
             # first dimension of append = first dimension of encoder_outputs[:,b] = seq_len of encoder
+            print(encoder_outputs.size())
             append = output[:, b].repeat(encoder_outputs.size(0), 1)
             # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
             attn_weights[b] = torch.mm(hidden[:, b],
