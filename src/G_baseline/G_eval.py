@@ -25,8 +25,8 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     fake_batch = None
     fake_seq_lens = None
     training, _, seq_lens = prepare_batch_var(training, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size, mode=['word', 'index'], concat_opt='ca')
-    inputs_ca = Variable(training_batch[0].cuda()) if use_cuda else Variable(training_batch[0]) # embeddings vectors, size = [seq len x batch size x embedding dim]
-    inputs_q = Variable(training_batch[1].cuda()) if use_cuda else Variable(training_batch[1]) # represented as indices, size = [seq len x batch size]
+    inputs_ca = Variable(training[0].cuda()) if use_cuda else Variable(training[0]) # embeddings vectors, size = [seq len x batch size x embedding dim]
+    inputs_q = Variable(training[1].cuda()) if use_cuda else Variable(training[1]) # represented as indices, size = [seq len x batch size]
 
     all_decoder_outputs = generator.forward(inputs_ca, inputs_q, seq_lens[0], batch_size, max_length,
                                             embeddings_index, embeddings_size, word2index, index2word,
