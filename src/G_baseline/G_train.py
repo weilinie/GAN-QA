@@ -109,10 +109,10 @@ def train(context_ans_batch_var, question_batch_var, batch_size, seq_lens,
 ######################################################################
 
 
-def trainIters(generator, criterion, optimizer, batch_size, embeddings_size,
+def trainIters(generator, optimizer, batch_size, embeddings_size,
     embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
     to_file, path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
-    n_iters, print_every=10, plot_every=100):
+    n_iters=5, print_every=10, plot_every=100):
 
     begin_time = time.time()
 
@@ -135,10 +135,12 @@ def trainIters(generator, criterion, optimizer, batch_size, embeddings_size,
     for iter in range(1, n_iters + 1):
 
         # prepare batch
-        training_batch, seq_lens = get_random_batch(triplets, batch_size, word2index)
-        training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, batch_size, embeddings_index, embeddings_size)
-        inputs_ca = training_batch[0] # embeddings vectors, size = [seq len x batch size x embedding dim]
-        inputs_q = training_batch[1] # represented as indices, size = [seq len x batch size]
+        training_batch, seq_lens = get_random_batch(triplets, batch_size)
+        fake_batch = None
+        fake_seq_lens = None
+        training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size, mode=['word', 'index'], concat_opt='ca')
+        inputs_ca = Variable(training_batch[0].cuda()) if use_cuda else Variable(training_batch[0]) # embeddings vectors, size = [seq len x batch size x embedding dim]
+        inputs_q = Variable(training_batch[1].cuda()) if use_cuda else Variable(training_batch[1]) # represented as indices, size = [seq len x batch size]
 
         max_c_a_len = max(seq_lens[0])  # max seq length of context + ans combined
         max_q_len = max(seq_lens[1])  # max seq length of question

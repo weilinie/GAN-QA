@@ -6,8 +6,8 @@ import os
 sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 
-from G_model import *
 from G_train import *
+from G_model import *
 import numpy as np
 
 use_cuda = torch.cuda.is_available()
@@ -18,7 +18,7 @@ teacher_forcing_ratio = 0.5 # default in original code is 0.5
 # TODO: to run properly, change the following paths and filenames
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
-f_name = 'train-v1.1.json'
+f_name = 'dev-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
@@ -70,7 +70,7 @@ enc_num_directions = 1
 dec_hidden_size = 256
 dec_n_layers = 1
 dec_num_directions = 1
-batch_size = 50
+batch_size = 20
 learning_rate = 0.0005
 
 generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
@@ -107,7 +107,7 @@ trainIters(generator, optimizer, batch_size, embeddings_size,
            n_iters = 5, print_every=10, plot_every=100)
 
 # save the final model
-if to_file:
+# if to_file:
     # torch.save(generator, path_to_exp_out+'/generator_temp.pth')
     # torch.save(encoder, path_to_exp_out+'/encoder_temp.pth')
     # torch.save(attn_decoder, path_to_exp_out+'/decoder_temp.pth')

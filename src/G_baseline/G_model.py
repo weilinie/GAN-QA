@@ -20,7 +20,7 @@ class G(nn.Module):
         super(G, self).__init__()
         self.encoder = EncoderRNN(enc_input_size, enc_hidden_size, batch_size, enc_n_layers, enc_num_directions)
         self.decoder = AttnDecoderRNN(dec_input_size, dec_hidden_size, output_size, self.encoder,
-                                      dec_n_layers=1, dec_num_directions=1)
+                                      dec_n_layers, dec_num_directions)
 
 
     def forward(self, inputs_ca, inputs_q, seq_lens, batch_size, max_q_len,
@@ -57,8 +57,8 @@ class G(nn.Module):
                 decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
                     Variable(torch.FloatTensor(1, batch_size, embeddings_size))
                 for b in range(batch_size):
-                    decoder_input[0, b] = embeddings_index[index2word[inputs_q[di, b]]].cuda() if use_cuda else \
-                                          embeddings_index[index2word[inputs_q[di, b]]]  # Teacher forcing
+                    decoder_input[0, b] = embeddings_index[index2word[inputs_q[di, b].data[0]]].cuda() if use_cuda else \
+                                          embeddings_index[index2word[inputs_q[di, b].data[0]]]  # Teacher forcing
 
         else:
             # Without teacher forcing: use its own predictions as the next input
