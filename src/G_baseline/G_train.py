@@ -163,6 +163,7 @@ def trainIters(generator, optimizer, batch_size, embeddings_size,
         max_q_len = max(seq_lens[1])  # max seq length of question
 
         # start = time.time()
+        optimizer.zero_grad()
         loss = 0
         all_decoder_outputs = generator.forward(inputs_ca, inputs_q, seq_lens[0], batch_size, max_q_len,
                                                 embeddings_index, embeddings_size, word2index, index2word,
