@@ -42,7 +42,6 @@ class G(nn.Module):
             decoder_input = decoder_input.cuda()
             all_decoder_outputs = all_decoder_outputs.cuda()
 
-        # use teacher forcing to step through each token in the decoder sequence
         use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
         
         if use_teacher_forcing:

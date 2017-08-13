@@ -47,40 +47,6 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
         else:
             decoded_words.append(index2word[ni])
 
-    # # context (paragraph + answer) encoding
-    # encoder_hiddens, encoder_hidden = encoder(context_ans_var, seq_lens[0], None)
-    #
-    # # prepare decoder input
-    # decoder_input = Variable(embeddings_index['SOS'].repeat(batch_size, 1).unsqueeze(0))
-    # if use_cuda:
-    #     decoder_input = decoder_input.cuda()
-    #
-    # # decoder generate words
-    # decoded_words = []
-    # decoder_attentions = torch.zeros(max_length, encoder_hiddens.size()[0])
-    # for di in range(max_length):
-    #     decoder_output, decoder_hidden, decoder_attention = decoder(decoder_input, encoder_hiddens, embeddings_index)
-    #
-    #     # top value and index of every batch
-    #     # size of both topv, topi = (batch size, 1)
-    #     topv, topi = decoder_output.data.topk(1)
-    #     ni = topi[0][0]
-    #
-    #     # get the word token and add to the list of words
-    #     if (ni == word2index['EOS']) or (ni == word2index['PAD']):
-    #         decoded_words.append('EOS')
-    #         decoder_attentions[di] = decoder_attention[0].data
-    #         break
-    #     else:
-    #         decoded_words.append(index2word[ni])
-    #
-    #     # prepare decoder next time step input
-    #     # get the output word for every batch
-    #     decoder_input = Variable(torch.FloatTensor(1, batch_size, embeddings_size).cuda()) if use_cuda else \
-    #         Variable(torch.FloatTensor(1, batch_size, embeddings_size))
-    #     decoder_input[0, 0] = embeddings_index[index2word[topi[0][0]]].cuda() if use_cuda else \
-    #                           embeddings_index[index2word[topi[0][0]]]
-
     # print results
     print('context              > ' + ' '.join(context_words[0]))
     print('answer               > ' + ' '.join(answer_words[0]))
@@ -91,5 +57,8 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     print('question with padding> ' + ' '.join(true_q))
     print('generated question   > ' + ' '.join(decoded_words))
 
+    # TODO: uncomment the following return if you want to record the decoder outputs in file
+    #       (note: need to modify this function call in G_train.py)
     # return decoded_words, decoder_attentions
+
 

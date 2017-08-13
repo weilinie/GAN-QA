@@ -77,22 +77,8 @@ generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions
                  embeddings_size, dec_hidden_size, effective_num_tokens, dec_n_layers, dec_num_directions,
                  batch_size)
 
-# context encoder
-# encoder = EncoderRNN(embeddings_size, hidden_size1, batch_size)
-# decoder
-# input_size, hidden_size, output_size, encoder, n_layers=1, num_directions=1, dropout_p=0.1
-# attn_decoder = AttnDecoderRNN(embeddings_size, hidden_size2, effective_num_tokens,
-#                                 encoder, n_layers=1, num_directions=1, dropout_p=0.1)
-
 if use_cuda:
     generator = generator.cuda()
-    # t1 = time.time()
-    # encoder = encoder.cuda()
-    # t2 = time.time()
-    # print('time load encoder: ' + str(t2 - t1))
-    # attn_decoder = attn_decoder.cuda()
-    # t3 = time.time()
-    # print('time load decoder: ' + str(t3 - t2))
 
 optimizer = optim.Adam(generator.parameters(), lr=learning_rate)
 criterion = nn.NLLLoss()
@@ -109,7 +95,5 @@ trainIters(generator, optimizer, batch_size, embeddings_size,
 # save the final model
 # if to_file:
     # torch.save(generator, path_to_exp_out+'/generator_temp.pth')
-    # torch.save(encoder, path_to_exp_out+'/encoder_temp.pth')
-    # torch.save(attn_decoder, path_to_exp_out+'/decoder_temp.pth')
 
 

@@ -8,7 +8,10 @@ import time
 sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 from data_proc import *
-# from util import *
+# FIXME: had some problem importing util.py; importing successful but 
+#        functions cannot be called (NameError: global name XXX is not defined)
+#        fast solution: copied asMinutes and timeSince functions here
+from util import *
 
 import torch
 from torch.autograd import Variable
@@ -19,8 +22,7 @@ use_cuda = torch.cuda.is_available()
 import time
 import math
 
-
-# temp
+# FIXME: added these two functions because import util does not seem to work (see above)
 def asMinutes(s):
     m = math.floor(s / 60)
     s -= m * 60
@@ -58,15 +60,15 @@ def train(discriminator, criterion, optimizer, batch_size, embeddings_size,
     for iter in range(1, n_iters + 1):
 
         # prepare batch
-        # do not need the answer location for now (the second output from get_random_batch)
         training_batch, seq_lens, fake_training_batch, fake_seq_lens = get_random_batch(triplets, batch_size, with_fake=True)
         # concat the context_ans batch with the question batch
         # each element in the training batch is context + question + answer
         training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, fake_training_batch, fake_seq_lens,
                                                         batch_size, word2index, embeddings_index, embeddings_size,
-                                                        mode = ['word', 'index'], concat_opt='cqa', with_fake=True)
+                                                        mode = ['word'], concat_opt='cqa', with_fake=True)
 
         train_input = Variable(training_batch[0].cuda()) if use_cuda else Variable(training_batch[0]) # embeddings vectors, size = [seq len x batch size x embedding dim]
+        # the labels are the last element of training_batch; see prepare_batch_var in data_proc.py for detail
         train_label = Variable(torch.FloatTensor(training_batch[-1]).cuda()) if use_cuda else Variable(torch.FloatTensor(training_batch[-1]))
 
         optimizer.zero_grad()
@@ -77,6 +79,7 @@ def train(discriminator, criterion, optimizer, batch_size, embeddings_size,
         print_loss_total += loss.data[0]
         plot_loss_total += loss.data[0]
 
+        # log on console
         if iter % print_every == 0:
             print_loss_avg = print_loss_total / print_every
             print_loss_total = 0
@@ -87,6 +90,7 @@ def train(discriminator, criterion, optimizer, batch_size, embeddings_size,
             print('-------------------------------')
             print()
 
+        # save error to file for plotting later
         if iter % plot_every == 0:
             plot_loss_avg = plot_loss_total / plot_every
             # plot_losses.append(plot_loss_avg)

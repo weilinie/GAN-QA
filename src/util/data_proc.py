@@ -15,6 +15,9 @@ spacynlp = English()
 import torch
 from torch.autograd import Variable
 
+# FIXME: import spacy again below to avoid an error encountered when importing torch and spacy
+#        it seems that spacy needs to be imported before torch. However, on Baylor cluster,
+#        you need to import spacy again here for it to actually be imported without error.
 from spacy.en import English
 spacynlp = English()
 
@@ -298,8 +301,6 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
         batch_size = int(batch_size/2)
         fake_q = fake_batch[1]
         fake_q_lens = fake_seq_lens[1]
-        # fake_label = [0] * batch_size
-        # true_label = [1] * batch_size
 
     #TODO (for different applications): change the below code (before for loop) to concat different portions of the batch_triplets
     if concat_opt == None:
@@ -313,7 +314,6 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
             ca_len.append(len(batch[0][b] + batch[2][b]))
         batch = [ca, batch[1], batch[3], batch[4]]
         seq_lens =  [ca_len] + seq_lens
-        # print(len(seq_lens))
 
     elif concat_opt == 'qa':
         pass
@@ -332,30 +332,16 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
                 cqa.append(batch[0][b] + fake_q_sample + batch[2][b])
                 cqa_len.append(len(batch[0][b] + fake_q_sample + batch[2][b]))
                 labels.append(0)
-        # print(len(max(cqa, key=len)))
-        # print(max(cqa_len))
         if with_fake:
             batch = [cqa, batch[3]+fake_batch[3], batch[4]+fake_batch[4], labels]
         else:
             batch = [cqa, batch[3], batch[4]]
-        # seq_lens =  [cqa_len] + seq_lens
         seq_lens = [cqa_len]
-        # print(len(seq_lens[0]))
     elif concat_opt == 'qca':
         pass
 
     else:
         raise ValueError('not a valid concat option.')
-
-    # print('len of first element in batch before zip: ' + str(len(batch[0])))
-    # print('len of second elemenet in batch before zip ' + str(len(batch[1])))
-    # print('len of third element in batch before zip ' + str(len(batch[2])))
-    # print('len of fourth element in batch before zip ' + str(len(batch[3])))
-    #
-    # print('type of first element in batch before zip: ' + str(type(batch[0])) + '; ' + str(type(batch[0][0])))
-    # print('type of second elemenet in batch before zip ' + str(type(batch[1])) + '; ' + str(type(batch[1][0])))
-    # print('type of third element in batch before zip ' + str(type(batch[2])) + '; ' + str(type(batch[2][0])))
-    # print('type of fourth element in batch before zip ' + str(type(batch[3])) + '; ' + str(type(batch[3][0])))
 
     # sort this batch_var in descending order according to the values of the lengths of the first element in batch
     num_batch = len(batch)
@@ -370,29 +356,15 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
     if with_fake:
         batch_size = batch_size * 2
 
-    # print('len of first element in batch after zip: ' + str(len(batch_orig[0])))
-    # print('len of second elemenet in batch after zip ' + str(len(batch_orig[1])))
-    # print('len of third element in batch after zip ' + str(len(batch_orig[2])))
-    # print('len of fourth element in batch after zip ' + str(len(batch_orig[3])))
-    #
-    # print('type of first element in batch after zip: ' + str(type(batch_orig[0])) + '; ' + str(type(batch_orig[0][0])))
-    # print('type of second elemenet in batch after zip ' + str(type(batch_orig[1])) + '; ' + str(type(batch_orig[1][0])))
-    # print('type of third element in batch after zip ' + str(type(batch_orig[2])) + '; ' + str(type(batch_orig[2][0])))
-    # print('type of fourth element in batch after zip ' + str(type(batch_orig[3])) + '; ' + str(type(batch_orig[3][0])))
-
     for b in range(num_batch):
 
         batch_var = batch[b]
 
         # if element in batch is float, i.e. indices, then do nothing
         if isinstance(batch_var[0], int):
-            # print('in numeric values')
-            # print(b)
             batch_var = list(batch_var)
             pass
         else:
-            # print('in token values')
-            # print(b)
             # pad each context, question, answer to their respective max length
             if mode[b]  == 'index':
                 batch_padded = [pad_sequence(s, max(seq_lens[b]), word2index, mode='index') for s in batch_var]
@@ -400,31 +372,20 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
                 batch_padded = [pad_sequence(s, max(seq_lens[b]), word2index) for s in batch_var]
 
             # init variable matrices
-            if mode[b] != 'index':
-                batch_var = torch.FloatTensor(max(seq_lens[b]), batch_size, embeddings_size)
-            else:
+            if mode[b] == 'index':
                 batch_var = torch.LongTensor(max(seq_lens[b]), batch_size) # long tensor for module loss criterion
+            else:
+                batch_var = torch.FloatTensor(max(seq_lens[b]), batch_size, embeddings_size)
 
             # FIXME: very stupid embedded for loop implementation
             for i in range(batch_size):
-                # print(i)
-                # print(type(i))
                 for j in range(max(seq_lens[b])):
-                    # print(j)
-                    # print(type(j))
-                    if mode[b] != 'index':
-                        batch_var[j, i,] = embeddings_index[batch_padded[i][j]]
-                    else:
+                    if mode[b] == 'index':
                         batch_var[j, i] = batch_padded[i][j]
-
-            # batch_var = Variable(batch_var.cuda()) if use_cuda else Variable(batch_var)
+                    else:
+                        batch_var[j, i,] = embeddings_index[batch_padded[i][j]]
 
         batch_vars.append(batch_var)
-
-    # print(type(seq_lens[-1][0]))
-    # print(type(seq_lens[-1]))
-    # print(batch_vars[-1][0:10])
-    # print(batch_vars[-1].size())
 
     # the second output is for debugging purpose
     return batch_vars, batch_orig, seq_lens
@@ -437,38 +398,13 @@ def pad_sequence(s, max_len, word2index, mode = 'word'):
     elif mode == 'index':
         return [word2index[i] for i in s] + [word2index['PAD'] for i in range(max_len - len(s))]
 
-# # test and time
-# # to run this test, you need to have these things ready:
-# # 1) triplet processed by tokenize_squad,
-# # 2) embeddings_index
-# # 3) a mini batch processed by get_random_batch
-# batch_size = 500
-# start = time.time()
-# batch, seq_lens, fake_batch, fake_seq_lens = get_random_batch(triplets, batch_size, with_fake=True)
-#
-# temp, temp_orig, seq_lens_cqa = prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size,
-#                                                   mode = ['word', 'index'], concat_opt='cqa', with_fake=True)
-# end = time.time()
-# print('time elapsed: ' + str(end-start))
-# # the following check if the batched data matches with the original data
-# batch_idx = random.choice(range(batch_size))
-# print(batch_idx)
-#
-# print('context  > ', ' '.join(temp_orig[0][batch_idx]))
-# print('question > ', ' '.join(temp_orig[1][batch_idx]))
-# print('answer   > ', ' '.join(temp_orig[2][batch_idx]))
-#
-# idx = batch[0].index(temp_orig[0][batch_idx])
-# print('context  > ', ' '.join(batch[0][idx]))
-# print('question > ', ' '.join(batch[1][idx]))
-# print('answer   > ', ' '.join(batch[2][idx]))
 
-# seq_idx = random.choice(range(min(seq_lens[0])))
-# print(seq_idx)
-# word1 = embeddings_index[batch[0][seq_lens[0].index(heapq.nlargest(batch_idx, seq_lens[0])[-1])][seq_idx]]
-# word2 = temp[0][seq_idx, batch_idx,]
-# set(word1) == set(word2.data.cpu())
+######################################################################
+# TODO: need a function to sample some (c, q, a) triplets from the generator
+def sample_generated_triples(triplets, G, batch_size):
 
+    # should return the same thing as get_random_batch with with_fake = False
+    return None
 
 
 ######################################################################

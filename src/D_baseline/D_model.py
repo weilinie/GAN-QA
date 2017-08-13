@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 
-# spacy has some problem with torch. need to import spacy first. therefore import data_proc first.
+# FIXME: spacy has some problem with torch. need to import spacy first. therefore import data_proc first.
 from data_proc import *
 from model_zoo import *
 
@@ -16,6 +16,7 @@ use_cuda = torch.cuda.is_available()
 ######################################################################
 # The Encoder
 # -----------
+# FIXME: not sure if __name__ is to be used. 
 # if __name__ == '__main__':
 
 class D(nn.Module):
@@ -31,9 +32,8 @@ class D(nn.Module):
 
 
     def forward(self, inputs, labels, seq_lens, hidden=None):
-        # input is tuple (concat of paragraph + answer + question, label). label = question is real or fake (binary)
-        # this first part is of size (seq len, batch size, embeddings dim)
-
+        # input size = (seq len, batch size, word embedding dimension)
+        
         # encoding
         # outputs dim (seq_len, batch size, hidden_size*num_directions)
         encoder_outputs, encoder_hidden = self.encoder(inputs, seq_lens)

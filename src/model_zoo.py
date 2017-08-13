@@ -1,8 +1,4 @@
-# -----------------------------------------------------------------------------------------------#
-# -----------------------------------------------------------------------------------------------#
-# the baseline model
-# -----------------------------------------------------------------------------------------------#
-# -----------------------------------------------------------------------------------------------#
+
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -79,12 +75,13 @@ class AttnDecoderRNN(nn.Module):
         # get the output
         # hidden: (num_layers * num_directions, batch, hidden_size)
         # note: for each time step, output and hidden are the same
-        # print('size of input: ' + str(input.size()))
         output, hidden = self.gru(input, hidden)
 
         # # unpack the sequence
         # # decoder_outputs size (seq len, batch, hidden_size * num_directions)
         # # --> collection of hidden states at every time step
+        # TODO: should figure out how to do this in a batch
+        #       current implementation is one token at a time using a forloop 
         # decoder_outputs, output_lens = torch.nn.utils.rnn.pad_packed_sequence(decoder_outputs)
 
         # init attention weights
@@ -93,23 +90,17 @@ class AttnDecoderRNN(nn.Module):
         if use_cuda:
             attn_weights = attn_weights.cuda()
 
-        # calculate attention weight for each output time step
-        # remember encoder_outputs size: (seq_len, batch, hidden_size * num_directions)
-        # for each token in the decoder output sequences:
-
         for b in range(encoder_outputs.size(1)):
             # copy the decoder output at the present time step to N rows, where N = num encoder outputs
             # first dimension of append = first dimension of encoder_outputs[:,b] = seq_len of encoder
-            # print(encoder_outputs.size())
-            # append = output[:, b].repeat(encoder_outputs.size(0), 1)
-            # print(output.size())
-            # print(encoder_outputs.size())
-            # print(append.size())
             # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
-                for i in range(encoder_outputs.size(0)):
-                    attn_weights[b,i] = hidden[:,b].squeeze(0).dot(self.attn(torch.cat((hidden[:,b], encoder_outputs[i,b].unsqueeze(0)), 1)).t())
-                    # attn_weights[i,b] = torch.mm(hidden[:, b],
-                    #                     self.attn(torch.cat((append, encoder_outputs[:, b]), 1)).t())
+            for i in range(encoder_outputs.size(0)):
+                attn_weights[b,i] = hidden[:,b].squeeze(0).dot(self.attn(torch.cat((hidden[:,b], encoder_outputs[i,b].unsqueeze(0)), 1)).t())
+            # Below is an alternative implementation using matrices instead of for loop
+            # not sure which one is more space efficient
+            # (the out of memory error most likely comes from here)
+            # attn_weights[i,b] = torch.mm(hidden[:, b],
+            #                     self.attn(torch.cat((append, encoder_outputs[:, b]), 1)).t())
 
         attn_weights = F.softmax(attn_weights)
 
@@ -122,7 +113,6 @@ class AttnDecoderRNN(nn.Module):
 
         # calculate 
         decoder_output = torch.cat((hidden.squeeze(0), context.squeeze(1)), 1)
-        # hidden =
 
         # output size: (batch size, vocab size)
         decoder_output = F.log_softmax(self.out(decoder_output))
@@ -134,9 +124,6 @@ class AttnDecoderRNN(nn.Module):
 # multi-layer perceptron
 # ^^^^^^^^^^^^^^^^^^^^^^
 # code adapted from pytorch tutorial
-# input size: (batch size, hidden size of encoder)
-# FIXME: what should be a good output size?
-# output size: same as input
 class MLP(nn.Module):
     # FIXME: the number of attention weights here is hard coded for tensor multiplication instead of using for loops
     def __init__(self, hidden_size, output_size, encoder, num_attn_weights, use_attn = True):
@@ -162,37 +149,13 @@ class MLP(nn.Module):
         # inputs size (seq len, batch size, hidden size * num directions)
         # if use attention, the output vector is a weighted combination of input hidden states
         # if not use attention, the output vector is simply a feedforward network operated on input's last hidden state
+        # TODO: write the attn function into another module???
         if self.use_attn:
 
             # reshape input to be 2D tensor instead of 3D
             seq_len = inputs.size(0)
             batch_size = inputs.size(1)
             inputs_for_attn_calc = inputs.view(-1, inputs.size(-1))
-
-            # attn_weights size = (batch_size, encoder output len, num_attn_weights)
-            # attn_weights = self.tanh(self.attn(inputs_for_attn_calc))
-            # # get back the dimension
-            # attn_weights = attn_weights.view(seq_len, batch_size, attn_weights.size(-1))
-            # attn_weights = attn_weights.transpose(0,1)
-            # only get attention weights of the first encoder output len
-            # of the last dimension of attn_weights
-            # attn_weights = attn_weights[:, :, 0:seq_len]
-
-            # append a bunch of zeros to inputs for context calculation
-            # to match the attn_length dimension of attn_weights
-            # append = Variable(torch.zeros(self.num_attn_weights - seq_len, batch_size, inputs.size(-1)))
-            # if use_cuda:
-            #     append = append.cuda()
-            # inputs_for_context_calc = torch.cat((inputs, append), 0)
-            # print(inputs_for_context_calc.size())
-
-            # for b in range(attn_weights.size(0)):
-            #     attn_weights[b] = F.softmax(attn_weights[b])
-            # context size = (batch size, hidden size * num directions)
-            # context = torch.sum( torch.bmm(attn_weights, inputs.transpose(0,1)), 1 ).squeeze(1)
-
-            # init attention weights
-            # length = batch_size x encoder output lens
 
             attn_weights = Variable(torch.zeros(inputs.size(1), inputs.size(0)))
             if use_cuda:
@@ -201,7 +164,6 @@ class MLP(nn.Module):
             # calculate attention weight for each output time step
             # remember encoder_outputs size: (seq_len, batch, hidden_size * num_directions)
             # for each token in the decoder output sequences:
-
             for b in range(inputs.size(1)):
                 # the scores for calculating attention weights of all encoder outputs for one time step of decoder output
                 attn_weights[b] = self.attn(inputs[:, b]).t()

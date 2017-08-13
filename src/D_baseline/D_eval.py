@@ -17,14 +17,13 @@ def evaluate(discriminator, triplets,
              word2index, embeddings_index, embeddings_size,
              eval_batch_size=10):
     
-    # read a batch of true and fake data
-    # size of true data = size of fake data (different setup compared to data_proc.py)
+    # prepare batch
     training_batch, seq_lens, fake_training_batch, fake_seq_lens = get_random_batch(triplets, eval_batch_size, with_fake=True)
     # concat the context_ans batch with the question batch
     # each element in the training batch is context + question + answer
     training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, fake_training_batch, fake_seq_lens,
                                                     eval_batch_size, word2index, embeddings_index, embeddings_size,
-                                                    mode = ['word', 'index'], concat_opt='cqa', with_fake=True)
+                                                    mode = ['word'], concat_opt='cqa', with_fake=True)
 
     train_input = Variable(training_batch[0].cuda()) if use_cuda else Variable(
         training_batch[0])  # embeddings vectors, size = [seq len x batch size x embedding dim]
@@ -44,3 +43,7 @@ def evaluate(discriminator, triplets,
 
     print('percentage of correct predictions (True/False): ' + 
             str(float(num_correct_pred)/float(outputs.size(0))*100) + '%.\n')
+
+
+
+    

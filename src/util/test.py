@@ -4,69 +4,49 @@
 
 from data_proc import *
 from util import *
-from ..D_baseline.model_zoo import *
-from ..D_baseline.G_eval import *
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline')
+from model_zoo import *
 import torch
 
 
-# test these models with data
-f_name = 'dev-v1.1.json'
-dataset = 'squad'
-path_to_dataset = '/home/jack/Documents/QA_QG/data/'
-path_to_data = path_to_dataset + dataset + '/' + f_name
-exp_name = 'QG_seq2seq_baseline'
-path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results/' + exp_name
-GLOVE_DIR = path_to_dataset + 'glove.6B/'
+######################################################################
+######################################################################
+# test case of get_random_batch and prepare_batch_var functions in data_proc.py
+# (uncomment code below to test)
+# # test and time
+# # to run this test, you need to have these things ready:
+# # 1) triplet processed by tokenize_squad,
+# # 2) embeddings_index
+# # 3) a mini batch processed by get_random_batch
+# batch_size = 500
+# start = time.time()
+# batch, seq_lens, fake_batch, fake_seq_lens = get_random_batch(triplets, batch_size, with_fake=True)
+#
+# temp, temp_orig, seq_lens_cqa = prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size,
+#                                                   mode = ['word', 'index'], concat_opt='cqa', with_fake=True)
+# end = time.time()
+# print('time elapsed: ' + str(end-start))
+# # the following check if the batched data matches with the original data
+# batch_idx = random.choice(range(batch_size))
+# print(batch_idx)
+#
+# print('context  > ', ' '.join(temp_orig[0][batch_idx]))
+# print('question > ', ' '.join(temp_orig[1][batch_idx]))
+# print('answer   > ', ' '.join(temp_orig[2][batch_idx]))
+#
+# idx = batch[0].index(temp_orig[0][batch_idx])
+# print('context  > ', ' '.join(batch[0][idx]))
+# print('question > ', ' '.join(batch[1][idx]))
+# print('answer   > ', ' '.join(batch[2][idx]))
 
-encoder1 = torch.load(path_to_exp_out+'/encoder1_temp.pth')
-encoder2 = torch.load(path_to_exp_out+'/encoder2_temp.pth')
-decoder  = torch.load(path_to_exp_out+'/decoder_temp.pth')
-
-triplets = readSQuAD(path_to_data)
-
-embeddings_index = {}
-f = open(os.path.join(GLOVE_DIR, 'glove.6B.100d.txt'))
-for line in f:
-    values = line.split()
-    word = values[0]
-    coefs = np.asarray(values[1:], dtype='float32')
-    coefs = torch.from_numpy(coefs)
-    embeddings_index[word] = coefs
-f.close()
-
-# get dimension from a random sample in the dict
-embeddings_size = random.sample( embeddings_index.items(), 1 )[0][1].size(-1)
-print('dimension of word embeddings: ' + str(embeddings_size))
-SOS_token = -torch.ones(embeddings_size) # start of sentence token, all zerons
-EOS_token = torch.ones(embeddings_size) # end of sentence token, all ones
-UNK_token = torch.ones(embeddings_size) + torch.ones(embeddings_size) # these choices are pretty random
-# add special tokens to the embeddings
-embeddings_index['SOS'] = SOS_token
-embeddings_index['EOS'] = EOS_token
-embeddings_index['UNK'] = UNK_token
-
-data_tokens = []
-for triple in triplets:
-    c = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[0]))
-    q = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[1]))
-    a = post_proc_tokenize_sentence(spacynlp.tokenizer(triple[2]))
-    data_tokens += c + q + a
-data_tokens = list(set(data_tokens)) # find unique
-data_tokens = ['SOS', 'EOS', 'UNK'] + data_tokens
-
-num_tokens = len(data_tokens)
-effective_tokens = list(set(data_tokens).intersection(embeddings_index.keys()))
-print(effective_tokens[0:20])
-effective_num_tokens = len(effective_tokens)
+# seq_idx = random.choice(range(min(seq_lens[0])))
+# print(seq_idx)
+# word1 = embeddings_index[batch[0][seq_lens[0].index(heapq.nlargest(batch_idx, seq_lens[0])[-1])][seq_idx]]
+# word2 = temp[0][seq_idx, batch_idx,]
+# set(word1) == set(word2.data.cpu())
 
 
-# build word2index dictionary and index2word dictionary
-word2index = {}
-index2word = {}
-for i in range(effective_num_tokens):
-    index2word[i] = effective_tokens[i]
-    word2index[effective_tokens[i]] = i
 
-# randomly evaluate
-max_length = 100
-evaluateRandomly(encoder1, encoder2, decoder, triplets, embeddings_index, word2index, index2word, max_length, n=1)
+
+
