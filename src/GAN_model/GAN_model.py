@@ -1,9 +1,32 @@
+import sys, os
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline')
+from G_model import *
+from D_model import *
+
 import torch
 import torch.nn as nn
 import numpy as np
 import torch.autograd as autograd
-from ..G_baseline_batch.G_model import G
-from ..D_baseline.D_baseline_model import D
+from torch.autograd import Variable
+
+######### helper functions for time recording & logging ##########
+import time
+import math
+
+# FIXME: added these two functions because import util does not seem to work (see above)
+def asMinutes(s):
+    m = math.floor(s / 60)
+    s -= m * 60
+    return '%dm %ds' % (m, s)
+
+def timeSince(since, percent):
+    now = time.time()
+    s = now - since
+    es = s / (percent)
+    rs = es - s
+    return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
+###################################################################
 
 use_cuda = torch.cuda.is_available()
 if use_cuda:
@@ -16,16 +39,68 @@ def to_var(x):
 
 
 class GAN_model(nn.Module):
-    def __init__(self, e_input_size, e_hidden_size, d_input_size, d_hidden_size, output_size):
-        self.G = G(e_input_size, e_hidden_size)  # TODO
-        self.D = D(d_input_size, d_hidden_size, output_size, self.encoder)  # TODO
+    def __init__(self, G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions,
+                 G_dec_input_size, G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions,
+                 D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions,
+                 D_mlp_hidden_size, D_num_attn_weights, D_mlp_output_size,
+                 use_attn, batch_size
+                 ):
 
-    def train(self, **kwargs):
+        super(GAN_model, self).__init__()
+
+        self.G = G(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions,G_dec_input_size,
+                   G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions, batch_size)
+
+        self.D = D(D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions,D_mlp_hidden_size,
+                   D_num_attn_weights, D_mlp_output_size, use_attn, batch_size)
+
+    def train(self, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size):
+
+        # record start time for logging
+        begin_time = time.time()
+
+        for iter in range(1, n_iters + 1):
+
+            # load a minibatch of data from corpus + data from the generator
+
+            # train D
+            for d_train_idx in range(d_steps):
+                # 1. Train D on real+fake
+                self.D.zero_grad()
+
+                #  1A: Train D on real
+                d_real_data = Variable(d_sampler(d_input_size)) #TODO replace below two lines with sampling from real data
+                d_real_decision = D(preprocess(d_real_data))
+                d_real_error = criterion(d_real_decision, Variable(torch.ones(1)))  # ones = true
+                # d_real_error.backward()  # compute/store gradients, but don't change params
+
+                #  1B: Train D on fake
+                d_gen_input = Variable(gi_sampler(minibatch_size, g_input_size)) # TODO replace this line by sampling from generator
+                d_fake_data = G(d_gen_input).detach()  # detach to avoid training G on these labels
+                d_fake_decision = D(preprocess(d_fake_data.t()))
+                d_fake_error = criterion(d_fake_decision, Variable(torch.zeros(1)))  # zeros = fake
+                # d_fake_error.backward()
+                # d_optimizer.step()
+
+                # accumulate loss
+                # L2 loss
+                # FIXME I dont think below implementation works for batch version
+                D_loss = -torch.mean(self.log(1 - d_fake_decision)) - torch.mean(self.log(d_real_decision))
+                D_loss.backward()
+                d_optimizer.step()
+
+            # train G
+            for g_train_idx in range(g_steps):
+
+
+    def backward(self):
         pass
 
-    def test(self):
-
-        pass
+    # def train(self, **kwargs):
+    #     pass
+    #
+    # def test(self):
+    #     pass
 
     # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
     def loss(self, D_real, D_fake, gen_params, disc_params, cond_real_data, cond_fake_data, mode, lr=None):
