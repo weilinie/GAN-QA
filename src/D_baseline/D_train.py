@@ -73,7 +73,7 @@ def train(discriminator, criterion, optimizer, batch_size, embeddings_size,
 
         optimizer.zero_grad()
         loss = 0
-        outputs = discriminator.forward(train_input, train_label, seq_lens[0])
+        outputs = discriminator.forward(train_input, seq_lens[0])
         loss += discriminator.backward(outputs, train_label, criterion, optimizer)
 
         print_loss_total += loss.data[0]

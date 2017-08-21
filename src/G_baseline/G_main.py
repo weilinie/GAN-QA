@@ -10,6 +10,7 @@ from G_train import *
 from G_model import *
 import numpy as np
 
+global use_cuda
 use_cuda = torch.cuda.is_available()
 teacher_forcing_ratio = 0.5 # default in original code is 0.5
 

@@ -1,6 +1,8 @@
 import sys, os
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline')
-sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+from data_proc import *
 from G_model import *
 from D_model import *
 
@@ -54,7 +56,9 @@ class GAN_model(nn.Module):
         self.D = D(D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions,D_mlp_hidden_size,
                    D_num_attn_weights, D_mlp_output_size, use_attn, batch_size)
 
-    def train(self, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size):
+    def train(self, triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size,
+              criterion, word2index, embeddings_index, embeddings_size):
+        # criterion is for both G and D
 
         # record start time for logging
         begin_time = time.time()
@@ -69,10 +73,24 @@ class GAN_model(nn.Module):
                 self.D.zero_grad()
 
                 #  1A: Train D on real
-                d_real_data = Variable(d_sampler(d_input_size)) #TODO replace below two lines with sampling from real data
-                d_real_decision = D(preprocess(d_real_data))
+                #       get data
+                #       prepare batch
+                training_batch, seq_lens = get_random_batch(triplets, batch_size)
+                #       concat the context_ans batch with the question batch
+                #       each element in the training batch is context + question + answer
+                cqa_batch, _, cqa_lens = prepare_batch_var(training_batch, seq_lens,
+                                                                batch_size, word2index, embeddings_index,
+                                                                embeddings_size, mode=['word'], concat_opt='cqa')
+                ca_batch, _, ca_lens = prepare_batch_var(training_batch, seq_lens,
+                                                                batch_size, word2index, embeddings_index,
+                                                                embeddings_size, mode=['word'], concat_opt='ca')
+
+                train_input = Variable(cqa_batch[0].cuda()) if use_cuda else Variable(
+                    cqa_batch[0])  # embeddings vectors, size = [seq len x batch size x embedding dim]
+
+                d_real_decision = self.D.forward(train_input, cqa_lens[0])
                 d_real_error = criterion(d_real_decision, Variable(torch.ones(1)))  # ones = true
-                # d_real_error.backward()  # compute/store gradients, but don't change params
+                d_real_error.backward()  # compute/store gradients, but don't change params
 
                 #  1B: Train D on fake
                 d_gen_input = Variable(gi_sampler(minibatch_size, g_input_size)) # TODO replace this line by sampling from generator
@@ -83,10 +101,11 @@ class GAN_model(nn.Module):
                 # d_optimizer.step()
 
                 # accumulate loss
-                # L2 loss
                 # FIXME I dont think below implementation works for batch version
-                D_loss = -torch.mean(self.log(1 - d_fake_decision)) - torch.mean(self.log(d_real_decision))
-                D_loss.backward()
+                # L2 loss
+                # D_loss = -torch.mean(self.log(1 - d_fake_decision)) - torch.mean(self.log(d_real_decision))
+                # D_loss.backward()
+
                 d_optimizer.step()
 
             # train G
@@ -103,6 +122,7 @@ class GAN_model(nn.Module):
     #     pass
 
     # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
+    # FIXME: is L2 loss the same as MSELoss in torch loss module?
     def loss(self, D_real, D_fake, gen_params, disc_params, cond_real_data, cond_fake_data, mode, lr=None):
         mode = mode.lower()
         if mode == 'gan':

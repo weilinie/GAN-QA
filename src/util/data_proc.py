@@ -290,9 +290,9 @@ def get_random_batch(triplets, batch_size, with_fake = False):
 # - if question is represented as index, then its size is [max seq len x batch size] --> this is transpose of the input
 #   from get_random_batch in order to fit NLLLoss function (indexing and selecting the whole batch of a single token) is
 #   easier. e.g. you can do question[i] which selects the whole sequence of the first dimension
-def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
-                      batch_size, word2index, embeddings_index, embeddings_size,
-                      use_cuda=1, mode = ('word', 'word', 'index'), concat_opt = None, with_fake = False):
+def prepare_batch_var(batch, seq_lens, batch_size, word2index, embeddings_index, embeddings_size,
+                      use_cuda=1, mode = ('word', 'word', 'index'), concat_opt = None,
+                      with_fake = False, fake_batch = None, fake_seq_lens = None):
 
     batch_vars = []
     batch_var_orig = []
@@ -355,6 +355,71 @@ def prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens,
     # get bacth size back to 2x if with fake
     if with_fake:
         batch_size = batch_size * 2
+
+    for b in range(num_batch):
+
+        batch_var = batch[b]
+
+        # if element in batch is float, i.e. indices, then do nothing
+        if isinstance(batch_var[0], int):
+            batch_var = list(batch_var)
+            pass
+        else:
+            # pad each context, question, answer to their respective max length
+            if mode[b]  == 'index':
+                batch_padded = [pad_sequence(s, max(seq_lens[b]), word2index, mode='index') for s in batch_var]
+            else:
+                batch_padded = [pad_sequence(s, max(seq_lens[b]), word2index) for s in batch_var]
+
+            # init variable matrices
+            if mode[b] == 'index':
+                batch_var = torch.LongTensor(max(seq_lens[b]), batch_size) # long tensor for module loss criterion
+            else:
+                batch_var = torch.FloatTensor(max(seq_lens[b]), batch_size, embeddings_size)
+
+            # FIXME: very stupid embedded for loop implementation
+            for i in range(batch_size):
+                for j in range(max(seq_lens[b])):
+                    if mode[b] == 'index':
+                        batch_var[j, i] = batch_padded[i][j]
+                    else:
+                        batch_var[j, i,] = embeddings_index[batch_padded[i][j]]
+
+        batch_vars.append(batch_var)
+
+    # the second output is for debugging purpose
+    return batch_vars, batch_orig, seq_lens
+
+
+def prepare_fake_batch_var(batch, seq_lens, batch_size, word2index, embeddings_index, embeddings_size,
+                           mode = ('word', 'word', 'index')):
+
+    batch_vars = []
+    batch_var_orig = []
+
+    cqa = []
+    cqa_len = []
+    labels = []
+    for b in range(batch_size):
+        ca = batch[0][b] + batch[2][b]
+        fake_q_sample = #TODO implement G sampler in G_eval.py
+        cqa.append(batch[0][b] + fake_q_sample + batch[2][b])
+        cqa_len.append(len(batch[0][b] + fake_q_sample + batch[2][b]))
+        labels.append(0)
+    if with_fake:
+        batch = [cqa, batch[3]+fake_batch[3], batch[4]+fake_batch[4], labels]
+    else:
+        batch = [cqa, batch[3], batch[4]]
+    seq_lens = [cqa_len]
+
+    # sort this batch_var in descending order according to the values of the lengths of the first element in batch
+    num_batch = len(batch)
+    all = batch + seq_lens
+    all = sorted(zip(*all), key=lambda p: len(p[0]), reverse=True)
+    all = zip(*all)
+    batch = all[0:num_batch]
+    seq_lens = all[num_batch:]
+    batch_orig = batch
 
     for b in range(num_batch):
 

@@ -31,7 +31,7 @@ class D(nn.Module):
         self.mlp = MLP(mlp_hidden_size, mlp_output_size, self.encoder, num_attn_weights, use_attn = True)
 
 
-    def forward(self, inputs, labels, seq_lens, hidden=None):
+    def forward(self, inputs, seq_lens, hidden=None):
         # input size = (seq len, batch size, word embedding dimension)
         
         # encoding
