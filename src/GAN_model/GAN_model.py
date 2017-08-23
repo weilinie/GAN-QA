@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 from data_proc import *
 from G_model import *
 from D_model import *
+from G_eval import *
 
 import torch
 import torch.nn as nn
@@ -28,7 +29,7 @@ def timeSince(since, percent):
     es = s / (percent)
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
-###################################################################
+##################################################################
 
 use_cuda = torch.cuda.is_available()
 if use_cuda:
@@ -56,16 +57,15 @@ class GAN_model(nn.Module):
         self.D = D(D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions,D_mlp_hidden_size,
                    D_num_attn_weights, D_mlp_output_size, use_attn, batch_size)
 
-    def train(self, triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size,
-              criterion, word2index, embeddings_index, embeddings_size):
+    def train(self, triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size, max_len,
+              criterion, word2index, index2word, embeddings_index, embeddings_size, print_every,
+              to_file = False, loss_f = None, sample_out_f = None):
         # criterion is for both G and D
 
         # record start time for logging
         begin_time = time.time()
 
         for iter in range(1, n_iters + 1):
-
-            # load a minibatch of data from corpus + data from the generator
 
             # train D
             for d_train_idx in range(d_steps):
@@ -81,39 +81,70 @@ class GAN_model(nn.Module):
                 cqa_batch, _, cqa_lens = prepare_batch_var(training_batch, seq_lens,
                                                                 batch_size, word2index, embeddings_index,
                                                                 embeddings_size, mode=['word'], concat_opt='cqa')
-                ca_batch, _, ca_lens = prepare_batch_var(training_batch, seq_lens,
-                                                                batch_size, word2index, embeddings_index,
-                                                                embeddings_size, mode=['word'], concat_opt='ca')
 
                 train_input = Variable(cqa_batch[0].cuda()) if use_cuda else Variable(
                     cqa_batch[0])  # embeddings vectors, size = [seq len x batch size x embedding dim]
 
                 d_real_decision = self.D.forward(train_input, cqa_lens[0])
-                d_real_error = criterion(d_real_decision, Variable(torch.ones(1)))  # ones = true
+                real_target = Variable(torch.FloatTensor([1]*batch_size)).cuda() if use_cuda else \
+                    Variable(torch.FloatTensor([1]*batch_size))
+                d_real_error = criterion(d_real_decision, real_target)  # ones = true
                 d_real_error.backward()  # compute/store gradients, but don't change params
 
                 #  1B: Train D on fake
-                d_gen_input = Variable(gi_sampler(minibatch_size, g_input_size)) # TODO replace this line by sampling from generator
-                d_fake_data = G(d_gen_input).detach()  # detach to avoid training G on these labels
-                d_fake_decision = D(preprocess(d_fake_data.t()))
-                d_fake_error = criterion(d_fake_decision, Variable(torch.zeros(1)))  # zeros = fake
-                # d_fake_error.backward()
-                # d_optimizer.step()
+                fake_cqa_batch, _, fake_cqa_lens = prepare_fake_batch_var(self.G, training_batch, max_len, batch_size,
+                                                                          word2index, index2word, embeddings_index,
+                                                                          embeddings_size, mode = ('word'))
+                d_fake_data = Variable(fake_cqa_batch[0].cuda()) if use_cuda else Variable(fake_cqa_batch[0])
+                d_fake_decision = self.D.forward(d_fake_data, fake_cqa_lens[0])
+                fake_target = Variable(torch.FloatTensor([0]*batch_size)).cuda() if use_cuda else \
+                    Variable(torch.FloatTensor([0]*batch_size))
+                d_fake_error = criterion(d_fake_decision, fake_target)  # zeros = fake
+                d_fake_error.backward()
+                d_optimizer.step()
 
                 # accumulate loss
                 # FIXME I dont think below implementation works for batch version
                 # L2 loss
                 # D_loss = -torch.mean(self.log(1 - d_fake_decision)) - torch.mean(self.log(d_real_decision))
                 # D_loss.backward()
-
-                d_optimizer.step()
+                # d_optimizer.step()
 
             # train G
             for g_train_idx in range(g_steps):
+                self.G.zero_grad()
 
+                # conditional data for generator
+                training_batch, seq_lens = get_random_batch(triplets, batch_size)
+                fake_cqa_batch, _, fake_cqa_lens = prepare_fake_batch_var(self.G, training_batch, max_len, batch_size,
+                                                                          word2index, index2word, embeddings_index,
+                                                                          embeddings_size, mode=('word'))
+                g_fake_data = Variable(fake_cqa_batch[0].cuda()) if use_cuda else Variable(fake_cqa_batch[0])
+                dg_fake_decision = self.D.forward(g_fake_data, fake_cqa_lens[0])
+                target = Variable(torch.FloatTensor([1]*batch_size).cuda()) if use_cuda else \
+                    Variable(torch.FloatTensor([1]*batch_size))
+                g_error = criterion(dg_fake_decision, target)
+                # g_error = -torch.mean(self.log(dg_fake_decision))
+                g_error.backward()
+                g_optimizer.step()  # Only optimizes G's parameters
 
-    def backward(self):
-        pass
+            # log error
+            if iter % print_every == 0:
+                if not to_file:
+                    print('%s (%d %d%%)' % (timeSince(begin_time, iter / float(n_iters)), iter, iter / n_iters * 100))
+                    print("errors: D: real-%s/fake-%s G: %s " % ( d_real_error.data[0], d_fake_error.data[0], g_error.data[0]) )
+                    print('---sample generated question---')
+                    # sample a triple and print the generated question
+                    evaluate(self.G, triplets, embeddings_index, embeddings_size, word2index, index2word, max_len)
+                else:
+                    print('%s (%d %d%%)' % (timeSince(begin_time, iter / float(n_iters)), iter, iter / n_iters * 100))
+                    loss_f.write(unicode('%s (%d %d%%)\n' % (timeSince(begin_time, iter / float(n_iters)), iter, float(iter) / float(n_iters) * 100)))
+                    loss_f.write(unicode("errors: D: real-%s/fake-%s G: %s \n" % ( d_real_error.data[0], d_fake_error.data[0], g_error.data[0])))
+                    loss_f.write(unicode('\n'))
+                    sample_out_f.write(unicode('%s (%d %d%%)\n' % (timeSince(begin_time, iter / float(n_iters)), iter, float(iter) / float(n_iters) * 100)))
+                    evaluate(self.G, triplets, embeddings_index, embeddings_size, word2index, index2word, max_len,
+                             to_file, sample_out_f)
+                    sample_out_f.write(unicode('\n'))
 
     # def train(self, **kwargs):
     #     pass
@@ -123,11 +154,14 @@ class GAN_model(nn.Module):
 
     # L2 loss instead of Binary cross entropy loss (this is optional for stable training)
     # FIXME: is L2 loss the same as MSELoss in torch loss module?
+    # FIXME: these losses don't work with minibatch yet?
     def loss(self, D_real, D_fake, gen_params, disc_params, cond_real_data, cond_fake_data, mode, lr=None):
         mode = mode.lower()
         if mode == 'gan':
             G_loss = -torch.mean(self.log(D_fake))
+            # FIXME G_loss.backward()
             D_loss = -torch.mean(self.log(1 - D_fake)) - torch.mean(self.log(D_real))
+            # FIXME D_loss.backward()
             metric = -D_loss / 2 + np.log(2)  # JS divergence
 
             G_solver = torch.optim.Adam(gen_params, lr=lr if lr else 1e-3)
@@ -191,3 +225,67 @@ class GAN_model(nn.Module):
 
         grad_penalty = torch.mean((slope - 1.) ** 2)
         return grad_penalty
+
+
+
+# same context and answer as in the real batch, but generated question
+def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, index2word,
+                           embeddings_index, embeddings_size, mode = ('word')):
+
+    batch_vars = []
+    batch_var_orig = []
+
+    cqa = []
+    cqa_len = []
+    labels = torch.LongTensor([0] * batch_size) # all fake labels, thus all 0's
+    for b in range(batch_size):
+        ca = batch[0][b] + batch[2][b]
+        fake_q_sample = G_sampler(generator, ca, embeddings_index, embeddings_size, word2index, index2word, max_len)
+        cqa.append(batch[0][b] + fake_q_sample + batch[2][b])
+        cqa_len.append(len(batch[0][b] + fake_q_sample + batch[2][b]))
+
+    batch = [cqa, batch[3], batch[4], labels]
+    seq_lens = [cqa_len]
+
+    # sort this batch_var in descending order according to the values of the lengths of the first element in batch
+    num_batch = len(batch)
+    all = batch + seq_lens
+    all = sorted(zip(*all), key=lambda p: len(p[0]), reverse=True)
+    all = zip(*all)
+    batch = all[0:num_batch]
+    seq_lens = all[num_batch:]
+    batch_orig = batch
+
+    for b in range(num_batch):
+
+        batch_var = batch[b]
+
+        # if element in batch is float, i.e. indices, then do nothing
+        if isinstance(batch_var[0], int):
+            batch_var = list(batch_var)
+            pass
+        else:
+            # pad each context, question, answer to their respective max length
+            if mode[b]  == 'index':
+                batch_padded = [pad_sequence(s, max(seq_lens[b]), word2index, mode='index') for s in batch_var]
+            else:
+                batch_padded = [pad_sequence(s, max(seq_lens[b]), word2index) for s in batch_var]
+
+            # init variable matrices
+            if mode[b] == 'index':
+                batch_var = torch.LongTensor(max(seq_lens[b]), batch_size) # long tensor for module loss criterion
+            else:
+                batch_var = torch.FloatTensor(max(seq_lens[b]), batch_size, embeddings_size)
+
+            # FIXME: very stupid embedded for loop implementation
+            for i in range(batch_size):
+                for j in range(max(seq_lens[b])):
+                    if mode[b] == 'index':
+                        batch_var[j, i] = batch_padded[i][j]
+                    else:
+                        batch_var[j, i,] = embeddings_index[batch_padded[i][j]]
+
+        batch_vars.append(batch_var)
+
+    # the second output is for debugging purpose
+    return batch_vars, batch_orig, seq_lens

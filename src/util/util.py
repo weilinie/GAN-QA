@@ -22,6 +22,10 @@ def showPlot(points):
 
 
 
+def extract(v):
+    return v.data.storage().tolist()
+
+
 
 ######################################################################
 # This is a helper function to print time elapsed and estimated time
