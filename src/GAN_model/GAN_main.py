@@ -112,7 +112,7 @@ g_steps = 3
 
 # open the files
 if to_file:
-    exp_name = 'GAN_exp_0823'
+    exp_name = 'GAN_exp_0824'
     path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)

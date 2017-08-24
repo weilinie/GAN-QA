@@ -88,8 +88,8 @@ class GAN_model(nn.Module):
                 d_real_decision = self.D.forward(train_input, cqa_lens[0])
                 real_target = Variable(torch.FloatTensor([1]*batch_size)).cuda() if use_cuda else \
                     Variable(torch.FloatTensor([1]*batch_size))
-                d_real_error = criterion(d_real_decision, real_target)  # ones = true
-                d_real_error.backward()  # compute/store gradients, but don't change params
+                # d_real_error = criterion(d_real_decision, real_target)  # ones = true
+                # d_real_error.backward()  # compute/store gradients, but don't change params
 
                 #  1B: Train D on fake
                 fake_cqa_batch, _, fake_cqa_lens = prepare_fake_batch_var(self.G, training_batch, max_len, batch_size,
@@ -99,16 +99,16 @@ class GAN_model(nn.Module):
                 d_fake_decision = self.D.forward(d_fake_data, fake_cqa_lens[0])
                 fake_target = Variable(torch.FloatTensor([0]*batch_size)).cuda() if use_cuda else \
                     Variable(torch.FloatTensor([0]*batch_size))
-                d_fake_error = criterion(d_fake_decision, fake_target)  # zeros = fake
-                d_fake_error.backward()
-                d_optimizer.step()
+                # d_fake_error = criterion(d_fake_decision, fake_target)  # zeros = fake
+                # d_fake_error.backward()
+                # d_optimizer.step()
 
                 # accumulate loss
                 # FIXME I dont think below implementation works for batch version
-                # L2 loss
-                # D_loss = -torch.mean(self.log(1 - d_fake_decision)) - torch.mean(self.log(d_real_decision))
-                # D_loss.backward()
-                # d_optimizer.step()
+                # W_GAN loss
+                d_error = torch.mean(d_fake_decision) - torch.mean(d_real_decision)
+                d_error.backward()
+                d_optimizer.step()
 
             # train G
             for g_train_idx in range(g_steps):
@@ -123,8 +123,8 @@ class GAN_model(nn.Module):
                 dg_fake_decision = self.D.forward(g_fake_data, fake_cqa_lens[0])
                 target = Variable(torch.FloatTensor([1]*batch_size).cuda()) if use_cuda else \
                     Variable(torch.FloatTensor([1]*batch_size))
-                g_error = criterion(dg_fake_decision, target)
-                # g_error = -torch.mean(self.log(dg_fake_decision))
+                # g_error = criterion(dg_fake_decision, target)
+                g_error = -torch.mean(dg_fake_decision)
                 g_error.backward()
                 g_optimizer.step()  # Only optimizes G's parameters
 
@@ -132,14 +132,16 @@ class GAN_model(nn.Module):
             if iter % print_every == 0:
                 if not to_file:
                     print('%s (%d %d%%)' % (timeSince(begin_time, iter / float(n_iters)), iter, iter / n_iters * 100))
-                    print("errors: D: real-%s/fake-%s G: %s " % ( d_real_error.data[0], d_fake_error.data[0], g_error.data[0]) )
+                    # print("errors: D: real-%s/fake-%s G: %s " % ( d_real_error.data[0], d_fake_error.data[0], g_error.data[0]) )
+                    print("errors: D: %s G: %s " % (d_error.data[0], g_error.data[0]))
                     print('---sample generated question---')
                     # sample a triple and print the generated question
                     evaluate(self.G, triplets, embeddings_index, embeddings_size, word2index, index2word, max_len)
                 else:
                     print('%s (%d %d%%)' % (timeSince(begin_time, iter / float(n_iters)), iter, iter / n_iters * 100))
                     loss_f.write(unicode('%s (%d %d%%)\n' % (timeSince(begin_time, iter / float(n_iters)), iter, float(iter) / float(n_iters) * 100)))
-                    loss_f.write(unicode("errors: D: real-%s/fake-%s G: %s \n" % ( d_real_error.data[0], d_fake_error.data[0], g_error.data[0])))
+                    # loss_f.write(unicode("errors: D: real-%s/fake-%s G: %s \n" % ( d_real_error.data[0], d_fake_error.data[0], g_error.data[0])))
+                    loss_f.write(unicode("errors: D: %s G: %s " % (d_error.data[0], g_error.data[0])))
                     loss_f.write(unicode('\n'))
                     sample_out_f.write(unicode('%s (%d %d%%)\n' % (timeSince(begin_time, iter / float(n_iters)), iter, float(iter) / float(n_iters) * 100)))
                     evaluate(self.G, triplets, embeddings_index, embeddings_size, word2index, index2word, max_len,
