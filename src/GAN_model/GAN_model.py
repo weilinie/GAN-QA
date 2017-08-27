@@ -46,14 +46,17 @@ class GAN_model(nn.Module):
                  G_dec_input_size, G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions,
                  D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions,
                  D_mlp_hidden_size, D_num_attn_weights, D_mlp_output_size,
-                 use_attn, batch_size
+                 use_attn, batch_size, pretrain=False
                  ):
 
         super(GAN_model, self).__init__()
 
-        self.G = G(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions, G_dec_input_size,
+        if not pretrain:
+            self.G = G(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions, G_dec_input_size,
                    G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions, batch_size)
-
+        else:
+            
+            
         self.D = D(D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions, D_mlp_hidden_size,
                    D_num_attn_weights, D_mlp_output_size, use_attn, batch_size)
 

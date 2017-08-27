@@ -64,7 +64,7 @@ enc_num_directions = 1
 dec_hidden_size = 256
 dec_n_layers = 1
 dec_num_directions = 1
-batch_size = 5
+batch_size = 50
 learning_rate = 0.0005
 
 generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
@@ -96,7 +96,7 @@ if to_file:
 
 trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
-           to_file, path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
+           to_file, loss_f, sample_out_f, path_to_exp_out,
            n_iters = 5, print_every=1, plot_every=1)
 
 # save the final model
