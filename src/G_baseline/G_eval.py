@@ -52,9 +52,9 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
 
     # print results
     if not to_file:
-        print('context              > ' + ' '.join(context_words[0]))
-        print('answer               > ' + ' '.join(answer_words[0]))
-        print('question             > ' + ' '.join(question_words[0]))
+        print('context              > ' + ' '.join(context_words[0]).encode('utf-8').strip())
+        print('answer               > ' + ' '.join(answer_words[0]).encode('utf-8').strip())
+        print('question             > ' + ' '.join(question_words[0]).encode('utf-8').strip())
         # true_q = []
         # for i in range(seq_lens[1][0]):
         #     true_q.append(index2word[inputs_q[i][0].data[0]])
