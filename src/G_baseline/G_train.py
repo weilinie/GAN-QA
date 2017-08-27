@@ -57,9 +57,7 @@ def trainIters(generator, optimizer, batch_size, embeddings_size,
 
         # prepare batch
         training_batch, seq_lens = get_random_batch(triplets, batch_size)
-        fake_batch = None
-        fake_seq_lens = None
-        training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size, mode=['word', 'index'], concat_opt='ca')
+        training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, batch_size, word2index, embeddings_index, embeddings_size, use_cuda=1, mode=['word', 'index'], concat_opt='ca')
         inputs_ca = Variable(training_batch[0].cuda()) if use_cuda else Variable(training_batch[0]) # embeddings vectors, size = [seq len x batch size x embedding dim]
         inputs_q = Variable(training_batch[1].cuda()) if use_cuda else Variable(training_batch[1]) # represented as indices, size = [seq len x batch size]
 
