@@ -42,15 +42,10 @@ def timeSince(since, percent):
 
 def trainIters(generator, optimizer, batch_size, embeddings_size,
     embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
-    to_file, path_to_loss_f, path_to_sample_out_f, path_to_exp_out,
+    to_file, loss_f, sample_out_f, path_to_exp_out,
     n_iters=5, print_every=10, plot_every=100):
 
     begin_time = time.time()
-
-    # open the files
-    if to_file:
-        loss_f = open(path_to_loss_f,'w+')
-        sample_out_f = open(path_to_sample_out_f, 'w+')
 
     # plot_losses = []
     print_loss_total = 0  # Reset every print_every
@@ -98,8 +93,14 @@ def trainIters(generator, optimizer, batch_size, embeddings_size,
             # plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
             if to_file:
+                loss_f.write(unicode('%s (%d %d%%)\n' % (timeSince(begin_time, iter / float(n_iters)), iter, float(iter) / float(n_iters) * 100)))
                 loss_f.write(unicode(plot_loss_avg))
                 loss_f.write(unicode('\n'))
+                sample_out_f.write(unicode('%s (%d %d%%)\n' % (timeSince(begin_time, iter / float(n_iters)), iter, float(iter) / float(n_iters) * 100)))
+                evaluate(generator, triplets, embeddings_index, embeddings_size, word2index, index2word, max_length, to_file, sample_out_f)
+                sample_out_f.write(unicode('\n'))
+
+                    
 
     # showPlot(plot_losses)
     if to_file:

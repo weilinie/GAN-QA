@@ -12,7 +12,7 @@ import numpy as np
 
 global use_cuda
 use_cuda = torch.cuda.is_available()
-teacher_forcing_ratio = 0.5 # default in original code is 0.5
+teacher_forcing_ratio = 0.75 # default in original code is 0.5
 
 
 ######### set paths
@@ -23,13 +23,6 @@ f_name = 'train-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
-# path for experiment outputs
-# exp_name = 'QG_seq2seq_baseline'
-path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
-loss_f = 'loss_temp.txt'
-sample_out_f = 'sample_outputs_temp.txt'
-path_to_loss_f = path_to_exp_out + '/' + loss_f
-path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
 
 
 ######### first load the pretrained word embeddings
@@ -86,7 +79,20 @@ criterion = nn.NLLLoss()
 
 # max_length of generated question
 max_length = 100
-to_file = False
+to_file = True
+
+# open the files
+if to_file:
+    exp_name = 'G_pretrain_exp_0827'
+    path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
+    if not os.path.exists(path_to_exp_out+exp_name):
+        os.mkdir(path_to_exp_out+exp_name)
+    loss_f = 'loss_temp.txt'
+    sample_out_f = 'sample_outputs_temp.txt'
+    path_to_loss_f = path_to_exp_out + exp_name + '/' + loss_f
+    path_to_sample_out_f = path_to_exp_out + exp_name + '/' + sample_out_f
+    loss_f = open(path_to_loss_f,'w+')
+    sample_out_f = open(path_to_sample_out_f, 'w+')
 
 trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
@@ -94,7 +100,7 @@ trainIters(generator, optimizer, batch_size, embeddings_size,
            n_iters = 100, print_every=5, plot_every=100)
 
 # save the final model
-# if to_file:
-    # torch.save(generator, path_to_exp_out+'/generator_temp.pth')
+if to_file:
+    torch.save(generator, path_to_exp_out + exp_name +'/generator_temp.pth')
 
 
