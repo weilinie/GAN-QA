@@ -16,11 +16,15 @@ use_cuda = torch.cuda.is_available()
 class G(nn.Module):
     def __init__(self, enc_input_size, enc_hidden_size, enc_n_layers, enc_num_directions,
                  dec_input_size, dec_hidden_size, output_size, dec_n_layers, dec_num_directions,
-                 batch_size):
+                 batch_size, use_attn=True):
         super(G, self).__init__()
         self.encoder = EncoderRNN(enc_input_size, enc_hidden_size, batch_size, enc_n_layers, enc_num_directions)
-        self.decoder = AttnDecoderRNN(dec_input_size, dec_hidden_size, output_size, self.encoder,
-                                      dec_n_layers, dec_num_directions)
+        if use_attn:
+            self.decoder = AttnDecoderRNN(dec_input_size, dec_hidden_size, output_size, self.encoder,
+                                          dec_n_layers, dec_num_directions)
+        else:
+            # TODO: complete case when not using attention (add decoder class in model zoo)
+            pass
 
 
     def forward(self, inputs_ca, inputs_q, seq_lens, batch_size, max_q_len,

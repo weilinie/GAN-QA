@@ -60,10 +60,10 @@ print('')
 ######### set up model
 enc_hidden_size = 256
 enc_n_layers = 1
-enc_num_directions = 1
+enc_num_directions = 2
 dec_hidden_size = 256
 dec_n_layers = 1
-dec_num_directions = 1
+dec_num_directions = 2
 batch_size = 3
 learning_rate = 0.0005
 
