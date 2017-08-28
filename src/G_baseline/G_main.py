@@ -97,7 +97,7 @@ if to_file:
 trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
            to_file, loss_f, sample_out_f, path_to_exp_out,
-           n_iters = 5, print_every=1, plot_every=1)
+           n_iters = 1000, print_every=50, plot_every=10)
 
 # save the final model
 if to_file:
