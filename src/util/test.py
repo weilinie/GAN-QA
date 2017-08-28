@@ -98,29 +98,29 @@ print(windowed_c_triplets[0][0])
 
 ######################################################################
 ######################################################################
-# test case to load the G model and sample from G
-teacher_forcing_ratio = 0.5 # default in original code is 0.5
+# # test case to load the G model and sample from G
+# teacher_forcing_ratio = 0.5 # default in original code is 0.5
 
-# param for G
-enc_hidden_size = 256
-enc_n_layers = 1
-enc_num_directions = 1
-dec_hidden_size = 256
-dec_n_layers = 1
-dec_num_directions = 1
-batch_size = 5
-learning_rate = 0.0005
+# # param for G
+# enc_hidden_size = 256
+# enc_n_layers = 1
+# enc_num_directions = 1
+# dec_hidden_size = 256
+# dec_n_layers = 1
+# dec_num_directions = 1
+# batch_size = 5
+# learning_rate = 0.0005
 
-generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
-                 embeddings_size, dec_hidden_size, effective_num_tokens, dec_n_layers, dec_num_directions,
-                 batch_size)
-if use_cuda:
-    generator = generator.cuda()
+# generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
+#                  embeddings_size, dec_hidden_size, effective_num_tokens, dec_n_layers, dec_num_directions,
+#                  batch_size)
+# if use_cuda:
+#     generator = generator.cuda()
 
-# prepare G input
-training_batch, seq_lens = get_random_batch(triplets, batch_size)
-ca = training_batch[0][0] + training_batch[2][0]
-# sample from G
-max_len = 100
-sample_q = G_sampler(generator, ca, embeddings_index, embeddings_size, word2index, index2word, max_len)
-print(' '.join(sample_q))
+# # prepare G input
+# training_batch, seq_lens = get_random_batch(triplets, batch_size)
+# ca = training_batch[0][0] + training_batch[2][0]
+# # sample from G
+# max_len = 100
+# sample_q = G_sampler(generator, ca, embeddings_index, embeddings_size, word2index, index2word, max_len)
+# print(' '.join(sample_q))

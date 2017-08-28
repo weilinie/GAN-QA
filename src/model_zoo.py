@@ -58,7 +58,7 @@ class DecoderRNN(nn.Module):
         self.output_size = output_size
         self.n_layers = n_layers
         self.dropout_p = dropout_p
-        self.bidi = True if num_directions==2 else self.bidi = False
+        self.bidi = True if num_directions==2 else False
 
         # recurrent model
         self.dropout = nn.Dropout(self.dropout_p)
