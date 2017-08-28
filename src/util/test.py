@@ -41,16 +41,22 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 ######### read corpus
 raw_triplets = read_raw_squad(path_to_data)
-triplets = tokenize_squad(raw_triplets, embeddings_index)
 
-# find max length of context, question, answer, respectively
-max_len_c, max_len_q, max_len_a = max_length(triplets)
+# test of windowed triplets
+window_size = 20
+windowed_c_triplets = get_windowed_ans(raw_triplets, window_size)
+print(windowed_c_triplets[0][0])
 
-effective_tokens, effective_num_tokens = count_effective_num_tokens(triplets, embeddings_index)
-print('effective number of tokens: ' + str(effective_num_tokens))
-print('expected initial loss: ' + str(-np.log(1/float(effective_num_tokens))) + '\n')
-# build word2index dictionary and index2word dictionary
-word2index, index2word = generate_look_up_table(effective_tokens, effective_num_tokens)
+# triplets = tokenize_squad(raw_triplets, embeddings_index)
+
+# # find max length of context, question, answer, respectively
+# max_len_c, max_len_q, max_len_a = max_length(triplets)
+
+# effective_tokens, effective_num_tokens = count_effective_num_tokens(triplets, embeddings_index)
+# print('effective number of tokens: ' + str(effective_num_tokens))
+# print('expected initial loss: ' + str(-np.log(1/float(effective_num_tokens))) + '\n')
+# # build word2index dictionary and index2word dictionary
+# word2index, index2word = generate_look_up_table(effective_tokens, effective_num_tokens)
 
 
 ######################################################################

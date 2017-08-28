@@ -47,6 +47,45 @@ class EncoderRNN(nn.Module):
 
 
 ######################################################################
+# Vanilla Decoder
+# ^^^^^^^^^^^^^^^^^
+# TODO: take another look at the attn implementation; there might be some errors
+class DecoderRNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, n_layers=1, num_directions=1, dropout_p=0.1):
+        super(AttnDecoderRNN, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.output_size = output_size
+        self.n_layers = n_layers
+        self.dropout_p = dropout_p
+        self.bidi = True if num_directions==2 else self.bidi = False
+
+        # recurrent model
+        self.dropout = nn.Dropout(self.dropout_p)
+        self.gru = nn.GRU(self.input_size, self.hidden_size, num_layers=self.n_layers, bidirectional=self.bidi)
+        self.out = nn.Linear(self.hidden_size, self.output_size)
+
+    # forward for each time step.
+    # need to do this because of teacher forcing at each time step
+    def forward(self, input, encoder_hidden, embeddings_index, hidden=None):
+
+        # get the output
+        # hidden: (num_layers * num_directions, batch, hidden_size)
+        # note: for each time step, output and hidden are the same
+        output, hidden = self.gru(input, hidden)
+        
+        # if bidirectional, sum decoder hidden states of both directions
+        if self.bidi:
+            hidden = hidden[2*self.n_layer - 1] + hidden[2*self.n_layer]
+            hidden = hidden.unsqueeze(0)
+
+        # output size: (batch size, vocab size)
+        output = F.log_softmax(self.out(output))
+
+        return output, hidden
+
+
+######################################################################
 # Attention Decoder
 # ^^^^^^^^^^^^^^^^^
 # TODO: take another look at the attn implementation; there might be some errors

@@ -129,11 +129,64 @@ def tokenize_squad(raw_squad, embeddings_index):
                                      triple[4] ) )
     return tokenized_triplets
 
+
+# helper function to get the sentence of where the answer appear in the context
+# based on tokenized_squad, first element in output
+# output seq of tokens only from the answer sentence (same format as element in tokenize_squad output)
+def get_ans_sentence(tokenized_triplets):
+    for tokenized_triple in tokenized_triplets:
+        c = tokenized_triple[0]
+        ans_start_idx = tokenized_triple[3]
+        ans_end_idx = tokenized_triple[4]
+
+
+
+# helper function to get a window of tokens around the answer
+# similar to get_ans_sentence; only difference is the span of tokens
+def get_windowed_ans(raw_squad, window_size):
+
+    windowed_c_triplets = []
+
+    for triple in raw_squad:
+        c = tokenized_triple[0]
+        a = tokenized_triple[2]
+        tokenized_c = spacynlp.tokenizer(c)
+        tokenized_a = spacynlp.tokenizer(a)
+        ans_start_idx = tokenized_triple[3]
+        ans_end_idx = tokenized_triple[4]
+        
+        # find the start token of the answer in context
+        idx = 0
+        t = 0
+        for token in tokenized_c:
+            if idx == ans_start_idx and token == tokenized_a[0]:
+                break
+            else:
+                idx += len(token)+1
+        if t < window_size:
+            left_window = 0;
+        else:
+            left_window = t - window_size
+        if t + window_size + len(a) > len(c):
+            right_window = len(c)
+        else:
+            right_window = t + window_size + len(a)
+
+        windowed_c_triplets.append( ( c[left_window:right_window], triple[1], a, triple[3], triple[4] ) )
+
+    return windowed_c_triplets
+
+
+
+
 # turns a sentence into individual tokens
 # this function takes care of word tokens that does not appear in pre trained embeddings
 # solution is to turn those word tokens into 'UNK'
-def tokenize_sentence(sentence, data_tokens):
-    tokenized_sentence = spacynlp.tokenizer(sentence)
+def tokenize_sentence(sentence, data_tokens, spacy=True):
+    if spacy:
+        tokenized_sentence = spacynlp.tokenizer(sentence)
+    else:
+        tokenized_sentence = sentence
     # # an additional preprocessing step to separate words and non-words when they appear together
     proc_tokenized_sentence = post_proc_tokenize_sentence(tokenized_sentence)
 
@@ -200,25 +253,25 @@ def post_proc_tokenize_sentence(tokenized_sentence):
 # x = post_proc_tokenizer(spacynlp.tokenizer(u'mid-1960s'))
 
 
-# find the max length of context, answer, and question
-def max_length(triplets):
+# # find the max length of context, answer, and question
+# def max_length(triplets):
 
-    max_len_c = 0
-    max_len_q = 0
-    max_len_a = 0
+#     max_len_c = 0
+#     max_len_q = 0
+#     max_len_a = 0
 
-    for triple in triplets:
-        len_c = len(triple[0])
-        len_q = len(triple[1])
-        len_a = len(triple[2])
-        if len_c > max_len_c:
-            max_len_c = len_c
-        if len_q > max_len_q:
-            max_len_q = len_q
-        if len_a > max_len_a:
-            max_len_a = len_a
+#     for triple in triplets:
+#         len_c = len(triple[0])
+#         len_q = len(triple[1])
+#         len_a = len(triple[2])
+#         if len_c > max_len_c:
+#             max_len_c = len_c
+#         if len_q > max_len_q:
+#             max_len_q = len_q
+#         if len_a > max_len_a:
+#             max_len_a = len_a
 
-    return max_len_c, max_len_q, max_len_a
+#     return max_len_c, max_len_q, max_len_a
 
 
 ######################################################################
