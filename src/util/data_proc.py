@@ -167,12 +167,12 @@ def get_windowed_ans(raw_squad, window_size):
             left_window = 0;
         else:
             left_window = t - window_size
-        if t + window_size + len(a) > len(c):
-            right_window = len(c)
+        if t + window_size + len(tokenized_a) > len(tokenized_c):
+            right_window = len(tokenized_c)
         else:
-            right_window = t + window_size + len(a)
+            right_window = t + window_size + len(tokenized_a)
 
-        windowed_c_triplets.append( ( c[left_window:right_window], triple[1], a, triple[3], triple[4] ) )
+        windowed_c_triplets.append( ( tokenized_c[left_window:right_window], triple[1], tokenized_a, triple[3], triple[4] ) )
 
     return windowed_c_triplets
 
