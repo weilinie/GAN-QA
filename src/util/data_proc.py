@@ -163,6 +163,7 @@ def get_windowed_ans(raw_squad, window_size):
                 break
             else:
                 idx += len(token)+1
+                t += 1
         if t < window_size:
             left_window = 0;
         else:
