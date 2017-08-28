@@ -48,7 +48,7 @@ test_idx = 199
 windowed_c_triplets = get_windowed_ans(raw_triplets[test_idx:test_idx+2], window_size)
 print(raw_triplets[test_idx][0])
 print(raw_triplets[test_idx][2])
-print(windowed_c_triplets[test_idx][0])
+print(windowed_c_triplets[0][0])
 
 # triplets = tokenize_squad(raw_triplets, embeddings_index)
 
