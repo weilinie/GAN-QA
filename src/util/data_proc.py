@@ -152,7 +152,7 @@ def get_windowed_ans(raw_squad, window_size):
         a = triple[2]
         tokenized_c = spacynlp.tokenizer(c)
         # sanity check
-        print(tokenized_c)
+        # print(tokenized_c)
         tokenized_a = spacynlp.tokenizer(a)
         ans_start_idx = triple[3]
         ans_end_idx = triple[4]
@@ -163,10 +163,12 @@ def get_windowed_ans(raw_squad, window_size):
         t = 0
         for token in tokenized_c:
             if idx+c_sub.count(' ') == ans_start_idx and token == tokenized_a[0]:
+                print('entered if statement')
                 break
             else:
                 idx += len(token)
                 t += 1
+        print('answe token is %d' % t)
         if t < window_size:
             left_window = 0;
         else:
