@@ -148,12 +148,12 @@ def get_windowed_ans(raw_squad, window_size):
     windowed_c_triplets = []
 
     for triple in raw_squad:
-        c = tokenized_triple[0]
-        a = tokenized_triple[2]
+        c = triple[0]
+        a = triple[2]
         tokenized_c = spacynlp.tokenizer(c)
         tokenized_a = spacynlp.tokenizer(a)
-        ans_start_idx = tokenized_triple[3]
-        ans_end_idx = tokenized_triple[4]
+        ans_start_idx = triple[3]
+        ans_end_idx = triple[4]
         
         # find the start token of the answer in context
         idx = 0
