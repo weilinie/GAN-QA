@@ -163,12 +163,13 @@ def get_ans_sentence(raw_squad):
 
         idx = 0
         for s in sent_c:
+            print('currenet index: %d' % idx)
             if idx <= ans_start_idx and idx+len(s.string)>=ans_end_idx:
                 sent = s
                 break
             else:
                 idx += len(s.string)
-        sent_c_triplets.append( ( sent , triple[1], triple[2], triple[3], triple[4] ) )
+        sent_c_triplets.append( ( sent, triple[1], triple[2], triple[3], triple[4] ) )
 
 
 
