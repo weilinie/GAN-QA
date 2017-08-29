@@ -173,6 +173,8 @@ def get_ans_sentence(raw_squad):
                 idx += len(s.string)
         sent_c_triplets.append( ( sent, triple[1], triple[2], triple[3], triple[4] ) )
 
+    return sent_c_triplets
+
 
 
 # helper function to get a window of tokens around the answer

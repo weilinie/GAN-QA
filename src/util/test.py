@@ -57,7 +57,7 @@ print(raw_triplets[test_idx][0])
 print(raw_triplets[test_idx][2])
 print('ans start idx: %d' % raw_triplets[test_idx][3])
 print('ans end idx:   %d' % raw_triplets[test_idx][4])
-print(sent_c_triplets[0])
+print(sent_c_triplets[0][0])
 
 
 # triplets = tokenize_squad(raw_triplets, embeddings_index)
