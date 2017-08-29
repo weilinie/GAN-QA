@@ -158,13 +158,15 @@ def get_windowed_ans(raw_squad, window_size):
         ans_end_idx = triple[4]
         c_sub = c[:ans_start_idx]
         print('number of spaces = %d' % c_sub.count(' '))
-        
+        print('first token in answer = %s' % tokenized_a[0])
+
         # find the start token of the answer in context
         idx = 0
         t = 0
         for token in tokenized_c:
             print('current idx = %d' % idx)
             if token == tokenized_a[0]:
+                print('current token is: %s' % unicode(token))
                 print('found answer token')
                 print('current index = %d' % (idx+c_sub.count(' ')))
                 print('answer index  = %d' % ans_start_idx)
