@@ -119,25 +119,56 @@ def read_raw_squad(path_to_data):
 # e.g. the context is read as a string; this function produces a list of word tokens from context string
 # and return as the processed tuple (context, question, ans_text, ans_start_idx, ans_end_idx)
 # the first three are lists, the last two are LongTensor
-def tokenize_squad(raw_squad, embeddings_index):
+def tokenize_squad(squad, embeddings_index, opt = 'raw'):
     tokenized_triplets = []
-    for triple in raw_squad:
-        tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index),
-                                     tokenize_sentence(triple[1], embeddings_index),
-                                     tokenize_sentence(triple[2], embeddings_index),
-                                     triple[3],
-                                     triple[4] ) )
+    if opt == 'raw':
+        for triple in squad:
+            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index),
+                                         tokenize_sentence(triple[1], embeddings_index),
+                                         tokenize_sentence(triple[2], embeddings_index),
+                                         triple[3],
+                                         triple[4] ) )
+    elif opt == 'window':
+        for triple in squad:
+            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index, spacy=False),
+                                         tokenize_sentence(triple[1], embeddings_index),
+                                         tokenize_sentence(triple[2], embeddings_index, spacy=False),
+                                         triple[3],
+                                         triple[4] ) )
+    elif opt == 'sent':
+        for triple in squad:
+            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index, spacy=False),
+                                         tokenize_sentence(triple[1], embeddings_index),
+                                         tokenize_sentence(triple[2], embeddings_index),
+                                         triple[3],
+                                         triple[4] ) )
     return tokenized_triplets
 
 
 # helper function to get the sentence of where the answer appear in the context
 # based on tokenized_squad, first element in output
 # output seq of tokens only from the answer sentence (same format as element in tokenize_squad output)
-def get_ans_sentence(tokenized_triplets):
-    for tokenized_triple in tokenized_triplets:
-        c = tokenized_triple[0]
-        ans_start_idx = tokenized_triple[3]
-        ans_end_idx = tokenized_triple[4]
+def get_ans_sentence(raw_squad):
+
+    sent_c_triplets = [] # now each context in 
+
+    for triple in raw_squad:
+        c = triple[0]
+        a = triple[2]
+        sent_c = list(spacynlp(c).sents)
+        # sanity check
+        # print(tokenized_c)
+        ans_start_idx = triple[3]
+        ans_end_idx = triple[4]
+
+        idx = 0
+        for s in sent_c:
+            if idx <= ans_start_idx and idx+len(s.string)>=ans_end_idx:
+                sent = s
+                break
+            else:
+                idx += len(s.string)
+        sent_c_triplets.append( ( sent , triple[1], triple[2], triple[3], triple[4] ) )
 
 
 
@@ -157,7 +188,7 @@ def get_windowed_ans(raw_squad, window_size):
         ans_start_idx = triple[3]
         ans_end_idx = triple[4]
         c_sub = c[:ans_start_idx]
-        print('first token in answer = %s' % tokenized_a[0])
+        # print('first token in answer = %s' % tokenized_a[0])
 
         # find the start token of the answer in context
         idx = 0
@@ -178,9 +209,9 @@ def get_windowed_ans(raw_squad, window_size):
             right_window = t + window_size + len(tokenized_a)
 
         windowed_c = tokenized_c[left_window:right_window]
-        # sanity check
-        if tokenized_a[0] not in windowed_c:
-            print('ERROR: windowed context does not contain answer token')
+        # # sanity check
+        # if tokenized_a[0] not in windowed_c:
+        #     print('ERROR: windowed context does not contain answer token')
 
         windowed_c_triplets.append( ( windowed_c , triple[1], tokenized_a, triple[3], triple[4] ) )
 
