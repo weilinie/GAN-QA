@@ -162,6 +162,8 @@ def get_windowed_ans(raw_squad, window_size):
         idx = 0
         t = 0
         for token in tokenized_c:
+            if token == tokenized_a[0]:
+                print('found answer token')
             if idx+c_sub.count(' ') == ans_start_idx and token == tokenized_a[0]:
                 print('entered if statement')
                 break
