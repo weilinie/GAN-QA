@@ -165,7 +165,7 @@ def get_windowed_ans(raw_squad, window_size):
         t = 0
         for token in tokenized_c:
             print('current idx = %d' % idx)
-            if token == tokenized_a[0]:
+            if unicode(token) == unicode(tokenized_a[0]):
                 print('current token is: %s' % unicode(token))
                 print('found answer token')
                 print('current index = %d' % (idx+c_sub.count(' ')))
