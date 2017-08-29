@@ -52,15 +52,21 @@ raw_triplets = read_raw_squad(path_to_data)
 
 # test of selecting the sentence containing answer from context
 test_idx = 185
-sent_c_triplets = get_ans_sentence(raw_triplets[test_idx:test_idx+2])
+sent_c_triplets = get_ans_sentence(raw_triplets)
+# print(raw_triplets[test_idx][0])
+# print(raw_triplets[test_idx][2])
+# print('ans start idx: %d' % raw_triplets[test_idx][3])
+# print('ans end idx:   %d' % raw_triplets[test_idx][4])
+# print(sent_c_triplets[0][0])
+
+
+triplets = tokenize_squad(raw_triplets, embeddings_index, opt='sent')
 print(raw_triplets[test_idx][0])
+print(triplets[test_idx][0])
+print(raw_triplets[test_idx][1])
+print(triplets[test_idx][1])
 print(raw_triplets[test_idx][2])
-print('ans start idx: %d' % raw_triplets[test_idx][3])
-print('ans end idx:   %d' % raw_triplets[test_idx][4])
-print(sent_c_triplets[0][0])
-
-
-# triplets = tokenize_squad(raw_triplets, embeddings_index)
+print(triplets[test_idx][2])
 
 # # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)

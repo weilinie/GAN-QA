@@ -142,6 +142,8 @@ def tokenize_squad(squad, embeddings_index, opt = 'raw'):
                                          tokenize_sentence(triple[2], embeddings_index),
                                          triple[3],
                                          triple[4] ) )
+    else:
+        raise Exception('unknown option. should be one of "raw", "window", or "sent".')
     return tokenized_triplets
 
 
@@ -174,7 +176,6 @@ def get_ans_sentence(raw_squad):
         sent_c_triplets.append( ( sent, triple[1], triple[2], triple[3], triple[4] ) )
 
     return sent_c_triplets
-
 
 
 # helper function to get a window of tokens around the answer
