@@ -165,12 +165,7 @@ def get_windowed_ans(raw_squad, window_size):
         t = 0
         for token in tokenized_c:
             print('current idx = %d' % idx)
-            if unicode(token) == unicode(tokenized_a[0]):
-                print('current token is: %s' % unicode(token))
-                print('found answer token')
-                print('current index = %d' % (idx+c_sub.count(' ')))
-                print('answer index  = %d' % ans_start_idx)
-            if idx+c_sub.count(' ') == ans_start_idx and token == tokenized_a[0]:
+            if idx+c_sub.count(' ') == ans_start_idx and unicode(token) == unicode(tokenized_a[0]):
                 print('entered if statement')
                 break
             else:
