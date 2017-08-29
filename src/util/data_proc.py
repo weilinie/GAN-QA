@@ -157,6 +157,7 @@ def get_windowed_ans(raw_squad, window_size):
         ans_start_idx = triple[3]
         ans_end_idx = triple[4]
         c_sub = c[:ans_start_idx]
+        print('number of spaces = %d' % c_sub.count(' '))
         
         # find the start token of the answer in context
         idx = 0

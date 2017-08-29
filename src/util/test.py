@@ -45,7 +45,7 @@ raw_triplets = read_raw_squad(path_to_data)
 # test of windowed triplets
 window_size = 10
 test_idx = 199
-windowed_c_triplets = get_windowed_ans(raw_triplets[test_idx:test_idx+2], window_size)
+windowed_c_triplets = get_windowed_ans(raw_triplets[test_idx:test_idx+1], window_size)
 print(raw_triplets[test_idx][0])
 print(raw_triplets[test_idx][2])
 print(windowed_c_triplets[0][0])
