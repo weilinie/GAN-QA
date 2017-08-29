@@ -168,9 +168,6 @@ def get_windowed_ans(raw_squad, window_size):
                 print('found answer token')
                 print('current index = %d' % (idx+c_sub.count(' ')))
                 print('answer index  = %d' % ans_start_idx)
-            else:
-                idx += len(token)
-                t += 1
             if idx+c_sub.count(' ') == ans_start_idx and token == tokenized_a[0]:
                 print('entered if statement')
                 break
