@@ -157,6 +157,7 @@ def get_windowed_ans(raw_squad, window_size):
         ans_start_idx = triple[3]
         ans_end_idx = triple[4]
         c_sub = c[:ans_start_idx]
+        print('first token in answer = %s' % tokenized_a[0])
 
         # find the start token of the answer in context
         idx = 0
