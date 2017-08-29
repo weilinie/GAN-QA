@@ -51,7 +51,7 @@ raw_triplets = read_raw_squad(path_to_data)
 # print(windowed_c_triplets[0][0])
 
 # test of selecting the sentence containing answer from context
-test_idx = 250
+test_idx = 185
 sent_c_triplets = get_ans_sentence(raw_triplets[test_idx:test_idx+2])
 print(raw_triplets[test_idx][0])
 print(raw_triplets[test_idx][2])

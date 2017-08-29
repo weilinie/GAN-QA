@@ -163,9 +163,9 @@ def get_ans_sentence(raw_squad):
 
         idx = 0
         for s in sent_c:
-            print('currenet index: %d' % idx)
+            # print('currenet index: %d' % idx)
             if idx <= ans_start_idx and idx+len(s.string)>=ans_end_idx:
-                print('enter if statement')
+                # print('enter if statement')
                 print(s)
                 sent = s
                 break
