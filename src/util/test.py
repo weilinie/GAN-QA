@@ -70,16 +70,16 @@ print(raw_triplets[test_idx][2])
 print(triplets[test_idx][2])
 
 # save to files
-import pickle
-save_path = '/home/jack/Documents/QA_QG/data/processed/'
-if not os.path.exists(save_path):
-	os.mkdir(save_path)
-with open(save_path+'windowed_c_triplets_10.txt', 'wb') as fp:
-	pickle.dump(windowed_c_triplets_10, fp)
-with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
-	pickle.dump(sent_c_triplets, fp)
-with open(save_path+'triplets.txt', 'wb') as fp:
-	pickle.dump(triplets, fp)
+# import pickle
+# save_path = '/home/jack/Documents/QA_QG/data/processed/'
+# if not os.path.exists(save_path):
+# 	os.mkdir(save_path)
+# with open(save_path+'windowed_c_triplets_10.txt', 'wb') as fp:
+# 	pickle.dump(windowed_c_triplets_10, fp)
+# with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
+# 	pickle.dump(sent_c_triplets, fp)
+# with open(save_path+'triplets.txt', 'wb') as fp:
+# 	pickle.dump(triplets, fp)
 
 # # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)

@@ -159,6 +159,7 @@ def get_ans_sentence(raw_squad):
         c = triple[0]
         a = triple[2]
         sent_c = list(spacynlp(c).sents)
+        tokenized_a = spacynlp.tokenizer(a)
         # sanity check
         # if len(sent_c) == 1:
         #     print('WARNING: sentence segmentation may not work in this triple')
@@ -177,6 +178,8 @@ def get_ans_sentence(raw_squad):
                 # if isinstance(sent, unicode):
                 #     raise Exception('unicode detected, where expecting spacy span object.')
                 # break
+                if tokenized_a[0] not in sent:
+                    raise Exception('answer token not in current sentence')
             else:
                 idx += len(s.string)
         sent_c_triplets.append( ( sent, triple[1], triple[2], triple[3], triple[4] ) )
