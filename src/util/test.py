@@ -45,14 +45,14 @@ raw_triplets = read_raw_squad(path_to_data)
 # # test of windowed triplets
 # window_size = 10
 # test_idx = 250
-# windowed_c_triplets = get_windowed_ans(raw_triplets[test_idx:test_idx+2], window_size)
+windowed_c_triplets = get_windowed_ans(raw_triplets[test_idx:test_idx+2], window_size)
 # print(raw_triplets[test_idx][0])
 # print(raw_triplets[test_idx][2])
 # print(windowed_c_triplets[0][0])
 
 # test of selecting the sentence containing answer from context
 test_idx = 185
-sent_c_triplets = get_ans_sentence(raw_triplets)
+# sent_c_triplets = get_ans_sentence(raw_triplets)
 # print(raw_triplets[test_idx][0])
 # print(raw_triplets[test_idx][2])
 # print('ans start idx: %d' % raw_triplets[test_idx][3])
@@ -60,7 +60,7 @@ sent_c_triplets = get_ans_sentence(raw_triplets)
 # print(sent_c_triplets[0][0])
 
 
-triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
+triplets = tokenize_squad(windowed_c_triplets, embeddings_index, opt='window')
 print(raw_triplets[test_idx][0])
 print(triplets[test_idx][0])
 print(raw_triplets[test_idx][1])
