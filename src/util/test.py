@@ -43,7 +43,7 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 raw_triplets = read_raw_squad(path_to_data)
 
 # # test of windowed triplets
-# window_size = 10
+window_size = 10
 # test_idx = 250
 windowed_c_triplets = get_windowed_ans(raw_triplets, window_size)
 # print(raw_triplets[test_idx][0])
