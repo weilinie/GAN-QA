@@ -161,6 +161,7 @@ def get_ans_sentence(raw_squad):
         # sanity check
         if len(sent_c) == 1:
             print('WARNING: sentence segmentation may not work in this triple')
+            print(sent_c)
         # print(tokenized_c)
         ans_start_idx = triple[3]
         ans_end_idx = triple[4]
