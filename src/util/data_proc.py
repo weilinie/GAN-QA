@@ -159,6 +159,8 @@ def get_ans_sentence(raw_squad):
         a = triple[2]
         sent_c = list(spacynlp(c).sents)
         # sanity check
+        if len(sent_c) == 1:
+            print('WARNING: sentence segmentation may not work in this triple')
         # print(tokenized_c)
         ans_start_idx = triple[3]
         ans_end_idx = triple[4]
@@ -170,6 +172,8 @@ def get_ans_sentence(raw_squad):
                 # print('enter if statement')
                 # print(s)
                 sent = s
+                if isinstance(sent, unicode):
+                    print('WARNING: unicode detected, where expecting spacy span object.')
                 break
             else:
                 idx += len(s.string)
