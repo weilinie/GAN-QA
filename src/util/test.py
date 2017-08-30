@@ -60,7 +60,7 @@ sent_c_triplets = get_ans_sentence(raw_triplets)
 # print(sent_c_triplets[0][0])
 windowed_c_triplets_10 = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window')
 sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
-triplets = tokenize_squad(raw_triplets, embeddings_index, opt='sent')
+triplets = tokenize_squad(raw_triplets, embeddings_index)
 
 #print(raw_triplets[test_idx][0])
 #print(' '.join(triplets[test_idx][0]))
