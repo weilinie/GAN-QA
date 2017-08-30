@@ -23,6 +23,7 @@ class EncoderRNN(nn.Module):
         self.input_size = input_size
         self.num_directions = num_directions
         self.batch_size = batch_size
+        print('batch size is: %d' % batch_size)
 
         if self.num_directions == 1:
             self.gru = nn.GRU(input_size, hidden_size, n_layers, bidirectional=False)
