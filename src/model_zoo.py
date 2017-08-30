@@ -1,4 +1,9 @@
 
+import sys
+import os
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+from data_proc import *
+
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -31,6 +36,7 @@ class EncoderRNN(nn.Module):
         # prepare encoder input
         if self.batch_size > 1:
             input = nn.utils.rnn.pack_padded_sequence(input, seq_lens)
+            # input = pack_sequence(input, seq_lens)
 
         # input is matrix of size [max seq len x batch size x embedding dimension]
         encoder_outputs, hidden = self.gru(input, hidden)

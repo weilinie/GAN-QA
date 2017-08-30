@@ -30,7 +30,7 @@ class G(nn.Module):
             pass
 
 
-    def forward(self, inputs, input, inputs, seq_lens, batch_size, max_q_len,
+    def forward(self, inputs, seq_lens, batch_size, max_q_len,
                 embeddings_index, embeddings_size, word2index, index2word, teacher_forcing_ratio):
         # inputs is a collection of c, a, q. index by 0,2,1
         # output size: (seq_len, batch, hidden_size)
