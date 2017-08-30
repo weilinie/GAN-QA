@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 
 from G_train import *
-from G_model import *
+from G_c_a_sep import *
 import numpy as np
 
 global use_cuda
@@ -64,7 +64,7 @@ enc_num_directions = 2
 dec_hidden_size = 256
 dec_n_layers = 1
 dec_num_directions = 2
-batch_size = 2
+batch_size = 20
 learning_rate = 0.0005
 
 generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
@@ -83,7 +83,7 @@ to_file = True
 
 # open the files
 if to_file:
-    exp_name = 'G_pretrain_exp_0827'
+    exp_name = 'G_c_a_sep_pretrain_exp_0830'
     path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
@@ -97,7 +97,7 @@ if to_file:
 trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
            to_file, loss_f, sample_out_f, path_to_exp_out,
-           n_iters = 1000, print_every=50, plot_every=10)
+           n_iters = 5, print_every=1, plot_every=1)
 
 # save the final model
 if to_file:

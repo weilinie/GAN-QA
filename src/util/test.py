@@ -81,6 +81,13 @@ with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
 with open(save_path+'triplets.txt', 'wb') as fp:
 	pickle.dump(triplets, fp)
 
+# test pickle load
+import pickle
+load_path = '/home/jack/Documents/QA_QG/data/processed/'
+triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
+sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
+windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt', 'rb'))
+
 # # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)
 

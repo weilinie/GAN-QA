@@ -23,7 +23,7 @@ class G(nn.Module):
         self.c_encoder = EncoderRNN(enc_input_size, enc_hidden_size, batch_size, enc_n_layers, enc_num_directions)
         self.a_encoder = EncoderRNN(enc_input_size, enc_hidden_size, batch_size, enc_n_layers, enc_num_directions)
         if use_attn:
-            self.decoder = DecoderRNN(dec_input_size, dec_hidden_size, output_size, self.encoder,
+            self.decoder = AttnDecoderRNN(dec_input_size, dec_hidden_size, output_size, self.encoder,
                                           dec_n_layers, dec_num_directions)
         else:
             # TODO: complete case when not using attention (add decoder class in model zoo)
