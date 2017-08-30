@@ -259,7 +259,10 @@ def tokenize_sentence(sentence, data_tokens, spacy=True):
 def post_proc_tokenize_sentence(tokenized_sentence):
     proc_tokenized_sentence = []
     for t in range(0, len(tokenized_sentence)):
-        token = tokenized_sentence[t].string.strip()
+        try:
+            token = tokenized_sentence[t].string.strip()
+        except:
+            print(tokenized_sentence)
         # first check if the string is number or alphabet only
         if token.isdigit() or token.isalpha():
             proc_tokenized_sentence.append(token)
