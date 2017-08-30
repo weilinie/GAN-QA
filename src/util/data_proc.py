@@ -85,7 +85,7 @@ def readGlove(path_to_data):
 ######################################################################
 # read data specific for SQUAD dataset
 
-def read_raw_squad(path_to_data):
+def read_raw_squad(path_to_data, normalize=True):
     # output (context, question, answer, ans_start_idx, ans_end_idx) triplets
     print("Reading dataset...")
     triplets = []
@@ -96,21 +96,22 @@ def read_raw_squad(path_to_data):
             samples = train[s]['paragraphs']
             for p in range(0, len(samples)):
                 context = samples[p]['context']
-                # turn from unicode to ascii and lower case everything
-                context = normalizeString(context)
                 qas = samples[p]['qas']
                 for i in range(0, len(qas)):
                 # print('current s,p,i are: ' + str(s)+str(p)+str(i))
                     answers = qas[i]['answers']
                     question = qas[i]['question']
-                    # turn from unicode to ascii and lower case everything
-                    question = normalizeString(question)
                     for a in range(0, len(answers)):
                         ans_text = answers[a]['text']
-                        # turn from unicode to ascii and lower case everything
-                        ans_text = normalizeString(ans_text)
                         ans_start_idx = answers[a]['answer_start']
                         ans_end_idx = ans_start_idx + len(ans_text)
+
+                        if normalize:
+                            # turn from unicode to ascii and lower case everything
+                            context = unicodeToAscii(context)
+                            question = unicodeToAscii(question)
+                            ans_text = unicodeToAscii(ans_text)
+
                         triplets.append((context, question, ans_text, ans_start_idx, ans_end_idx))
     return triplets
 
@@ -174,7 +175,7 @@ def get_ans_sentence(raw_squad):
                 # print(s)
                 sent = s
                 if isinstance(sent, unicode):
-                    print('WARNING: unicode detected, where expecting spacy span object.')
+                    raise Exception('unicode detected, where expecting spacy span object.')
                 break
             else:
                 idx += len(s.string)
@@ -264,10 +265,11 @@ def tokenize_sentence(sentence, data_tokens, spacy=True):
 def post_proc_tokenize_sentence(tokenized_sentence):
     proc_tokenized_sentence = []
     for t in range(0, len(tokenized_sentence)):
-        try:
-            token = tokenized_sentence[t].string.strip()
-        except:
-            print(tokenized_sentence)
+        # try:
+        #     token = tokenized_sentence[t].string.lower().strip()
+        # except:
+        #     print(tokenized_sentence)
+        token = tokenized_sentence[t].string.lower().strip()
         # first check if the string is number or alphabet only
         if token.isdigit() or token.isalpha():
             proc_tokenized_sentence.append(token)
