@@ -23,7 +23,7 @@ use_cuda = torch.cuda.is_available()
 # TODO: to run properly, change the following paths and filenames
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
-f_name = 'dev-v1.1.json'
+f_name = 'train-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
@@ -36,7 +36,7 @@ path_to_loss_f = path_to_exp_out + '/' + loss_f
 path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
 
 ######### first load the pretrained word embeddings
-path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.50d.txt')
+path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 ######### read corpus
@@ -51,7 +51,7 @@ windowed_c_triplets_10 = get_windowed_ans(raw_triplets, window_size)
 # print(windowed_c_triplets[0][0])
 
 # test of selecting the sentence containing answer from context
-test_idx = 185
+# test_idx = 0
 sent_c_triplets = get_ans_sentence(raw_triplets)
 # print(raw_triplets[test_idx][0])
 # print(raw_triplets[test_idx][2])
@@ -60,26 +60,26 @@ sent_c_triplets = get_ans_sentence(raw_triplets)
 # print(sent_c_triplets[0][0])
 windowed_c_triplets_10 = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window')
 sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
-triplets = tokenize_squad(raw_triplets, embeddings_index)
+triplets = tokenize_squad(raw_triplets, embeddings_index, opt='sent')
 
-print(raw_triplets[test_idx][0])
-print(triplets[test_idx][0])
-print(raw_triplets[test_idx][1])
-print(triplets[test_idx][1])
-print(raw_triplets[test_idx][2])
-print(triplets[test_idx][2])
+#print(raw_triplets[test_idx][0])
+#print(' '.join(triplets[test_idx][0]))
+#print(raw_triplets[test_idx][1])
+#print(' '.join(triplets[test_idx][1]))
+#print(raw_triplets[test_idx][2])
+#print(' '.join(triplets[test_idx][2]))
 
 # save to files
-# import pickle
-# save_path = '/home/jack/Documents/QA_QG/data/processed/'
-# if not os.path.exists(save_path):
-# 	os.mkdir(save_path)
-# with open(save_path+'windowed_c_triplets_10.txt', 'wb') as fp:
-# 	pickle.dump(windowed_c_triplets_10, fp)
-# with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
-# 	pickle.dump(sent_c_triplets, fp)
-# with open(save_path+'triplets.txt', 'wb') as fp:
-# 	pickle.dump(triplets, fp)
+import pickle
+save_path = '/home/jack/Documents/QA_QG/data/processed/'
+if not os.path.exists(save_path):
+	os.mkdir(save_path)
+with open(save_path+'windowed_c_triplets_10.txt', 'wb') as fp:
+	pickle.dump(windowed_c_triplets_10, fp)
+with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
+	pickle.dump(sent_c_triplets, fp)
+with open(save_path+'triplets.txt', 'wb') as fp:
+	pickle.dump(triplets, fp)
 
 # # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)

@@ -167,6 +167,9 @@ def get_ans_sentence(raw_squad):
         # print(tokenized_c)
         ans_start_idx = triple[3]
         ans_end_idx = triple[4]
+       
+        # print(ans_start_idx)
+        # print(ans_end_idx)
 
         idx = 0
         for s in sent_c:
@@ -177,8 +180,13 @@ def get_ans_sentence(raw_squad):
                 sent = s
                 # if isinstance(sent, unicode):
                 #     raise Exception('unicode detected, where expecting spacy span object.')
-                # break
+                break
                 if tokenized_a[0] not in sent:
+                    print('c')
+                    print(idx)
+                    print(idx+len(s.string))
+                    print(ans_start_idx)
+                    print(ans_end_idx)
                     raise Exception('answer token not in current sentence')
             else:
                 idx += len(s.string)
