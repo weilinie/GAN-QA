@@ -35,7 +35,7 @@ class G(nn.Module):
         # the collection of all hidden states per batch is of size (seq_len, batch, hidden_size * num_directions)
         encoder_hiddens, encoder_hidden = self.encoder(inputs_ca, seq_lens, None)
 
-        print(type(encoder_hiddens))
+        print(type(encoder_hiddens.data))
         print(encoder_hiddens.size())
 
         # decoder
