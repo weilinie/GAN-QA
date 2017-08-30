@@ -72,8 +72,8 @@ print(triplets[test_idx][2])
 # save to files
 import pickle
 save_path = '/home/jack/Documents/QA_QG/data/processed/'
-    if not os.path.exists(save_path):
-        os.mkdir(save_path)
+if not os.path.exists(save_path):
+	os.mkdir(save_path)
 with open(save_path+'windowed_c_triplets_10.txt', 'wb') as fp:
 	pickle.dump(windowed_c_triplets_10, fp)
 with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
