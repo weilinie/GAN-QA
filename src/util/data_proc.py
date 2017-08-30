@@ -186,6 +186,9 @@ def get_ans_sentence(raw_squad):
 
 # helper function to get a window of tokens around the answer
 # similar to get_ans_sentence; only difference is the span of tokens
+# NOTE: here the number of window operates on crude tokens: there's = one token.
+#       in proc_tokenized_sent, there's = 3 tokens. therefore, the actual
+#       number of tokens before and after the answer may exceed the set window size
 def get_windowed_ans(raw_squad, window_size):
 
     windowed_c_triplets = []
