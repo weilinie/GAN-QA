@@ -60,7 +60,7 @@ sent_c_triplets = get_ans_sentence(raw_triplets)
 # print(sent_c_triplets[0][0])
 
 
-triplets = tokenize_squad(raw_triplets, embeddings_index, opt='sent')
+triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
 print(raw_triplets[test_idx][0])
 print(triplets[test_idx][0])
 print(raw_triplets[test_idx][1])
