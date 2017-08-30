@@ -93,10 +93,13 @@ if to_file:
     path_to_sample_out_f = path_to_exp_out + exp_name + '/' + sample_out_f
     loss_f = open(path_to_loss_f,'w+')
     sample_out_f = open(path_to_sample_out_f, 'w+')
+else:
+    loss_f = None
+    sample_out_f = None
 
 trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
-           to_file, loss_f, sample_out_f, path_to_exp_out,
+           to_file, loss_f, sample_out_f,
            n_iters = 1, print_every=1, plot_every=1)
 
 # save the final model

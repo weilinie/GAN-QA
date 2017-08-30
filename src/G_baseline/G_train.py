@@ -42,7 +42,7 @@ def timeSince(since, percent):
 
 def trainIters(generator, optimizer, batch_size, embeddings_size,
     embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
-    to_file, loss_f, sample_out_f, path_to_exp_out,
+    to_file, loss_f, sample_out_f,
     n_iters=5, print_every=10, plot_every=100):
 
     begin_time = time.time()
