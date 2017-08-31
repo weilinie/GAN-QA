@@ -57,8 +57,21 @@ def trainIters(generator, optimizer, batch_size, embeddings_size,
 
         # prepare batch
         training_batch, seq_lens = get_random_batch(triplets, batch_size)
-        training_batch, _, seq_lens = prepare_batch_var(training_batch, seq_lens, batch_size, word2index, embeddings_index, embeddings_size)
-        inputs = Variable(training_batch.cuda()) if use_cuda else Variable(training_batch) # embeddings vectors, size = [seq len x batch size x embedding dim]
+        training_batch, _, seq_lens = prepare_batch_var(
+            training_batch, seq_lens, batch_size, word2index, embeddings_index, embeddings_size)
+
+        # print(type(training_batch))
+        # print(type(training_batch[0]))
+
+        # prepare inputs (load to cuda)
+        inputs = []
+        for var in training_batch:
+            if not isinstance(var, list):
+                inputs.append(Variable(var.cuda())) if use_cuda else inputs.append(Variable(var))
+            # NOTE not currently appending start and end index to inputs because model does not use them.
+            # NOTE if want to apend, make sure these are changed from list to LongTensor
+            # else:
+            #     inputs.append(Variable(var))
 
         max_c_a_len = max(seq_lens[0])  # max seq length of context + ans combined
         max_q_len = max(seq_lens[1])  # max seq length of question
@@ -68,7 +81,7 @@ def trainIters(generator, optimizer, batch_size, embeddings_size,
         all_decoder_outputs = generator.forward(inputs, seq_lens, batch_size, max_q_len,
                                                 embeddings_index, embeddings_size, word2index, index2word,
                                                 teacher_forcing_ratio)
-        loss += generator.backward(all_decoder_outputs, inputs_q, seq_lens[1], optimizer)
+        loss += generator.backward(all_decoder_outputs, inputs[1], seq_lens[1], optimizer)
 
         print_loss_total += loss.data[0]
         plot_loss_total += loss.data[0]

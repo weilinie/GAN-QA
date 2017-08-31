@@ -23,7 +23,7 @@ class G(nn.Module):
         self.c_encoder = EncoderRNN(enc_input_size, enc_hidden_size, batch_size, enc_n_layers, enc_num_directions)
         self.a_encoder = EncoderRNN(enc_input_size, enc_hidden_size, batch_size, enc_n_layers, enc_num_directions)
         if use_attn:
-            self.decoder = AttnDecoderRNN(dec_input_size, dec_hidden_size, output_size, self.encoder,
+            self.decoder = AttnDecoderRNN(dec_input_size, dec_hidden_size, output_size, self.a_encoder,
                                           dec_n_layers, dec_num_directions)
         else:
             # TODO: complete case when not using attention (add decoder class in model zoo)
@@ -40,7 +40,7 @@ class G(nn.Module):
         a_encoder_hiddens, a_encoder_hidden = self.a_encoder(inputs[2], seq_lens[2])
 
         # TODO: the below code of how to use/combine hidden states from context/answer can be changed
-        encoder_hiddens = torch.cat(c_encoder_hiddens, a_encoder_hiddens, 0) # concat along the first dimension (seq len)
+        encoder_hiddens = torch.cat((c_encoder_hiddens, a_encoder_hiddens), 0) # concat along the first dimension (seq len)
 
         # decoder
         # prepare decoder inputs as word embeddings in a batch

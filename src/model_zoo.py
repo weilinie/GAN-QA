@@ -23,7 +23,7 @@ class EncoderRNN(nn.Module):
         self.input_size = input_size
         self.num_directions = num_directions
         self.batch_size = batch_size
-        print('batch size is: %d' % batch_size)
+        # print('batch size is: %d' % batch_size)
 
         if self.num_directions == 1:
             self.gru = nn.GRU(input_size, hidden_size, n_layers, bidirectional=False)
@@ -34,18 +34,19 @@ class EncoderRNN(nn.Module):
 
     def forward(self, input, seq_lens, hidden=None):
 
-        # prepare encoder input
-        if self.batch_size > 1:
-            input = nn.utils.rnn.pack_padded_sequence(input, seq_lens)
-            # input = pack_sequence(input, seq_lens)
+        # # prepare encoder input
+        # if self.batch_size > 1:
+        #     # see how pack_padded_sequence works, take a look here (this is a wrong example): https://goo.gl/oN9uc9
+        #     input = nn.utils.rnn.pack_padded_sequence(input, seq_lens)
+        #     # input = pack_sequence(input, seq_lens)
 
         # input is matrix of size [max seq len x batch size x embedding dimension]
         encoder_outputs, hidden = self.gru(input, hidden)
 
-        # unpack the sequence
-        # size of unpacked sequence: (seq_len, batch size, hidden_size*num_directions)
-        if self.batch_size > 1:
-            encoder_outputs, output_lens = torch.nn.utils.rnn.pad_packed_sequence(encoder_outputs)
+        # # unpack the sequence
+        # # size of unpacked sequence: (seq_len, batch size, hidden_size*num_directions)
+        # if self.batch_size > 1:
+        #     encoder_outputs, output_lens = torch.nn.utils.rnn.pad_packed_sequence(encoder_outputs)
 
         # FIXME: do I need to sum the eocnder_outputs when the network is bidirectional:
         # e.g. outputs = outputs[:, :, :self.hidden_size] + outputs[:, : ,self.hidden_size:]

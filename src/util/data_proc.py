@@ -419,11 +419,12 @@ def get_random_batch(triplets, batch_size, with_fake = False):
 #   from get_random_batch in order to fit NLLLoss function (indexing and selecting the whole batch of a single token) is
 #   easier. e.g. you can do question[i] which selects the whole sequence of the first dimension
 def prepare_batch_var(batch, seq_lens, batch_size, word2index, embeddings_index, embeddings_size,
-                      use_cuda=1, mode = ('word', 'word', 'index'), concat_opt = None,
-                      with_fake = False, fake_batch = None, fake_seq_lens = None):
+                      use_cuda=1, sort=False, mode=('word', 'index', 'word'), concat_opt=None,
+                      with_fake=False, fake_batch=None, fake_seq_lens=None):
 
     batch_vars = []
     batch_var_orig = []
+    batch_paddings = []
 
     if with_fake:
         batch_size = int(batch_size/2)
@@ -471,14 +472,15 @@ def prepare_batch_var(batch, seq_lens, batch_size, word2index, embeddings_index,
     else:
         raise ValueError('not a valid concat option.')
 
-    # sort this batch_var in descending order according to the values of the lengths of the first element in batch
     num_batch = len(batch)
-    all = batch + seq_lens
-    all = sorted(zip(*all), key=lambda p: len(p[0]), reverse=True)
-    all = zip(*all)
-    batch = all[0:num_batch]
-    seq_lens = all[num_batch:]
-    batch_orig = batch
+    # sort this batch_var in descending order according to the values of the lengths of the first element in batch
+    if sort:
+        all = batch + seq_lens
+        all = sorted(zip(*all), key=lambda p: len(p[0]), reverse=True)
+        all = zip(*all)
+        batch = all[0:num_batch]
+        seq_lens = all[num_batch:]
+        batch_orig = batch
 
     # get bacth size back to 2x if with fake
     if with_fake:
@@ -514,9 +516,10 @@ def prepare_batch_var(batch, seq_lens, batch_size, word2index, embeddings_index,
                         batch_var[j, i,] = embeddings_index[batch_padded[i][j]]
 
         batch_vars.append(batch_var)
+        batch_paddings.append(batch_padded)
 
     # the second output is for debugging purpose
-    return batch_vars, batch_orig, seq_lens
+    return batch_vars, batch_paddings, seq_lens
 
 # helper function to zero pad context, question, answer to their respective maximum length
 def pad_sequence(s, max_len, word2index, mode = 'word'):

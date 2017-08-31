@@ -25,12 +25,19 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     context_words = training[0]
     answer_words = training[2]
     question_words = training[1]
-    training, _, seq_lens = prepare_batch_var(training, seq_lens, batch_size, word2index, embeddings_index, embeddings_size, mode=['word', 'index'], concat_opt='ca')
-    inputs_ca = Variable(training[0].cuda()) if use_cuda else Variable(training[0]) # embeddings vectors, size = [seq len x batch size x embedding dim]
-    # inputs_q = Variable(training[1].cuda()) if use_cuda else Variable(training[1]) # represented as indices, size = [seq len x batch size]
+    training, _, seq_lens = prepare_batch_var(training, seq_lens, batch_size,
+                                                              word2index, embeddings_index, embeddings_size)
+    inputs = []
+    for var in training:
+        if not isinstance(var, list):
+            inputs.append(Variable(var.cuda())) if use_cuda else inputs.append(Variable(var))
+            # NOTE not currently appending start and end index to inputs because model does not use them
+            # else:
+            #     inputs.append(Variable(var))
+
     inputs_q = None
 
-    all_decoder_outputs = generator.forward(inputs_ca, inputs_q, seq_lens[0], batch_size, max_length,
+    all_decoder_outputs = generator.forward(inputs, seq_lens, batch_size, max_length,
                                             embeddings_index, embeddings_size, word2index, index2word,
                                             teacher_forcing_ratio=0)
 

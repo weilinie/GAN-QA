@@ -2,7 +2,13 @@
 
 # load model
 import sys, os
+__file__ = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
+sys.path.append(os.path.abspath(__file__))
+import data_proc
+reload(data_proc)
 from data_proc import *
+import util
+reload(util)
 from util import *
 sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline')
@@ -23,7 +29,7 @@ use_cuda = torch.cuda.is_available()
 # TODO: to run properly, change the following paths and filenames
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
-f_name = 'train-v1.1.json'
+f_name = 'dev-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
@@ -36,7 +42,7 @@ path_to_loss_f = path_to_exp_out + '/' + loss_f
 path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
 
 ######### first load the pretrained word embeddings
-path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
+path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.50d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 ######### read corpus
@@ -91,28 +97,31 @@ windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt'
 # # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)
 
-# effective_tokens, effective_num_tokens = count_effective_num_tokens(triplets, embeddings_index)
+effective_tokens, effective_num_tokens = count_effective_num_tokens(triplets, embeddings_index)
 # print('effective number of tokens: ' + str(effective_num_tokens))
 # print('expected initial loss: ' + str(-np.log(1/float(effective_num_tokens))) + '\n')
 # # build word2index dictionary and index2word dictionary
-# word2index, index2word = generate_look_up_table(effective_tokens, effective_num_tokens)
+word2index, index2word = generate_look_up_table(effective_tokens, effective_num_tokens)
 
 
 ######################################################################
 ######################################################################
-# # test case of get_random_batch and prepare_batch_var functions in data_proc.py
-# # (uncomment code below to test)
-# # test and time
-# # to run this test, you need to have these things ready:
-# # 1) triplet processed by tokenize_squad,
-# # 2) embeddings_index
-# # 3) a mini batch processed by get_random_batch
-# batch_size = 500
-# start = time.time()
-# batch, seq_lens, fake_batch, fake_seq_lens = get_random_batch(triplets, batch_size, with_fake=True)
-#
+# test case of get_random_batch and prepare_batch_var functions in data_proc.py
+# (uncomment code below to test)
+# test and time
+# to run this test, you need to have these things ready:
+# 1) triplet processed by tokenize_squad,
+# 2) embeddings_index
+# 3) a mini batch processed by get_random_batch
+batch_size = 500
+start = time.time()
+batch, seq_lens, fake_batch, fake_seq_lens = get_random_batch(triplets, batch_size, with_fake=True)
+batch, seq_lens = get_random_batch(triplets, batch_size)
+
 # temp, temp_orig, seq_lens_cqa = prepare_batch_var(batch, seq_lens, fake_batch, fake_seq_lens, batch_size, word2index, embeddings_index, embeddings_size,
 #                                                   mode = ['word', 'index'], concat_opt='cqa', with_fake=True)
+batch_vars, batch_paddings, seq_lens = prepare_batch_var(batch, seq_lens, batch_size, word2index, embeddings_index, embeddings_size)
+
 # end = time.time()
 # print('time elapsed: ' + str(end-start))
 # # the following check if the batched data matches with the original data
