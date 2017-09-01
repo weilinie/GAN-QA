@@ -58,7 +58,7 @@ print('start training...')
 print('')
 
 
-######### set up model
+######### set up model 
 enc_hidden_size = 256
 enc_n_layers = 1
 enc_num_directions = 2

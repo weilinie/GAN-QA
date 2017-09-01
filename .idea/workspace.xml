@@ -3,13 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="f9ea85a3-5cef-4c19-a462-b9db063ecc13" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py" afterPath="$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_c_a_sep/G_eval.py" afterPath="$PROJECT_DIR$/src/G_c_a_sep/G_eval.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" afterPath="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_c_a_sep/G_train.py" afterPath="$PROJECT_DIR$/src/G_c_a_sep/G_train.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/model_zoo.py" afterPath="$PROJECT_DIR$/src/model_zoo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/data_proc.py" afterPath="$PROJECT_DIR$/src/util/data_proc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/test.py" afterPath="$PROJECT_DIR$/src/util/test.py" />
     </list>
     <ignored path="GAN-QA.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -23,10 +16,10 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/GAN-QA$Unnamed.coverage" NAME="Unnamed Coverage Results" MODIFIED="1502163327480" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/G_baseline_batch" />
-    <SUITE FILE_PATH="coverage/GAN-QA$GAN_main.coverage" NAME="GAN_main Coverage Results" MODIFIED="1503597517368" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/GAN_model" />
+    <SUITE FILE_PATH="coverage/GAN-QA$GAN_main.coverage" NAME="GAN_main Coverage Results" MODIFIED="1504290805646" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/GAN_model" />
     <SUITE FILE_PATH="coverage/GAN-QA$G_model.coverage" NAME="G_model Coverage Results" MODIFIED="1502492745471" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/G_baseline" />
     <SUITE FILE_PATH="coverage/GAN-QA$D_baseline_model.coverage" NAME="D_baseline_model Coverage Results" MODIFIED="1502248911862" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/D_baseline" />
-    <SUITE FILE_PATH="coverage/GAN-QA$test.coverage" NAME="test Coverage Results" MODIFIED="1503455901291" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/util" />
+    <SUITE FILE_PATH="coverage/GAN-QA$test.coverage" NAME="test Coverage Results" MODIFIED="1504290865382" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/util" />
     <SUITE FILE_PATH="coverage/GAN-QA$D_main.coverage" NAME="D_main Coverage Results" MODIFIED="1502298138877" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/D_baseline" />
     <SUITE FILE_PATH="coverage/GAN-QA$D_train.coverage" NAME="D_train Coverage Results" MODIFIED="1502248938475" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/D_baseline" />
     <SUITE FILE_PATH="coverage/GAN-QA$data_proc.coverage" NAME="data_proc Coverage Results" MODIFIED="1502248981535" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/util" />
@@ -56,8 +49,8 @@
       <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/util/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="572">
-              <caret line="123" column="0" selection-start-line="123" selection-start-column="0" selection-end-line="123" selection-end-column="0" />
+            <state relative-caret-position="260">
+              <caret line="67" column="0" selection-start-line="67" selection-start-column="0" selection-end-line="67" selection-end-column="79" />
               <folding />
             </state>
           </provider>
@@ -76,18 +69,18 @@
       <file leaf-file-name="G_c_a_sep.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="640">
+            <state relative-caret-position="1000">
               <caret line="94" column="34" selection-start-line="94" selection-start-column="28" selection-end-line="94" selection-end-column="34" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="G_eval.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="G_eval.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_eval.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="460">
-              <caret line="23" column="50" selection-start-line="23" selection-start-column="50" selection-end-line="23" selection-end-column="50" />
+            <state relative-caret-position="480">
+              <caret line="24" column="31" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="31" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -95,11 +88,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="G_main.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="G_main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="85" column="44" selection-start-line="85" selection-start-column="44" selection-end-line="85" selection-end-column="44" />
+            <state relative-caret-position="257">
+              <caret line="60" column="23" selection-start-line="60" selection-start-column="23" selection-end-line="60" selection-end-column="23" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -111,7 +104,7 @@
         <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_train.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="640">
-              <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="69" selection-end-column="97" />
+              <caret line="68" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="69" selection-end-column="97" />
               <folding />
             </state>
           </provider>
@@ -149,12 +142,12 @@
         <option value="$PROJECT_DIR$/src/G_baseline/G_eval.py" />
         <option value="$PROJECT_DIR$/src/GAN_model/GAN_model.py" />
         <option value="$PROJECT_DIR$/src/GAN_model/GAN_main.py" />
-        <option value="$PROJECT_DIR$/src/util/test.py" />
         <option value="$PROJECT_DIR$/src/util/data_proc.py" />
         <option value="$PROJECT_DIR$/src/model_zoo.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_train.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_eval.py" />
+        <option value="$PROJECT_DIR$/src/util/test.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" />
       </list>
     </option>
@@ -315,7 +308,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.GAN_main">
+  <component name="RunManager" selected="Python.test">
     <configuration default="false" name="data_proc" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -642,8 +635,8 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.GAN_main" />
-        <item index="1" class="java.lang.String" itemvalue="Python.test" />
+        <item index="0" class="java.lang.String" itemvalue="Python.test" />
+        <item index="1" class="java.lang.String" itemvalue="Python.GAN_main" />
         <item index="2" class="java.lang.String" itemvalue="Python.G_model" />
         <item index="3" class="java.lang.String" itemvalue="Python.D_main" />
         <item index="4" class="java.lang.String" itemvalue="Python.data_proc" />
@@ -801,7 +794,14 @@
       <option name="project" value="LOCAL" />
       <updated>1503468766461</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="updates for G_c_a_model&#10;">
+      <created>1504292734675</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1504292734675</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TodoView">
@@ -815,14 +815,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1920" y="24" width="1920" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22838847" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.05922551" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32881" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="WINDOWED" visible="true" show_stripe_button="true" weight="0.23590814" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" x="65" y="24" width="1855" height="1056" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="WINDOWED" visible="true" show_stripe_button="true" weight="0.23590814" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" x="65" y="24" width="1855" height="1056" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33194155" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -883,7 +883,8 @@
     <MESSAGE value="updates for batch seq2seq discriminator" />
     <MESSAGE value="updates for batch seq2seq generator model" />
     <MESSAGE value="updates for gan&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="updates for gan&#10;" />
+    <MESSAGE value="updates for G_c_a_model&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="updates for G_c_a_model&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1097,14 +1098,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="572">
-          <caret line="123" column="0" selection-start-line="123" selection-start-column="0" selection-end-line="123" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/G_baseline/G_eval.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1178">
@@ -1132,17 +1125,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="439">
-          <caret line="521" column="21" selection-start-line="521" selection-start-column="11" selection-end-line="521" selection-end-column="21" />
-          <folding>
-            <element signature="e#424#489#0" expanded="true" />
-            <marker date="1504210398942" expanded="true" signature="21532:21733" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/model_zoo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="299">
@@ -1154,35 +1136,54 @@
     <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_train.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="640">
-          <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="69" selection-end-column="97" />
+          <caret line="68" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="69" selection-end-column="97" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_eval.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="24" column="31" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
+        <state relative-caret-position="1000">
           <caret line="94" column="34" selection-start-line="94" selection-start-column="28" selection-end-line="94" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="439">
+          <caret line="521" column="21" selection-start-line="521" selection-start-column="11" selection-end-line="521" selection-end-column="21" />
+          <folding>
+            <element signature="e#424#489#0" expanded="true" />
+            <marker date="1504210398942" expanded="true" signature="21532:21733" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="67" column="0" selection-start-line="67" selection-start-column="0" selection-end-line="67" selection-end-column="79" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="85" column="44" selection-start-line="85" selection-start-column="44" selection-end-line="85" selection-end-column="44" />
+        <state relative-caret-position="257">
+          <caret line="60" column="23" selection-start-line="60" selection-start-column="23" selection-end-line="60" selection-end-column="23" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_eval.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="460">
-          <caret line="23" column="50" selection-start-line="23" selection-start-column="50" selection-end-line="23" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
