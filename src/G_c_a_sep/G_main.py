@@ -19,20 +19,21 @@ teacher_forcing_ratio = 0.75 # default in original code is 0.5
 # TODO: to run properly, change the following paths and filenames
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
-f_name = 'dev-v1.1.json'
+f_name = 'train-v1.1.json'
 path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
 
 
 ######### first load the pretrained word embeddings
-path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.50d.txt')
+path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
-######### read corpus
+######### read corpus - only the sentence containing the answer as context
 raw_triplets = read_raw_squad(path_to_data)
-triplets = tokenize_squad(raw_triplets, embeddings_index)
+sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
+triplets = sent_c_triplets
 
 # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)
@@ -64,7 +65,7 @@ enc_num_directions = 2
 dec_hidden_size = 256
 dec_n_layers = 1
 dec_num_directions = 2
-batch_size = 50
+batch_size = 5
 learning_rate = 0.001
 
 generator = G(embeddings_size, enc_hidden_size, enc_n_layers, enc_num_directions,
@@ -83,7 +84,7 @@ to_file = True
 
 # open the files
 if to_file:
-    exp_name = 'G_c_a_sep_pretrain_exp_0831'
+    exp_name = 'G_c_a_sep_pretrain_exp_0901'
     path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
