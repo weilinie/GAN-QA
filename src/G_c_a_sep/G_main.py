@@ -31,9 +31,16 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
 ######### read corpus - only the sentence containing the answer as context
-raw_triplets = read_raw_squad(path_to_data)
-sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
+# raw_triplets = read_raw_squad(path_to_data)
+# sent_c_triplets = get_ans_sentence(raw_triplets)
+# sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
+import pickle
+load_path = '/home/jack/Documents/QA_QG/data/processed/'
+# triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
+sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
+# windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt', 'rb'))
 triplets = sent_c_triplets
+# triplets = windowed_c_triplets_10
 
 # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)
@@ -58,7 +65,7 @@ print('start training...')
 print('')
 
 
-######### set up model 
+######### set up model
 enc_hidden_size = 256
 enc_n_layers = 1
 enc_num_directions = 2
@@ -84,7 +91,7 @@ to_file = True
 
 # open the files
 if to_file:
-    exp_name = 'G_c_a_sep_pretrain_exp_0901'
+    exp_name = 'G_c_a_sep_pretrain_exp_0902(2)'
     path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
@@ -98,7 +105,7 @@ if to_file:
 trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
            to_file, loss_f, sample_out_f, path_to_exp_out,
-           n_iters = 5, print_every=1, plot_every=1)
+           n_iters = 30000, print_every=300, plot_every=30)
 
 # save the final model
 if to_file:
