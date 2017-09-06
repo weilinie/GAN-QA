@@ -6,7 +6,7 @@
 # ``plot_losses`` saved while training.
 #
 import matplotlib
-matplotlib.use('GTKAgg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
