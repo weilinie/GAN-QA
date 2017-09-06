@@ -53,7 +53,7 @@ def timeSince(since, percent):
 # show loss function
 def plotLoss(loss_f):
     loss_vec = []
-    with open(fname) as f:
+    with open(loss_f) as f:
         content = f.readlines()
         content = [x.strip() for x in content] # list of every line, each a string
         for line in content:
