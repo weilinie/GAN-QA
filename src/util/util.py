@@ -76,7 +76,6 @@ def plotLoss(loss_f):
 # For a better viewing experience we will do the extra work of adding axes
 # and labels:
 #
-
 def showAttention(input_sentence, output_words, attentions):
     # Set up figure with colorbar
     fig = plt.figure()
