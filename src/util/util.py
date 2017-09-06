@@ -67,9 +67,11 @@ def plotLoss(loss_f):
     plt.xlabel('training iterations')
     plt.ylabel('loss')
     plt.grid()
-    plt.plot(range(2, len(loss_vec)+1), loss_vec)
+    plt.plot(range(1, len(loss_vec)+1), loss_vec)
 
-
+# test
+# from util import *
+# plotLoss('../../../exp_results_temp/G_c_a_sep_pretrain_exp_0902/loss_temp.txt')
 
 
 ######################################################################
