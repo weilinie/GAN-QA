@@ -5,10 +5,10 @@
 # Plotting is done with matplotlib, using the array of loss values
 # ``plot_losses`` saved while training.
 #
-# import matplotlib
-# matplotlib.use('Agg')
-# import matplotlib.pyplot as plt
-# import matplotlib.ticker as ticker
+import matplotlib
+matplotlib.use('GTKAgg')
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
 
 
@@ -49,6 +49,12 @@ def timeSince(since, percent):
 
 
 
+######################################################################
+# show loss function
+def plotLoss(loss_f):
+
+
+
 
 ######################################################################
 # For a better viewing experience we will do the extra work of adding axes
@@ -80,3 +86,5 @@ def evaluateAndShowAttention(input_sentence):
     print('input =', input_sentence)
     print('output =', ' '.join(output_words))
     showAttention(input_sentence, output_words, attentions)
+
+
