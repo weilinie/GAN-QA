@@ -18,7 +18,6 @@ class G(nn.Module):
                  dec_input_size, dec_hidden_size, output_size, dec_n_layers, dec_num_directions,
                  batch_size, use_attn=True):
         super(G, self).__init__()
-        print('batch size is: %d' % batch_size)
         self.encoder = EncoderRNN(enc_input_size, enc_hidden_size, batch_size, enc_n_layers, enc_num_directions)
         if use_attn:
             self.decoder = AttnDecoderRNN(dec_input_size, dec_hidden_size, output_size, self.encoder,
