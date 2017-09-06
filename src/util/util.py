@@ -52,6 +52,22 @@ def timeSince(since, percent):
 ######################################################################
 # show loss function
 def plotLoss(loss_f):
+    loss_vec = []
+    with open(fname) as f:
+        content = f.readlines()
+        content = [x.strip() for x in content] # list of every line, each a string
+        for line in content:
+            try:
+                loss_vec.append(float(line))
+            except ValueError:
+                pass
+    # plot
+    plt.figure()
+    plt.title('training loss')
+    plt.xlabel('training iterations')
+    plt.ylabel('loss')
+    plt.grid()
+    plt.plot(range(2, len(loss_vec)+1), loss_vec)
 
 
 
