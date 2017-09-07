@@ -1,13 +1,14 @@
 import sys, os
-# sys.path.append(os.path.abspath(__file__ + "/../../") + '/util/')
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/util/')
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_c_a_sep/')
 # sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline/')
-# sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline/')
-# from data_proc import *
+sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline/')
+from util import asMinutes
+from data_proc import *
 from G_c_a_sep import G
-# from G_eval import *
+from G_eval import *
 # from G_model import G
-# from D_model import *
+from D_model import *
 
 import torch
 import torch.nn as nn
@@ -19,11 +20,11 @@ from torch.autograd import Variable
 import time
 import math
 
-# FIXME: added these two functions because import util does not seem to work (see above)
-def asMinutes(s):
-    m = math.floor(s / 60)
-    s -= m * 60
-    return '%dm %ds' % (m, s)
+# # FIXME: added these two functions because import util does not seem to work (see above)
+# def asMinutes(s):
+#     m = math.floor(s / 60)
+#     s -= m * 60
+#     return '%dm %ds' % (m, s)
 
 def timeSince(since, percent):
     now = time.time()
