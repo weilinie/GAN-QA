@@ -2,14 +2,14 @@ from __future__ import print_function
 from __future__ import division
 
 import sys, os
-sys.path.append(os.path.abspath(__file__ + "/../../"))
+# sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
-sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_c_a_sep')
-sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline')
+# sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_c_a_sep')
+# sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline')
 
 from data_proc import *
-from G_train import *
-from G_c_a_sep import *
+# from G_train import *
+# from G_c_a_sep import *
 from GAN_model import *
 import numpy as np
 
