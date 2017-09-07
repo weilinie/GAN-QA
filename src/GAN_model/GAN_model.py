@@ -16,22 +16,6 @@ import numpy as np
 import torch.autograd as autograd
 from torch.autograd import Variable
 
-######### helper functions for time recording & logging ##########
-import time
-import math
-
-# # FIXME: added these two functions because import util does not seem to work (see above)
-# def asMinutes(s):
-#     m = math.floor(s / 60)
-#     s -= m * 60
-#     return '%dm %ds' % (m, s)
-
-# def timeSince(since, percent):
-#     now = time.time()
-#     s = now - since
-#     es = s / (percent)
-#     rs = es - s
-#     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
 ##################################################################
 
 use_cuda = torch.cuda.is_available()
