@@ -114,14 +114,14 @@ criterion = nn.BCELoss()
 max_len = 100
 to_file = True
 print_every = 1
-n_iters = 10
+n_iters = 3
 d_steps = 1
-g_steps = 5
+g_steps = 1
 
 # open the files
 if to_file:
-    exp_name = 'GAN_exp_0824'
-    path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/GAN_0906/'
+    exp_name = 'GAN_0907'
+    path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
     loss_f = 'loss_temp.txt'
