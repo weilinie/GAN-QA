@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_c_a_sep/')
 # sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_baseline/')
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline/')
 from data_proc import *
-from G_c_a_sep import G
+from G_c_a_sep import *
 from G_eval import *
 # from G_model import G
 from D_model import *
@@ -296,3 +296,59 @@ def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, in
 
     # the second output is for debugging purpose
     return batch_vars, batch_orig, seq_lens
+
+
+# function to sample generator output
+def G_sampler(generator, input, embeddings_index, embeddings_size, word2index, index2word, max_length, concat=None, detach=True):
+# NOTE currently only generate one question at a time. multiple questions not yet supported
+
+    if concat == 'ca':
+        var = torch.FloatTensor(len(input), embeddings_size)
+        for j in range(len(input)):
+            var[j] = embeddings_index[input[j]]
+        var = inputs.unsqueeze(1)
+        if use_cuda:
+            var = Variable(var.cuda())
+        else:
+            var = Variable(var)
+
+        decoder_output = generator.forward(var, None, [len(input)], 1, max_length,
+                                           embeddings_index, embeddings_size, word2index, index2word,
+                                           teacher_forcing_ratio=0).detach()
+        decoder_output = decoder_output.squeeze(1)
+    elif concat == None:
+        # NOTE: hardcode indices of c, q, a, in the line - for i in range(0,3)
+        inputs = []
+        for i in range(0,3):
+            var = torch.FloatTensor(len(input[i]), embeddings_size)
+            for j in range(len(input[i])):
+                var[j] = embeddings_index[input[i][j]]
+            var = var.unsqueeze(1)
+            if use_cuda:
+                var = Variable(var.cuda())
+            else:
+                var = Variable(var)
+            inputs.append(var)
+
+        decoder_output = generator.forward(inputs, [len(x) for x in input], 1, max_length,
+                                           embeddings_index, embeddings_size, word2index, index2word,
+                                           teacher_forcing_ratio=0)
+        if detach:
+            decoder_output = decoder_output.detach()
+        decoder_output = decoder_output.squeeze(1)
+
+
+
+    decoded_words = []
+    for di in range(max_length):
+        # top value and index of every batch
+        topv, topi = decoder_output[di].data.topk(1)
+        ni = topi[0]
+        if (ni == word2index['EOS']) or (ni == word2index['PAD']):
+            decoded_words.append('EOS')
+            # decoder_attentions[di] = decoder_attention[0].data
+            break
+        else:
+            decoded_words.append(index2word[ni])
+
+    return decoded_words
