@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline')
 
 from data_proc import *
 from G_train import *
-from G_model import *
+from G_c_a_sep import *
 from GAN_model import *
 import numpy as np
 
