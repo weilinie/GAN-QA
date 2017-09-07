@@ -28,12 +28,12 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     training, _, seq_lens = prepare_batch_var(training, seq_lens, batch_size,
                                                               word2index, embeddings_index, embeddings_size)
     inputs = []
-    for var in training:
-        if not isinstance(var, list):
-            inputs.append(Variable(var.cuda())) if use_cuda else inputs.append(Variable(var))
+    for inputs in training:
+        if not isinstance(inputs, list):
+            inputs.append(Variable(inputs.cuda())) if use_cuda else inputs.append(Variable(inputs))
             # NOTE not currently appending start and end index to inputs because model does not use them
             # else:
-            #     inputs.append(Variable(var))
+            #     inputs.append(Variable(inputs))
 
     inputs_q = None
 
@@ -78,22 +78,45 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     # return decoded_sentences
 
 
-def G_sampler(generator, ca, embeddings_index, embeddings_size, word2index, index2word, max_length):
+def G_sampler(generator, input, embeddings_index, embeddings_size, word2index, index2word, max_length, concat=None, detach=True):
 # NOTE currently only generate one question at a time. multiple questions not yet supported
 
-    var = torch.FloatTensor(len(ca), embeddings_size)
-    for j in range(len(ca)):
-        var[j] = embeddings_index[ca[j]]
-    var = var.unsqueeze(1)
-    if use_cuda:
-        var = Variable(var.cuda())
-    else:
-        var = Variable(var)
+    if concat == 'ca':
+        var = torch.FloatTensor(len(input), embeddings_size)
+        for j in range(len(input)):
+            var[j] = embeddings_index[input[j]]
+        var = inputs.unsqueeze(1)
+        if use_cuda:
+            var = Variable(var.cuda())
+        else:
+            var = Variable(var)
 
-    decoder_output = generator.forward(var, None, [len(ca)], 1, max_length,
-                                       embeddings_index, embeddings_size, word2index, index2word,
-                                       teacher_forcing_ratio=0).detach()
-    decoder_output = decoder_output.squeeze(1)
+        decoder_output = generator.forward(var, None, [len(input)], 1, max_length,
+                                           embeddings_index, embeddings_size, word2index, index2word,
+                                           teacher_forcing_ratio=0).detach()
+        decoder_output = decoder_output.squeeze(1)
+    elif concat == None:
+        # NOTE: hardcode indices of c, q, a, in the line - for i in range(0,3)
+        inputs = []
+        for i in range(0,3):
+            var = torch.FloatTensor(len(input[i]), embeddings_size)
+            for j in range(len(input[i])):
+                var[j] = embeddings_index[input[i][j]]
+            var = var.unsqueeze(1)
+            if use_cuda:
+                var = Variable(var.cuda())
+            else:
+                var = Variable(var)
+            inputs.append(var)
+
+        decoder_output = generator.forward(inputs, [len(x) for x in input], 1, max_length,
+                                           embeddings_index, embeddings_size, word2index, index2word,
+                                           teacher_forcing_ratio=0)
+        if detach:
+            decoder_output = decoder_output.detach()
+        decoder_output = decoder_output.squeeze(1)
+
+
 
     decoded_words = []
     for di in range(max_length):

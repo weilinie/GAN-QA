@@ -42,12 +42,18 @@ path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
-######### read corpus
-raw_triplets = read_raw_squad(path_to_data)
-triplets = tokenize_squad(raw_triplets, embeddings_index)
+import pickle
+load_path = '/home/jack/Documents/QA_QG/data/processed/'
+# triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
+sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
+# windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt', 'rb'))
+triplets = sent_c_triplets
+# ######### read corpus
+# raw_triplets = read_raw_squad(path_to_data)
+# triplets = tokenize_squad(raw_triplets, embeddings_index)
 
-# find max length of context, question, answer, respectively
-max_len_c, max_len_q, max_len_a = max_length(triplets)
+# # find max length of context, question, answer, respectively
+# max_len_c, max_len_q, max_len_a = max_length(triplets)
 
 ######### corpus preprocessing
 # words that do not appear in embeddings, etc

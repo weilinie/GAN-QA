@@ -123,7 +123,7 @@ class GAN_model(nn.Module):
                 training_batch, seq_lens = get_random_batch(triplets, batch_size)
                 fake_cqa_batch, _, fake_cqa_lens = prepare_fake_batch_var(self.G, training_batch, max_len, batch_size,
                                                                           word2index, index2word, embeddings_index,
-                                                                          embeddings_size, mode=('word'))
+                                                                          embeddings_size, mode=('word'), detach=False)
                 g_fake_data = Variable(fake_cqa_batch[0].cuda()) if use_cuda else Variable(fake_cqa_batch[0])
                 dg_fake_decision = self.D.forward(g_fake_data, fake_cqa_lens[0])
                 target = Variable(torch.FloatTensor([1]*batch_size).cuda()) if use_cuda else \
@@ -237,7 +237,7 @@ class GAN_model(nn.Module):
 
 # same context and answer as in the real batch, but generated question
 def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, index2word,
-                           embeddings_index, embeddings_size, mode = ('word')):
+                           embeddings_index, embeddings_size, mode = ('word'), detach=True):
 
     batch_vars = []
     batch_var_orig = []
@@ -247,7 +247,7 @@ def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, in
     labels = torch.LongTensor([0] * batch_size) # all fake labels, thus all 0's
     for b in range(batch_size):
         ca = batch[0][b] + batch[2][b]
-        fake_q_sample = G_sampler(generator, ca, embeddings_index, embeddings_size, word2index, index2word, max_len)
+        fake_q_sample = G_sampler(generator, ca, embeddings_index, embeddings_size, word2index, index2word, max_len, detach=detach)
         cqa.append(batch[0][b] + fake_q_sample + batch[2][b])
         cqa_len.append(len(batch[0][b] + fake_q_sample + batch[2][b]))
 
