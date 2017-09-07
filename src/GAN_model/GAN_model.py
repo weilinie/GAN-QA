@@ -3,6 +3,7 @@ sys.path.append(os.path.abspath(__file__ + "../") + 'G_c_a_sep')
 sys.path.append(os.path.abspath(__file__ + "../") + 'D_baseline')
 sys.path.append(os.path.abspath(__file__ + "../") + 'util')
 from data_proc import *
+print(os.path.abspath(__file__ + "../") + 'G_c_a_sep')
 from G_c_a_sep import G
 from D_model import *
 from G_eval import *
