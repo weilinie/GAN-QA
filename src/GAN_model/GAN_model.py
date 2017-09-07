@@ -321,6 +321,7 @@ def G_sampler(generator, input, embeddings_index, embeddings_size, word2index, i
         # NOTE: hardcode indices of c, q, a, in the line - for i in range(0,3)
         inputs = []
         for i in range(0,3):
+            print(input[i])
             var = torch.FloatTensor(len(input[i]), embeddings_size)
             for j in range(len(input[i])):
                 var[j] = embeddings_index[input[i][j]]
