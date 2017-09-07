@@ -51,12 +51,10 @@ class GAN_model(nn.Module):
 
         super(GAN_model, self).__init__()
 
-        if not pretrain:
-            self.G = G(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions, G_dec_input_size,
+        self.G = G(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions, G_dec_input_size,
                    G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions, batch_size)
-        else:
+        if pretrain:
             # load the G model from G_path
-            # TODO: as tes tnow, I fix the path to pretrained model
             self.G = torch.load(G_path)
 
         self.D = D(D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions, D_mlp_hidden_size,
