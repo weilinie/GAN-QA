@@ -101,7 +101,7 @@ vanilla_gan = GAN_model(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_e
                         G_dec_input_size, G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions,
                         D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions,
                         D_mlp_hidden_size, D_num_attn_weights, D_mlp_output_size,
-                        use_attn, batch_size, G_path=G_path)
+                        use_attn, batch_size, G_path=G_path, pretrain=True)
 if use_cuda:
     vanilla_gan = vanilla_gan.cuda()
 
