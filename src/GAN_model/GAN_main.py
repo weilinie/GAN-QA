@@ -87,13 +87,15 @@ D_mlp_hidden_size = 64
 D_num_attn_weights = 1
 D_mlp_output_size = 1
 use_attn = True
-batch_size = 50
+batch_size = 5
+
+G_path = '/home/jack/Documents/QA_QG/exp_results_temp/G_pretrain_exp_0902(2)/generator_temp.pth'
 
 vanilla_gan = GAN_model(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions,
                         G_dec_input_size, G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions,
                         D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions,
                         D_mlp_hidden_size, D_num_attn_weights, D_mlp_output_size,
-                        use_attn, batch_size)
+                        use_attn, batch_size, G_path=G_path)
 if use_cuda:
     vanilla_gan = vanilla_gan.cuda()
 
@@ -105,15 +107,15 @@ criterion = nn.BCELoss()
 # max_length of generated question
 max_len = 100
 to_file = True
-print_every = 5
-n_iters = 100
+print_every = 1
+n_iters = 10
 d_steps = 1
-g_steps = 3
+g_steps = 5
 
 # open the files
 if to_file:
     exp_name = 'GAN_exp_0824'
-    path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
+    path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/GAN_0906/'
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
     loss_f = 'loss_temp.txt'
@@ -130,4 +132,4 @@ vanilla_gan.train(triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer,
 if to_file:
     loss_f.close()
     sample_out_f.close()
-    torch.save(vanilla_gan, path_to_exp_out + exp_name + '/generator_temp.pth')
+    torch.save(vanilla_gan, path_to_exp_out + exp_name + '/GAN_model.pth')

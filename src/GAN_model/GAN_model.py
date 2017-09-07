@@ -57,7 +57,7 @@ class GAN_model(nn.Module):
         else:
             # load the G model from G_path
             # TODO: as tes tnow, I fix the path to pretrained model
-            self.G = torch.load('/home/jack/Documents/QA_QG/exp_results_temp/G_pretrain_exp_0827/generator_temp.pth')
+            self.G = torch.load(G_path)
 
         self.D = D(D_enc_input_size, D_enc_hidden_size, D_enc_n_layers, D_num_directions, D_mlp_hidden_size,
                    D_num_attn_weights, D_mlp_output_size, use_attn, batch_size)
