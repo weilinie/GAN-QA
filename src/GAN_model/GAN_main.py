@@ -3,7 +3,7 @@ from __future__ import division
 
 import sys, os
 # sys.path.append(os.path.abspath(__file__ + "/../../"))
-sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
+# sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 # sys.path.append(os.path.abspath(__file__ + "/../../") + '/G_c_a_sep')
 # sys.path.append(os.path.abspath(__file__ + "/../../") + '/D_baseline')
 
