@@ -95,7 +95,7 @@ D_mlp_output_size = 1
 use_attn = True
 batch_size = 5
 
-G_path = '/home/jack/Documents/QA_QG/exp_results_temp/G_pretrain_exp_0902(2)/generator_temp.pth'
+G_path = '/home/jack/Documents/QA_QG/exp_results_temp/G_c_a_sep_pretrain_exp_0902(2)/generator_temp.pth'
 
 vanilla_gan = GAN_model(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions,
                         G_dec_input_size, G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions,
