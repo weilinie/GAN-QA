@@ -82,9 +82,13 @@ class GAN_model(nn.Module):
                 # d_real_error.backward()  # compute/store gradients, but don't change params
 
                 #  1B: Train D on fake
-                fake_cqa_batch, _, fake_cqa_lens = prepare_fake_batch_var(self.G, training_batch, max_len, batch_size,
-                                                                          word2index, index2word, embeddings_index,
-                                                                          embeddings_size, mode = ('word'))
+                fake_cqa_batch, fake_cqa_lens = prepare_fake_batch_var(self.G, training_batch, max_len, batch_size,
+                                                                        word2index, index2word, embeddings_index,
+                                                                        embeddings_size, mode = ('word'))
+
+                # sanity check: rpepare fake batch和prepare batch的顺序是一样的
+                print(fake_cqa_batch[0][12] == cqa_batch[0][12])
+
                 d_fake_data = Variable(fake_cqa_batch[0].cuda()) if use_cuda else Variable(fake_cqa_batch[0])
                 d_fake_decision = self.D.forward(d_fake_data, fake_cqa_lens[0])
                 fake_target = Variable(torch.FloatTensor([0]*batch_size)).cuda() if use_cuda else \
@@ -106,9 +110,9 @@ class GAN_model(nn.Module):
 
                 # conditional data for generator
                 training_batch, seq_lens = get_random_batch(triplets, batch_size)
-                fake_cqa_batch, _, fake_cqa_lens = prepare_fake_batch_var(self.G, training_batch, max_len, batch_size,
-                                                                          word2index, index2word, embeddings_index,
-                                                                          embeddings_size, mode=('word'), detach=False)
+                fake_cqa_batch, fake_cqa_lens = prepare_fake_batch_var(self.G, training_batch, max_len, batch_size,
+                                                                        word2index, index2word, embeddings_index,
+                                                                        embeddings_size, mode=('word'), detach=False)
                 g_fake_data = Variable(fake_cqa_batch[0].cuda()) if use_cuda else Variable(fake_cqa_batch[0])
                 dg_fake_decision = self.D.forward(g_fake_data, fake_cqa_lens[0])
                 target = Variable(torch.FloatTensor([1]*batch_size).cuda()) if use_cuda else \
@@ -286,7 +290,10 @@ def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, in
         batch_vars.append(batch_var)
 
     # the second output is for debugging purpose
-    return batch_vars, batch_orig, seq_lens
+    if sort:
+        return batch_vars, batch_orig, seq_lens
+    else:
+        return batch_vars, seq_lens
 
 
 # function to sample generator output
@@ -314,7 +321,6 @@ def G_sampler(generator, input, embeddings_index, embeddings_size, word2index, i
             print(input[i])
             var = torch.FloatTensor(len(input[i]), embeddings_size)
             for j in range(len(input[i])):
-                print(input[i][j])
                 var[j] = embeddings_index[input[i][j]]
             var = var.unsqueeze(1)
             if use_cuda:
