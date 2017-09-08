@@ -115,6 +115,7 @@ max_len = 100
 to_file = True
 print_every = 1
 plot_every = 1
+checkpoint_every = 1
 n_iters = 3
 d_steps = 1
 g_steps = 1
@@ -122,21 +123,26 @@ g_steps = 1
 # open the files
 if to_file:
     exp_name = 'GAN_0907'
-    path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
+    path_to_exp = '/home/jack/Documents/QA_QG/exp_results_temp/'
+    path_to_exp_out = path_to_exp + exp_name
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
     loss_f = 'loss_temp.txt'
     sample_out_f = 'sample_outputs_temp.txt'
-    path_to_loss_f = path_to_exp_out + exp_name + '/' + loss_f
-    path_to_sample_out_f = path_to_exp_out + exp_name + '/' + sample_out_f
+    path_to_loss_f = path_to_exp_out + '/' + loss_f
+    path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
     loss_f = open(path_to_loss_f,'w+')
     sample_out_f = open(path_to_sample_out_f, 'w+')
+else:
+    loss_f = None
+    sample_out_f = None
+    path_to_exp_out = None
 
 vanilla_gan.train(triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size, max_len,
-                  criterion, word2index, index2word, embeddings_index, embeddings_size, print_every, plot_every,
-                  to_file=to_file, loss_f=loss_f, sample_out_f=sample_out_f)
+                  criterion, word2index, index2word, embeddings_index, embeddings_size, print_every, plot_every, checkpoint_every,
+                  to_file=to_file, loss_f=loss_f, sample_out_f=sample_out_f, path_to_exp_out=path_to_exp_out)
 
 if to_file:
     loss_f.close()
     sample_out_f.close()
-    torch.save(vanilla_gan, path_to_exp_out + exp_name + '/GAN_model.pth')
+    torch.save(vanilla_gan, path_to_exp_out + exp_name + '/GAN_model.pth.tar')

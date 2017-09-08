@@ -49,7 +49,7 @@ class GAN_model(nn.Module):
 
     def train(self, triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size, max_len,
               criterion, word2index, index2word, embeddings_index, embeddings_size, print_every, plot_every,
-              to_file = False, loss_f = None, sample_out_f = None):
+              to_file=False, loss_f=None, sample_out_f=None, path_to_exp_out=None):
         # criterion is for both G and D
 
         # record start time for logging
@@ -165,6 +165,17 @@ class GAN_model(nn.Module):
                     loss_f.write(unicode('%s (%d %d%%)\n' % (timeSince(begin_time, iter / float(n_iters)), iter, float(iter) / float(n_iters) * 100)))
                     loss_f.write(unicode("errors: D: %s G: %s " % (print_d_loss_avg, print_g_loss_avg)))
                     loss_f.write(unicode('\n'))
+
+            if iter % checkpoint_evert == 0:
+                checkpoint_fname = 'checkpoint_iter_' + str(iter) + '.pth.tar'
+                state = {
+                            'iteration': iter + 1,
+                            'd_state_dict': self.D.state_dict(),
+                            'g_state_dict': self.G.state_dict(),
+                            'd_optimizer' : d_optimizer.state_dict(),
+                            'g_optimizer' : g_optimizer.state_dict(),
+                        }
+                torch.save(state, path_to_exp_out+'/'+checkpoint_fname)
 
     # def train(self, **kwargs):
     #     pass
