@@ -48,7 +48,7 @@ class GAN_model(nn.Module):
                    D_num_attn_weights, D_mlp_output_size, use_attn, batch_size)
 
     def train(self, triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size, max_len,
-              criterion, word2index, index2word, embeddings_index, embeddings_size, print_every, plot_every,
+              criterion, word2index, index2word, embeddings_index, embeddings_size, print_every, plot_every, checkpoint_every,
               to_file=False, loss_f=None, sample_out_f=None, path_to_exp_out=None):
         # criterion is for both G and D
 
@@ -166,7 +166,7 @@ class GAN_model(nn.Module):
                     loss_f.write(unicode("errors: D: %s G: %s " % (print_d_loss_avg, print_g_loss_avg)))
                     loss_f.write(unicode('\n'))
 
-            if iter % checkpoint_evert == 0:
+            if iter % checkpoint_every == 0:
                 checkpoint_fname = 'checkpoint_iter_' + str(iter) + '.pth.tar'
                 state = {
                             'iteration': iter + 1,
