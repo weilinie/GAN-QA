@@ -310,6 +310,7 @@ def G_sampler(generator, input, embeddings_index, embeddings_size, word2index, i
             print(input[i])
             var = torch.FloatTensor(len(input[i]), embeddings_size)
             for j in range(len(input[i])):
+                print(input[i][j])
                 var[j] = embeddings_index[input[i][j]]
             var = var.unsqueeze(1)
             if use_cuda:
