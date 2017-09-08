@@ -112,7 +112,7 @@ criterion = nn.BCELoss()
 
 # max_length of generated question
 max_len = 100
-to_file = False
+to_file = True
 print_every = 1
 plot_every = 1
 checkpoint_every = 1

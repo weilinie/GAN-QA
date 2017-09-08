@@ -58,6 +58,8 @@ class GAN_model(nn.Module):
         plot_d_loss_total = 0  # Reset every plot_every
         print_g_loss_total = 0  # Reset every print_every
         plot_g_loss_total = 0  # Reset every plot_every
+        plot_d_loss_avgs = []
+        plot_g_loss_avgs = []
 
         for iter in range(1, n_iters + 1):
 
@@ -157,7 +159,9 @@ class GAN_model(nn.Module):
 
             if iter % plot_every == 0:
                 plot_d_loss_avg = plot_d_loss_total / plot_every
+                plot_d_loss_avgs.append(plot_d_loss_avg)
                 plot_g_loss_avg = plot_g_loss_total / plot_every
+                plot_g_loss_avgs.append(plot_g_loss_avg)
                 plot_d_loss_total = 0
                 plot_g_loss_total = 0
 
@@ -176,6 +180,10 @@ class GAN_model(nn.Module):
                             'g_optimizer' : g_optimizer.state_dict(),
                         }
                 torch.save(state, path_to_exp_out+'/'+checkpoint_fname)
+                plotLoss(plot_d_loss_avgs, plot_every, save_path=path_to_exp_out, f_name='d_loss_itr_'+str(iter)+'.png', 
+                    title='training loss D (monitoring purpose)')
+                plotLoss(plot_g_loss_avgs, plot_every, save_path=path_to_exp_out, f_name='d_loss_itr_'+str(iter)+'.png',
+                    title='training loss D (monitoring purpose)')
 
     # def train(self, **kwargs):
     #     pass
