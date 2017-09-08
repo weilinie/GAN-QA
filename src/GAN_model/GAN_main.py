@@ -114,6 +114,7 @@ criterion = nn.BCELoss()
 max_len = 100
 to_file = False
 print_every = 1
+plot_every = 1
 n_iters = 3
 d_steps = 1
 g_steps = 1
@@ -132,7 +133,7 @@ if to_file:
     sample_out_f = open(path_to_sample_out_f, 'w+')
 
 vanilla_gan.train(triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size, max_len,
-                  criterion, word2index, index2word, embeddings_index, embeddings_size, print_every,
+                  criterion, word2index, index2word, embeddings_index, embeddings_size, print_every, plot_every,
                   to_file=to_file, loss_f=loss_f, sample_out_f=sample_out_f)
 
 if to_file:

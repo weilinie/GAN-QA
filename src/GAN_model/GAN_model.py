@@ -48,7 +48,7 @@ class GAN_model(nn.Module):
                    D_num_attn_weights, D_mlp_output_size, use_attn, batch_size)
 
     def train(self, triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size, max_len,
-              criterion, word2index, index2word, embeddings_index, embeddings_size, print_every,
+              criterion, word2index, index2word, embeddings_index, embeddings_size, print_every, plot_every,
               to_file = False, loss_f = None, sample_out_f = None):
         # criterion is for both G and D
 
