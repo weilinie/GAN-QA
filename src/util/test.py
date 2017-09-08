@@ -64,35 +64,35 @@ sent_c_triplets = get_ans_sentence(raw_triplets)
 # print('ans start idx: %d' % raw_triplets[test_idx][3])
 # print('ans end idx:   %d' % raw_triplets[test_idx][4])
 # print(sent_c_triplets[0][0])
-windowed_c_triplets_10 = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window')
-sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
+windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window')
+# sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
 triplets = tokenize_squad(raw_triplets, embeddings_index)
 
-#print(raw_triplets[test_idx][0])
-#print(' '.join(triplets[test_idx][0]))
-#print(raw_triplets[test_idx][1])
-#print(' '.join(triplets[test_idx][1]))
-#print(raw_triplets[test_idx][2])
-#print(' '.join(triplets[test_idx][2]))
+print(raw_triplets[test_idx][0])
+print(' '.join(triplets[test_idx][0]))
+print(raw_triplets[test_idx][1])
+print(' '.join(triplets[test_idx][1]))
+print(raw_triplets[test_idx][2])
+print(' '.join(triplets[test_idx][2]))
 
 # save to files
-import pickle
-save_path = '/home/jack/Documents/QA_QG/data/processed/'
-if not os.path.exists(save_path):
-	os.mkdir(save_path)
-with open(save_path+'windowed_c_triplets_10.txt', 'wb') as fp:
-	pickle.dump(windowed_c_triplets_10, fp)
-with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
-	pickle.dump(sent_c_triplets, fp)
-with open(save_path+'triplets.txt', 'wb') as fp:
-	pickle.dump(triplets, fp)
+# import pickle
+# save_path = '/home/jack/Documents/QA_QG/data/processed/'
+# if not os.path.exists(save_path):
+# 	os.mkdir(save_path)
+# with open(save_path+'windowed_c_triplets_10.txt', 'wb') as fp:
+# 	pickle.dump(windowed_c_triplets_10, fp)
+# with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
+# 	pickle.dump(sent_c_triplets, fp)
+# with open(save_path+'triplets.txt', 'wb') as fp:
+# 	pickle.dump(triplets, fp)
 
-# test pickle load
-import pickle
-load_path = '/home/jack/Documents/QA_QG/data/processed/'
-triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
-sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
-windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt', 'rb'))
+# # test pickle load
+# import pickle
+# load_path = '/home/jack/Documents/QA_QG/data/processed/'
+# triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
+# sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
+# windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt', 'rb'))
 
 # # find max length of context, question, answer, respectively
 # # max_len_c, max_len_q, max_len_a = max_length(triplets)

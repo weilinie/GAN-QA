@@ -53,7 +53,7 @@ def normalizeString(s):
 
 ######################################################################
 # read GLOVE word embeddings
-def readGlove(path_to_data, sos_eos = True):
+def readGlove(path_to_data):
     embeddings_index = {}
     f = open(path_to_data)
     for line in f:
@@ -77,9 +77,8 @@ def readGlove(path_to_data, sos_eos = True):
     PAD_token = torch.zeros(embeddings_size)
 
     # add special tokens to the embeddings
-    if sos_eos:
-        embeddings_index['SOS'] = SOS_token
-        embeddings_index['EOS'] = EOS_token
+    embeddings_index['SOS'] = SOS_token
+    embeddings_index['EOS'] = EOS_token
     embeddings_index['UNK'] = UNK_token
     embeddings_index['PAD'] = PAD_token
 
@@ -124,27 +123,27 @@ def read_raw_squad(path_to_data, normalize=True):
 # e.g. the context is read as a string; this function produces a list of word tokens from context string
 # and return as the processed tuple (context, question, ans_text, ans_start_idx, ans_end_idx)
 # the first three are lists, the last two are LongTensor
-def tokenize_squad(squad, embeddings_index, opt = 'raw'):
+def tokenize_squad(squad, embeddings_index, opt='raw', c_EOS=True, a_EOS=True):
     tokenized_triplets = []
     if opt == 'raw':
         for triple in squad:
-            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index),
+            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index, EOS=c_EOS),
                                          tokenize_sentence(triple[1], embeddings_index),
-                                         tokenize_sentence(triple[2], embeddings_index),
+                                         tokenize_sentence(triple[2], embeddings_index, EOS=a_EOS),
                                          triple[3],
                                          triple[4] ) )
     elif opt == 'window':
         for triple in squad:
-            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index, spacy=False),
+            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index, spacy=False, EOS=c_EOS),
                                          tokenize_sentence(triple[1], embeddings_index),
-                                         tokenize_sentence(triple[2], embeddings_index, spacy=False),
+                                         tokenize_sentence(triple[2], embeddings_index, spacy=False, EOS=a_EOS),
                                          triple[3],
                                          triple[4] ) )
     elif opt == 'sent':
         for triple in squad:
-            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index, spacy=False),
+            tokenized_triplets.append( ( tokenize_sentence(triple[0], embeddings_index, spacy=False, EOS=c_EOS),
                                          tokenize_sentence(triple[1], embeddings_index),
-                                         tokenize_sentence(triple[2], embeddings_index),
+                                         tokenize_sentence(triple[2], embeddings_index, EOS=a_EOS),
                                          triple[3],
                                          triple[4] ) )
     else:
@@ -155,7 +154,7 @@ def tokenize_squad(squad, embeddings_index, opt = 'raw'):
 # helper function to get the sentence of where the answer appear in the context
 # based on tokenized_squad, first element in output
 # output seq of tokens only from the answer sentence (same format as element in tokenize_squad output)
-def get_ans_sentence(raw_squad):
+def get_ans_sentence(raw_squad, sent_window=0):
 
     sent_c_triplets = [] # now each context in 
 
@@ -194,6 +193,13 @@ def get_ans_sentence(raw_squad):
                     raise Exception('answer token not in current sentence')
             else:
                 idx += len(s.string)
+
+        #TODO: multiple sentences as context
+        if sent_window > 0:
+            ans_sent_idx = sent_c.index(sent)
+            print(ans_sent_idx)
+            for i in range(sent_window):
+                sent = 
         sent_c_triplets.append( ( sent, triple[1], triple[2], triple[3], triple[4] ) )
 
     return sent_c_triplets
@@ -253,7 +259,7 @@ def get_windowed_ans(raw_squad, window_size):
 # turns a sentence into individual tokens
 # this function takes care of word tokens that does not appear in pre trained embeddings
 # solution is to turn those word tokens into 'UNK'
-def tokenize_sentence(sentence, data_tokens, spacy=True, sos_eos=True):
+def tokenize_sentence(sentence, data_tokens, spacy=True, EOS=True):
     if spacy:
         tokenized_sentence = spacynlp.tokenizer(sentence)
     else:
@@ -272,7 +278,7 @@ def tokenize_sentence(sentence, data_tokens, spacy=True, sos_eos=True):
         else:
             var.append(proc_tokenized_sentence[t])
 
-    if sos_eos:
+    if EOS:
         var.append('EOS')
     return var
 
