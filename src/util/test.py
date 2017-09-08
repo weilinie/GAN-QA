@@ -65,8 +65,9 @@ test_idx = 0
 # print('ans end idx:   %d' % raw_triplets[test_idx][4])
 # print(sent_c_triplets[0][0])
 windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window', a_EOS=False, c_EOS=False)
+windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10_noEOS, embeddings_index, opt='window')
 # sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
-triplets = tokenize_squad(raw_triplets, embeddings_index)
+# triplets = tokenize_squad(raw_triplets, embeddings_index)
 
 print(raw_triplets[test_idx][0])
 print(' '.join(triplets[test_idx][0]))
