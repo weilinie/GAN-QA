@@ -57,8 +57,8 @@ windowed_c_triplets_10 = get_windowed_ans(raw_triplets, window_size)
 # print(windowed_c_triplets[0][0])
 
 # test of selecting the sentence containing answer from context
-# test_idx = 0
-sent_c_triplets = get_ans_sentence(raw_triplets)
+test_idx = 0
+# sent_c_triplets = get_ans_sentence(raw_triplets)
 # print(raw_triplets[test_idx][0])
 # print(raw_triplets[test_idx][2])
 # print('ans start idx: %d' % raw_triplets[test_idx][3])
