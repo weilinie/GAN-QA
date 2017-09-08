@@ -53,7 +53,7 @@ def normalizeString(s):
 
 ######################################################################
 # read GLOVE word embeddings
-def readGlove(path_to_data):
+def readGlove(path_to_data, sos_eos = True):
     embeddings_index = {}
     f = open(path_to_data)
     for line in f:
@@ -69,13 +69,17 @@ def readGlove(path_to_data):
     # get dimension from a random sample in the dict
     embeddings_size = random.sample( embeddings_index.items(), 1 )[0][1].size(-1)
     print('dimension of word embeddings: ' + str(embeddings_size))
-    SOS_token = -torch.ones(embeddings_size) # start of sentence token, all zerons
-    EOS_token = torch.ones(embeddings_size) # end of sentence token, all ones
+
+    if sos_eos:
+        SOS_token = -torch.ones(embeddings_size) # start of sentence token, all zerons
+        EOS_token = torch.ones(embeddings_size) # end of sentence token, all ones
     UNK_token = torch.ones(embeddings_size) + torch.ones(embeddings_size) # these choices are pretty random
     PAD_token = torch.zeros(embeddings_size)
+
     # add special tokens to the embeddings
-    embeddings_index['SOS'] = SOS_token
-    embeddings_index['EOS'] = EOS_token
+    if sos_eos:
+        embeddings_index['SOS'] = SOS_token
+        embeddings_index['EOS'] = EOS_token
     embeddings_index['UNK'] = UNK_token
     embeddings_index['PAD'] = PAD_token
 
@@ -249,7 +253,7 @@ def get_windowed_ans(raw_squad, window_size):
 # turns a sentence into individual tokens
 # this function takes care of word tokens that does not appear in pre trained embeddings
 # solution is to turn those word tokens into 'UNK'
-def tokenize_sentence(sentence, data_tokens, spacy=True):
+def tokenize_sentence(sentence, data_tokens, spacy=True, sos_eos=True):
     if spacy:
         tokenized_sentence = spacynlp.tokenizer(sentence)
     else:
@@ -268,7 +272,8 @@ def tokenize_sentence(sentence, data_tokens, spacy=True):
         else:
             var.append(proc_tokenized_sentence[t])
 
-    var.append('EOS')
+    if sos_eos:
+        var.append('EOS')
     return var
 
 
@@ -347,13 +352,16 @@ def post_proc_tokenize_sentence(tokenized_sentence):
 
 ######################################################################
 # count the number of tokens in both the word embeddings and the corpus
-def count_effective_num_tokens(triplets, embeddings_index):
+def count_effective_num_tokens(triplets, embeddings_index, sos_eos = True):
     ## find all unique tokens in the data (should be a subset of the number of embeddings)
     data_tokens = []
     for triple in triplets:
         data_tokens += triple[0] + triple[1] + triple[2]
     data_tokens = list(set(data_tokens)) # find unique
-    data_tokens = ['SOS', 'EOS', 'UNK', 'PAD'] + data_tokens
+    if sos_eos:
+        data_tokens = ['SOS', 'EOS', 'UNK', 'PAD'] + data_tokens
+    else:
+        data_tokens = ['UNK', 'PAD']
 
     effective_tokens = list(set(data_tokens).intersection(embeddings_index.keys()))
     effective_num_tokens = len(effective_tokens)
