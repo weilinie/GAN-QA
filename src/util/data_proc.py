@@ -199,7 +199,7 @@ def get_ans_sentence(raw_squad, sent_window=0):
             ans_sent_idx = sent_c.index(sent)
             print(ans_sent_idx)
             for i in range(sent_window):
-                sent = 
+                pass
         sent_c_triplets.append( ( sent, triple[1], triple[2], triple[3], triple[4] ) )
 
     return sent_c_triplets
