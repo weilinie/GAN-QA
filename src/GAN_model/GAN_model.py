@@ -166,7 +166,7 @@ class GAN_model(nn.Module):
                     loss_f.write(unicode("errors: D: %s G: %s " % (print_d_loss_avg, print_g_loss_avg)))
                     loss_f.write(unicode('\n'))
 
-            if iter % checkpoint_every == 0:
+            if (iter % checkpoint_every == 0) or (iter == n_iters):
                 checkpoint_fname = 'checkpoint_iter_' + str(iter) + '.pth.tar'
                 state = {
                             'iteration': iter + 1,

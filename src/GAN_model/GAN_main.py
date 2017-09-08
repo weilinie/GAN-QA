@@ -110,6 +110,16 @@ d_optimizer = optim.Adam(vanilla_gan.D.parameters(), lr=learning_rate)
 g_optimizer = optim.Adam(vanilla_gan.G.parameters(), lr=learning_rate)
 criterion = nn.BCELoss()
 
+# load a pre-trained model
+model_fname = 'checkpoint_iter_1.pth.tar'
+path_to_model = path_to_exp_out + '/' + model_fname
+checkpoint = torch.load(path_to_model)
+vanilla_gan.D.load_state_dict(checkpoint['d_state_dict'])
+vanilla_gan.G.load_state_dict(checkpoint['g_state_dict'])
+d_optimizer.load_state_dict(checkpoint['d_optimizer'])
+g_optimizer.load_state_dict(checkpoint['g_optimizer'])
+
+
 # max_length of generated question
 max_len = 100
 to_file = True
@@ -142,7 +152,8 @@ vanilla_gan.train(triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer,
                   criterion, word2index, index2word, embeddings_index, embeddings_size, print_every, plot_every, checkpoint_every,
                   to_file=to_file, loss_f=loss_f, sample_out_f=sample_out_f, path_to_exp_out=path_to_exp_out)
 
+
 if to_file:
     loss_f.close()
     sample_out_f.close()
-    torch.save(vanilla_gan, path_to_exp_out + exp_name + '/GAN_model.pth.tar')
+    # torch.save(vanilla_gan, path_to_exp_out + exp_name + '/GAN_model.pth.tar')
