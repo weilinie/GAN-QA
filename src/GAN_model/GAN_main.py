@@ -125,8 +125,8 @@ exp_name = 'GAN_0907'
 path_to_exp = '/home/jack/Documents/QA_QG/exp_results_temp/'
 path_to_exp_out = path_to_exp + exp_name
 if to_file:
-    if not os.path.exists(path_to_exp_out+exp_name):
-        os.mkdir(path_to_exp_out+exp_name)
+    if not os.path.exists(path_to_exp_out):
+        os.mkdir(path_to_exp_out)
     loss_f = 'loss_temp.txt'
     sample_out_f = 'sample_outputs_temp.txt'
     path_to_loss_f = path_to_exp_out + '/' + loss_f
