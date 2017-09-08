@@ -64,7 +64,7 @@ sent_c_triplets = get_ans_sentence(raw_triplets)
 # print('ans start idx: %d' % raw_triplets[test_idx][3])
 # print('ans end idx:   %d' % raw_triplets[test_idx][4])
 # print(sent_c_triplets[0][0])
-windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window')
+windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window', a_EOS=False, c_EOS=False)
 # sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
 triplets = tokenize_squad(raw_triplets, embeddings_index)
 
