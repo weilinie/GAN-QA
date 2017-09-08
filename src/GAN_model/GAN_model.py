@@ -222,7 +222,7 @@ class GAN_model(nn.Module):
 
 # same context and answer as in the real batch, but generated question
 def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, index2word,
-                           embeddings_index, embeddings_size, mode = ('word'), detach=True):
+                           embeddings_index, embeddings_size, sort=False, mode = ('word'), detach=True):
 
     batch_vars = []
     batch_var_orig = []
@@ -232,7 +232,7 @@ def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, in
     labels = torch.LongTensor([0] * batch_size) # all fake labels, thus all 0's
     for b in range(batch_size):
         ca = batch[0][b] + batch[2][b]
-        fake_q_sample = G_sampler(generator, ca, embeddings_index, embeddings_size, word2index, index2word, max_len, detach=detach)
+        fake_q_sample = G_sampler(generator, batch, embeddings_index, embeddings_size, word2index, index2word, max_len, detach=detach)
         cqa.append(batch[0][b] + fake_q_sample + batch[2][b])
         cqa_len.append(len(batch[0][b] + fake_q_sample + batch[2][b]))
 
@@ -241,12 +241,14 @@ def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, in
 
     # sort this batch_var in descending order according to the values of the lengths of the first element in batch
     num_batch = len(batch)
-    all = batch + seq_lens
-    all = sorted(zip(*all), key=lambda p: len(p[0]), reverse=True)
-    all = zip(*all)
-    batch = all[0:num_batch]
-    seq_lens = all[num_batch:]
-    batch_orig = batch
+    
+    if sort:
+        all = batch + seq_lens
+        all = sorted(zip(*all), key=lambda p: len(p[0]), reverse=True)
+        all = zip(*all)
+        batch = all[0:num_batch]
+        seq_lens = all[num_batch:]
+        batch_orig = batch
 
     for b in range(num_batch):
 
