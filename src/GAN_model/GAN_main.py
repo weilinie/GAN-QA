@@ -112,7 +112,7 @@ criterion = nn.BCELoss()
 
 # max_length of generated question
 max_len = 100
-to_file = True
+to_file = False
 print_every = 1
 plot_every = 1
 checkpoint_every = 1
@@ -121,10 +121,10 @@ d_steps = 1
 g_steps = 1
 
 # open the files
+exp_name = 'GAN_0907'
+path_to_exp = '/home/jack/Documents/QA_QG/exp_results_temp/'
+path_to_exp_out = path_to_exp + exp_name
 if to_file:
-    exp_name = 'GAN_0907'
-    path_to_exp = '/home/jack/Documents/QA_QG/exp_results_temp/'
-    path_to_exp_out = path_to_exp + exp_name
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
     loss_f = 'loss_temp.txt'
