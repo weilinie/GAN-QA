@@ -113,12 +113,12 @@ criterion = nn.BCELoss()
 # max_length of generated question
 max_len = 100
 to_file = True
-print_every = 1
-plot_every = 1
-checkpoint_every = 1
-n_iters = 3
+print_every = 50
+plot_every = 500
+checkpoint_every = 2000
+n_iters = 10000
 d_steps = 1
-g_steps = 1
+g_steps = 5
 
 # open the files
 exp_name = 'GAN_0907'
@@ -155,4 +155,4 @@ vanilla_gan.train(triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer,
 if to_file:
     loss_f.close()
     sample_out_f.close()
-    # torch.save(vanilla_gan, path_to_exp_out + exp_name + '/GAN_model.pth.tar')
+    torch.save(vanilla_gan, path_to_exp_out + exp_name + '/GAN_model.pth.tar')
