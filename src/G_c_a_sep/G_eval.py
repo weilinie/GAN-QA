@@ -28,9 +28,9 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     training, _, seq_lens = prepare_batch_var(training, seq_lens, batch_size,
                                                               word2index, embeddings_index, embeddings_size)
     inputs = []
-    for inputs in training:
-        if not isinstance(inputs, list):
-            inputs.append(Variable(inputs.cuda())) if use_cuda else inputs.append(Variable(inputs))
+    for var in training:
+        if not isinstance(var, list):
+            inputs.append(Variable(var.cuda())) if use_cuda else inputs.append(Variable(var))
             # NOTE not currently appending start and end index to inputs because model does not use them
             # else:
             #     inputs.append(Variable(inputs))
