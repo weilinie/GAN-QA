@@ -138,14 +138,14 @@ if to_file:
 #     sample_out_f = None
 #     path_to_exp_out = None
 
-# load a pre-trained model
-model_fname = 'checkpoint_iter_1.pth.tar'
-path_to_model = path_to_exp_out + '/' + model_fname
-checkpoint = torch.load(path_to_model)
-vanilla_gan.D.load_state_dict(checkpoint['d_state_dict'])
-vanilla_gan.G.load_state_dict(checkpoint['g_state_dict'])
-d_optimizer.load_state_dict(checkpoint['d_optimizer'])
-g_optimizer.load_state_dict(checkpoint['g_optimizer'])
+# # load a pre-trained model
+# model_fname = 'checkpoint_iter_1.pth.tar'
+# path_to_model = path_to_exp_out + '/' + model_fname
+# checkpoint = torch.load(path_to_model)
+# vanilla_gan.D.load_state_dict(checkpoint['d_state_dict'])
+# vanilla_gan.G.load_state_dict(checkpoint['g_state_dict'])
+# d_optimizer.load_state_dict(checkpoint['d_optimizer'])
+# g_optimizer.load_state_dict(checkpoint['g_optimizer'])
 
 # train
 vanilla_gan.train(triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size, max_len,
