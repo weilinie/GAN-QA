@@ -133,7 +133,7 @@ if to_file:
 
 vanilla_gan.train(triplets, n_iters, d_steps, d_optimizer, g_steps, g_optimizer, batch_size, max_len,
                   criterion, word2index, index2word, embeddings_index, embeddings_size, print_every,
-                  to_file=True, loss_f=loss_f, sample_out_f=sample_out_f)
+                  to_file=to_file, loss_f=loss_f, sample_out_f=sample_out_f)
 
 if to_file:
     loss_f.close()
