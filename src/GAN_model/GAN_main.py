@@ -112,7 +112,7 @@ criterion = nn.BCELoss()
 
 # max_length of generated question
 max_len = 100
-to_file = True
+to_file = False
 print_every = 1
 n_iters = 3
 d_steps = 1
