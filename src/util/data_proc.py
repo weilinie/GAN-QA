@@ -70,9 +70,8 @@ def readGlove(path_to_data):
     embeddings_size = random.sample( embeddings_index.items(), 1 )[0][1].size(-1)
     print('dimension of word embeddings: ' + str(embeddings_size))
 
-    if sos_eos:
-        SOS_token = -torch.ones(embeddings_size) # start of sentence token, all zerons
-        EOS_token = torch.ones(embeddings_size) # end of sentence token, all ones
+    SOS_token = -torch.ones(embeddings_size) # start of sentence token, all zerons
+    EOS_token = torch.ones(embeddings_size) # end of sentence token, all ones
     UNK_token = torch.ones(embeddings_size) + torch.ones(embeddings_size) # these choices are pretty random
     PAD_token = torch.zeros(embeddings_size)
 
