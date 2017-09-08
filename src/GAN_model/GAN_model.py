@@ -86,7 +86,7 @@ class GAN_model(nn.Module):
                                                                         word2index, index2word, embeddings_index,
                                                                         embeddings_size, mode = ('word'))
 
-                # sanity check: rpepare fake batch和prepare batch的顺序是一样的
+                # sanity check: rpepare fake batch and prepare batch have the same order
                 print(fake_cqa_batch[0][12] == cqa_batch[0][12])
 
                 d_fake_data = Variable(fake_cqa_batch[0].cuda()) if use_cuda else Variable(fake_cqa_batch[0])
