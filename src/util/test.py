@@ -49,9 +49,9 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 raw_triplets = read_raw_squad(path_to_data)
 
 # # test of windowed triplets
-window_size = 30
+window_size = 10
 # test_idx = 250
-windowed_c_triplets_30 = get_windowed_ans(raw_triplets, window_size)
+windowed_c_triplets_10 = get_windowed_ans(raw_triplets, window_size)
 # print(raw_triplets[test_idx][0])
 # print(raw_triplets[test_idx][2])
 # print(windowed_c_triplets[0][0])
@@ -64,7 +64,7 @@ windowed_c_triplets_30 = get_windowed_ans(raw_triplets, window_size)
 # print('ans start idx: %d' % raw_triplets[test_idx][3])
 # print('ans end idx:   %d' % raw_triplets[test_idx][4])
 # print(sent_c_triplets[0][0])
-windowed_c_triplets_30_noEOS = tokenize_squad(windowed_c_triplets_30, embeddings_index, opt='window', a_EOS=False, c_EOS=False)
+windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window', a_EOS=False, c_EOS=False)
 # triplets = windowed_c_triplets_30_noEOS
 # windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10_noEOS, embeddings_index, opt='window')
 # sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
@@ -82,8 +82,8 @@ import pickle
 save_path = '/home/jack/Documents/QA_QG/data/processed/'
 if not os.path.exists(save_path):
 	os.mkdir(save_path)
-with open(save_path+'windowed_c_triplets_30_noEOS.txt', 'wb') as fp:
-	pickle.dump(windowed_c_triplets_30_noEOS, fp)
+with open(save_path+'windowed_c_triplets_10_noEOS.txt', 'wb') as fp:
+	pickle.dump(windowed_c_triplets_10_noEOS, fp)
 # with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
 # 	pickle.dump(sent_c_triplets, fp)
 # with open(save_path+'triplets.txt', 'wb') as fp:
