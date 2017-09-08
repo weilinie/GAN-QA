@@ -222,7 +222,7 @@ class GAN_model(nn.Module):
 
 # same context and answer as in the real batch, but generated question
 def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, index2word,
-                           embeddings_index, embeddings_size, sort=False, mode = ('word'), detach=True):
+                           embeddings_index, embeddings_size, sort=False, mode = ('word'), detach=True, concat=None):
 
     batch_vars = []
     batch_var_orig = []
@@ -231,8 +231,12 @@ def prepare_fake_batch_var(generator, batch, max_len, batch_size, word2index, in
     cqa_len = []
     labels = torch.LongTensor([0] * batch_size) # all fake labels, thus all 0's
     for b in range(batch_size):
-        ca = batch[0][b] + batch[2][b]
-        fake_q_sample = G_sampler(generator, batch, embeddings_index, embeddings_size, word2index, index2word, max_len, detach=detach)
+        if concat=='ca':
+            ca = batch[0][b] + batch[2][b]
+            fake_q_sample = G_sampler(generator, ca, embeddings_index, embeddings_size, word2index, index2word, max_len, detach=detach, concat=concat)
+        elif concat==None:
+            inputs = [batch[0][b], batch[1][b], batch[2][b]]
+            fake_q_sample = G_sampler(generator, inputs, embeddings_index, embeddings_size, word2index, index2word, max_len, detach=detach)
         cqa.append(batch[0][b] + fake_q_sample + batch[2][b])
         cqa_len.append(len(batch[0][b] + fake_q_sample + batch[2][b]))
 
