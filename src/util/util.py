@@ -51,7 +51,7 @@ def timeSince(since, percent):
 
 ######################################################################
 # show loss function
-def plotLoss(loss_f):
+def plotLoss(loss_f, plot_every, save_path=None):
     loss_vec = []
     with open(loss_f) as f:
         content = f.readlines()
@@ -67,11 +67,13 @@ def plotLoss(loss_f):
     plt.xlabel('training iterations')
     plt.ylabel('loss')
     plt.grid()
-    plt.plot(range(1, len(loss_vec)+1), loss_vec)
+    plt.plot(range(1, len(loss_vec)+1)*plot_every, loss_vec)
+    if save_path == None:
+        plt.save('loss.png')
 
 # test
 # from util import *
-# plotLoss('../../../exp_results_temp/G_c_a_sep_pretrain_exp_0902/loss_temp.txt')
+# plotLoss('../../../exp_results_temp/G_c_a_sep_pretrain_exp_0902/loss_temp.txt', 30, )
 
 
 ######################################################################
