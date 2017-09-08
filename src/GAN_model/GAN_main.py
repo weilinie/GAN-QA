@@ -133,10 +133,10 @@ if to_file:
     path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
     loss_f = open(path_to_loss_f,'w+')
     sample_out_f = open(path_to_sample_out_f, 'w+')
-else:
-    loss_f = None
-    sample_out_f = None
-    path_to_exp_out = None
+# else:
+#     loss_f = None
+#     sample_out_f = None
+#     path_to_exp_out = None
 
 # load a pre-trained model
 model_fname = 'checkpoint_iter_1.pth.tar'
