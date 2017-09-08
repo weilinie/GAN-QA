@@ -111,10 +111,6 @@ class GAN_model(nn.Module):
                 d_optimizer.step()
 
                 d_error = d_real_error + d_fake_error
-                print_d_loss_total += d_error.data[0]
-                print_g_loss_total += g_error.data[0]
-                plot_d_loss_total += d_error.data[0]
-                plot_g_loss_total += g_error.data[0]
 
             # train G
             for g_train_idx in range(g_steps):
@@ -136,6 +132,10 @@ class GAN_model(nn.Module):
                 g_optimizer.step()  # Only optimizes G's parameters
 
             # log error
+            print_d_loss_total += d_error.data[0]
+            print_g_loss_total += g_error.data[0]
+            plot_d_loss_total += d_error.data[0]
+            plot_g_loss_total += g_error.data[0]
             if iter % print_every == 0:
                 print_d_loss_avg = print_d_loss_total / print_every
                 print_g_loss_avg = print_g_loss_total / print_every
