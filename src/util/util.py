@@ -69,7 +69,7 @@ def plotLoss(loss_f, plot_every, save_path=None):
     plt.grid()
     plt.plot([x*plot_every for x in range(1, len(loss_vec)+1)], loss_vec)
     if save_path == None:
-        plt.save('loss.png')
+        plt.savefig('loss.png')
 
 # test
 # from util import *
