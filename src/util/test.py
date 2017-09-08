@@ -2,8 +2,8 @@
 
 # load model
 import sys, os
-__file__ = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
-sys.path.append(os.path.abspath(__file__))
+# __file__ = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
+# sys.path.append(os.path.abspath(__file__))
 import data_proc
 reload(data_proc)
 from data_proc import *
