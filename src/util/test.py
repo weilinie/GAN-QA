@@ -110,7 +110,7 @@ sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
 q = 'what is the language spoken in germany ? EOS'
 scores = generated_q_novelty(sent_c_triplets, q)
 idx = np.argpartition(scores, -10)[-10:]
-scores【idx】
+scores[idx]
 for i in idx:
 	print(sent_c_triplets[1][i])
 
