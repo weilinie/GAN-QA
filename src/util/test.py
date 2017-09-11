@@ -17,6 +17,7 @@ from G_model import *
 from model_zoo import *
 from G_eval import *
 import torch
+import numpy as np
 
 global use_cuda
 use_cuda = torch.cuda.is_available()
