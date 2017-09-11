@@ -1,14 +1,14 @@
-from __future__ import print_function
-from __future__ import division
+# from __future__ import print_function
+# from __future__ import division
 
 import sys
 import os
 sys.path.append(os.path.abspath(__file__ + "/../../"))
-sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 
 from G_train import *
 from G_c_a_sep import *
-import numpy as np
+# import numpy as np
+from torch import optim
 
 global use_cuda
 use_cuda = torch.cuda.is_available()
@@ -37,10 +37,10 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 import pickle
 load_path = '/home/jack/Documents/QA_QG/data/processed/'
 # triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
-sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
-# windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt', 'rb'))
-triplets = sent_c_triplets
-# triplets = windowed_c_triplets_10
+# sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
+windowed_c_triplets_30_noEOS = pickle.load(open(load_path+'windowed_c_triplets_30_noEOS.txt', 'rb'))
+# triplets = sent_c_triplets
+triplets = windowed_c_triplets_30_noEOS
 
 # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)
@@ -91,7 +91,7 @@ to_file = True
 
 # open the files
 if to_file:
-    exp_name = 'G_c_a_sep_pretrain_exp_0902(2)'
+    exp_name = 'G_c_a_sep_pretrain_exp_windowed_c_noEOS_0911'
     path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
@@ -101,14 +101,18 @@ if to_file:
     path_to_sample_out_f = path_to_exp_out + exp_name + '/' + sample_out_f
     loss_f = open(path_to_loss_f,'w+')
     sample_out_f = open(path_to_sample_out_f, 'w+')
+else:
+    loss_f = None
+    sample_out_f = None
+    path_to_exp_out = None
 
 trainIters(generator, optimizer, batch_size, embeddings_size,
            embeddings_index, word2index, index2word, max_length, triplets, teacher_forcing_ratio,
            to_file, loss_f, sample_out_f, path_to_exp_out,
-           n_iters = 30000, print_every=300, plot_every=30)
+           n_iters=30000, print_every=300, plot_every=30, checkpoint_every=6000)
 
 # save the final model
 if to_file:
-    torch.save(generator, path_to_exp_out + exp_name +'/generator_temp.pth')
+    torch.save(generator, path_to_exp_out + exp_name +'/generator_temp.pth.tar')
 
 

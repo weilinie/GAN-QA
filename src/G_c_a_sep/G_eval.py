@@ -3,14 +3,9 @@ import os
 sys.path.append(os.path.abspath(__file__ + "/../../"))
 sys.path.append(os.path.abspath(__file__ + "/../../") + '/util')
 from data_proc import *
-from util import *
 
 import torch
-import torch.nn as nn
-from torch import optim
 from torch.autograd import Variable
-import torch.nn.functional as F
-import time
 
 use_cuda = torch.cuda.is_available()
 
