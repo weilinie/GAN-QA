@@ -22,20 +22,18 @@ teacher_forcing_ratio = 0.5 # default in original code is 0.5
 
 ######### set paths
 # TODO: to run properly, change the following paths and filenames
+# path variables
+path_to_dataset = '/home/jack/Documents/QA_QG/data/' # path to original dataset
+load_path = '/home/jack/Documents/QA_QG/data/processed/' # path to processed dataset
+G_path = '/home/jack/Documents/QA_QG/exp_results_temp/G_c_a_sep_pretrain_exp_0902(2)/generator_temp.pth' # path to saved generator model
+path_to_exp = '/home/jack/Documents/QA_QG/exp_results_temp/' # path to experiment folder
+
+
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
 f_name = 'train-v1.1.json'
-path_to_dataset = '/home/jack/Documents/QA_QG/data/'
 path_to_data = path_to_dataset + dataset + '/' + f_name
 GLOVE_DIR = path_to_dataset + 'glove.6B/'
-# path for experiment outputs
-# exp_name = 'QG_seq2seq_baseline'
-path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
-loss_f = 'loss_temp.txt'
-sample_out_f = 'sample_outputs_temp.txt'
-path_to_loss_f = path_to_exp_out + '/' + loss_f
-path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
-
 
 ######### first load the pretrained word embeddings
 path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
@@ -43,7 +41,6 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
 import pickle
-load_path = '/home/jack/Documents/QA_QG/data/processed/'
 # triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
 sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
 # windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt', 'rb'))
@@ -95,7 +92,6 @@ D_mlp_output_size = 1
 use_attn = True
 batch_size = 5
 
-G_path = '/home/jack/Documents/QA_QG/exp_results_temp/G_c_a_sep_pretrain_exp_0902(2)/generator_temp.pth'
 
 vanilla_gan = GAN_model(G_enc_input_size, G_enc_hidden_size, G_enc_n_layers, G_enc_num_directions,
                         G_dec_input_size, G_dec_hidden_size, G_output_size, G_dec_n_layers, G_dec_num_directions,
@@ -113,16 +109,15 @@ criterion = nn.BCELoss()
 # max_length of generated question
 max_len = 100
 to_file = True
-print_every = 50
-plot_every = 500
+print_every = 500
+plot_every = 50
 checkpoint_every = 2000
 n_iters = 10000
 d_steps = 1
 g_steps = 5
 
 # open the files
-exp_name = 'GAN_0907'
-path_to_exp = '/home/jack/Documents/QA_QG/exp_results_temp/'
+exp_name = 'GAN_0911'
 path_to_exp_out = path_to_exp + exp_name
 if to_file:
     if not os.path.exists(path_to_exp_out):

@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f9ea85a3-5cef-4c19-a462-b9db063ecc13" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/data_proc.py" afterPath="$PROJECT_DIR$/src/util/data_proc.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/GAN_model/GAN_main.py" afterPath="$PROJECT_DIR$/src/GAN_model/GAN_main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/GAN_model/GAN_model.py" afterPath="$PROJECT_DIR$/src/GAN_model/GAN_model.py" />
     </list>
     <ignored path="GAN-QA.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -38,11 +39,31 @@
         <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="299">
-              <caret line="467" column="28" selection-start-line="467" selection-start-column="23" selection-end-line="467" selection-end-column="28" />
+              <caret line="476" column="28" selection-start-line="476" selection-start-column="23" selection-end-line="476" selection-end-column="28" />
               <folding>
                 <element signature="e#424#489#0" expanded="true" />
-                <marker date="1504721022852" expanded="true" signature="21715:21916" ph="..." />
+                <marker date="1505149845648" expanded="true" signature="22010:22211" ph="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GAN_main.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1386">
+              <caret line="28" column="88" selection-start-line="28" selection-start-column="88" selection-end-line="28" selection-end-column="88" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GAN_model.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_model.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1092">
+              <caret line="136" column="48" selection-start-line="136" selection-start-column="48" selection-end-line="136" selection-end-column="48" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -50,8 +71,8 @@
       <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/util/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="580">
-              <caret line="68" column="38" selection-start-line="68" selection-start-column="26" selection-end-line="68" selection-end-column="38" />
+            <state relative-caret-position="640">
+              <caret line="71" column="38" selection-start-line="71" selection-start-column="38" selection-end-line="71" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -83,18 +104,6 @@
             <state relative-caret-position="688">
               <caret line="91" column="34" selection-start-line="91" selection-start-column="15" selection-end-line="91" selection-end-column="34" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="masked_cross_entropy.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/util/masked_cross_entropy.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -163,8 +172,6 @@
         <option value="$PROJECT_DIR$/src/G_baseline/G_main.py" />
         <option value="$PROJECT_DIR$/src/util/util.py" />
         <option value="$PROJECT_DIR$/src/G_baseline/G_eval.py" />
-        <option value="$PROJECT_DIR$/src/GAN_model/GAN_model.py" />
-        <option value="$PROJECT_DIR$/src/GAN_model/GAN_main.py" />
         <option value="$PROJECT_DIR$/src/model_zoo.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_train.py" />
@@ -172,6 +179,8 @@
         <option value="$PROJECT_DIR$/src/util/test.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" />
         <option value="$PROJECT_DIR$/src/util/data_proc.py" />
+        <option value="$PROJECT_DIR$/src/GAN_model/GAN_main.py" />
+        <option value="$PROJECT_DIR$/src/GAN_model/GAN_model.py" />
       </list>
     </option>
   </component>
@@ -182,7 +191,7 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="5760" />
+    <option name="x" value="1920" />
     <option name="y" value="24" />
     <option name="width" value="1920" />
     <option name="height" value="1056" />
@@ -295,6 +304,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="G_baseline" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GAN-QA" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GAN-QA" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GAN_model" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -855,7 +882,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="5760" y="24" width="1920" height="1056" extended-state="6" />
+    <frame x="1920" y="24" width="1920" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22838847" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
@@ -864,7 +891,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32881" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="WINDOWED" visible="true" show_stripe_button="true" weight="0.23590814" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" x="3905" y="24" width="1855" height="1056" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="WINDOWED" visible="true" show_stripe_button="true" weight="0.23590814" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" x="65" y="24" width="1855" height="1056" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33194155" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -966,7 +993,7 @@
           <caret line="316" column="0" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
           <folding>
             <element signature="e#424#489#0" expanded="true" />
-            <marker date="1504721022852" expanded="true" signature="21715:21916" ph="..." />
+            <marker date="1505149845648" expanded="true" signature="22010:22211" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1004,7 +1031,7 @@
           <caret line="316" column="0" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
           <folding>
             <element signature="e#424#489#0" expanded="true" />
-            <marker date="1504721022852" expanded="true" signature="21715:21916" ph="..." />
+            <marker date="1505149845648" expanded="true" signature="22010:22211" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1097,24 +1124,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="571">
-          <caret line="119" column="44" selection-start-line="119" selection-start-column="44" selection-end-line="119" selection-end-column="44" />
-          <folding>
-            <element signature="e#0#37#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="113" column="82" selection-start-line="113" selection-start-column="82" selection-end-line="113" selection-end-column="82" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/D_baseline/D_train.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="420">
@@ -1152,8 +1161,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/util/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="580">
-          <caret line="68" column="38" selection-start-line="68" selection-start-column="26" selection-end-line="68" selection-end-column="38" />
+        <state relative-caret-position="640">
+          <caret line="71" column="38" selection-start-line="71" selection-start-column="38" selection-end-line="71" selection-end-column="38" />
           <folding />
         </state>
       </provider>
@@ -1179,10 +1188,10 @@
     <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="299">
-          <caret line="467" column="28" selection-start-line="467" selection-start-column="23" selection-end-line="467" selection-end-column="28" />
+          <caret line="476" column="28" selection-start-line="476" selection-start-column="23" selection-end-line="476" selection-end-column="28" />
           <folding>
             <element signature="e#424#489#0" expanded="true" />
-            <marker date="1504721022852" expanded="true" signature="21715:21916" ph="..." />
+            <marker date="1505149845648" expanded="true" signature="22010:22211" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1213,6 +1222,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/masked_cross_entropy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#12#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="688">
@@ -1221,13 +1240,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/masked_cross_entropy.py">
+    <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-1386">
+          <caret line="28" column="88" selection-start-line="28" selection-start-column="88" selection-end-line="28" selection-end-column="88" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1092">
+          <caret line="136" column="48" selection-start-line="136" selection-start-column="48" selection-end-line="136" selection-end-column="48" />
+          <folding />
         </state>
       </provider>
     </entry>

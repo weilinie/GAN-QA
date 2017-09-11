@@ -99,20 +99,18 @@ class GAN_model(nn.Module):
                 d_fake_decision = self.D.forward(d_fake_data, fake_cqa_lens[0])
                 fake_target = Variable(torch.FloatTensor([0]*batch_size)).cuda() if use_cuda else \
                     Variable(torch.FloatTensor([0]*batch_size))
-                d_fake_error = criterion(d_fake_decision, fake_target)  # zeros = fake
-                d_fake_error.backward()
+                # d_fake_error = criterion(d_fake_decision, fake_target)  # zeros = fake
+                # d_fake_error.backward()
                 # d_optimizer.step()
 
                 # accumulate loss
                 # FIXME I dont think below implementation works for batch version
-                # W_GAN loss
-                # d_error = torch.mean(d_fake_decision) - torch.mean(d_real_decision)
-                # GAN loss
-                # d_error = -torch.mean(self.log(1 - d_fake_decision)) - torch.mean(self.log(d_real_decision))
-                # d_error.backward()
+                d_error = torch.mean(d_fake_decision) - torch.mean(d_real_decision) # W_GAN loss
+                # d_error = -torch.mean(self.log(1 - d_fake_decision)) - torch.mean(self.log(d_real_decision)) # GAN loss
+                d_error.backward()
                 d_optimizer.step()
 
-                d_error = d_real_error + d_fake_error
+                # d_error = d_real_error + d_fake_error
 
             # train G
             for g_train_idx in range(g_steps):
@@ -127,9 +125,9 @@ class GAN_model(nn.Module):
                 dg_fake_decision = self.D.forward(g_fake_data, fake_cqa_lens[0])
                 target = Variable(torch.FloatTensor([1]*batch_size).cuda()) if use_cuda else \
                     Variable(torch.FloatTensor([1]*batch_size))
-                g_error = criterion(dg_fake_decision, target)
-                # g_error = -torch.mean(dg_fake_decision)
-                # G_error = -torch.mean(self.log(dg_fake_decision))
+                # g_error = criterion(dg_fake_decision, target)
+                g_error = -torch.mean(dg_fake_decision) # wgan loss
+                # G_error = -torch.mean(self.log(dg_fake_decision)) # gan loss
                 g_error.backward()
                 g_optimizer.step()  # Only optimizes G's parameters
 
