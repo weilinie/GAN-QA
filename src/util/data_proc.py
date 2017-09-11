@@ -253,6 +253,10 @@ def get_windowed_ans(raw_squad, window_size):
     return windowed_c_triplets
 
 
+def annotate_context_w_ans(raw_squad):
+    pass
+
+
 
 
 # turns a sentence into individual tokens

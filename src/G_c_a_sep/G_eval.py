@@ -67,6 +67,7 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
         #     true_q.append(index2word[inputs_q[i][0].data[0]])
         # print('question with padding> ' + ' '.join(true_q))
         print('generated question   > ' + ' '.join(decoded_words))
+        return decoded_words
     else:
         sample_out_f.write(unicode('context              > ' + ' '.join(context_words[0]) + '\n'))
         sample_out_f.write(unicode('answer               > ' + ' '.join(answer_words[0]) + '\n'))

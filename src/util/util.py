@@ -10,6 +10,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+import difflib
 
 
 def showPlot(points):
@@ -82,33 +83,50 @@ def plotLoss(loss_f, plot_every, save_path=None, from_file=True, f_name='loss.pn
 
 
 ######################################################################
-# For a better viewing experience we will do the extra work of adding axes
-# and labels:
-#
-def showAttention(input_sentence, output_words, attentions):
-    # Set up figure with colorbar
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    cax = ax.matshow(attentions.numpy(), cmap='bone')
-    fig.colorbar(cax)
-
-    # Set up axes
-    ax.set_xticklabels([''] + input_sentence.split(' ') +
-                       ['<EOS>'], rotation=90)
-    ax.set_yticklabels([''] + output_words)
-
-    # Show label at every tick
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-
-    plt.show()
+# check if the generated question already exist in the corpus
+def generated_q_novelty(triplets, generated_q):
+    # input - tokenized triplets, each one a list of strings
+    # input - generated question
+    # output - a similarity score vector for each of the questions in the triplets
+    questions = triplets[2]
+    scores = np.array()
+    if not (isinstance(generated_q, str) or isinstance(generated_q, unicode)):
+        generated_q = ' '.join(generated_q)
+    for q in questions:
+        q = ' '.join(q)
+        scores.append(difflib.SequenceMatcher(None, generated_q, q).ratio)
+    return np.array(scores)
+# test
 
 
-def evaluateAndShowAttention(input_sentence):
-    output_words, attentions = evaluate(
-        encoder1, attn_decoder1, input_sentence)
-    print('input =', input_sentence)
-    print('output =', ' '.join(output_words))
-    showAttention(input_sentence, output_words, attentions)
+# ######################################################################
+# # For a better viewing experience we will do the extra work of adding axes
+# # and labels:
+# #
+# def showAttention(input_sentence, output_words, attentions):
+#     # Set up figure with colorbar
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111)
+#     cax = ax.matshow(attentions.numpy(), cmap='bone')
+#     fig.colorbar(cax)
+
+#     # Set up axes
+#     ax.set_xticklabels([''] + input_sentence.split(' ') +
+#                        ['<EOS>'], rotation=90)
+#     ax.set_yticklabels([''] + output_words)
+
+#     # Show label at every tick
+#     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+#     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+
+#     plt.show()
+
+
+# def evaluateAndShowAttention(input_sentence):
+#     output_words, attentions = evaluate(
+#         encoder1, attn_decoder1, input_sentence)
+#     print('input =', input_sentence)
+#     print('output =', ' '.join(output_words))
+#     showAttention(input_sentence, output_words, attentions)
 
 

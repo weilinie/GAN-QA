@@ -183,7 +183,7 @@ class GAN_model(nn.Module):
                 plotLoss(plot_d_loss_avgs, plot_every, save_path=path_to_exp_out, f_name='d_loss_itr_'+str(iter)+'.png', 
                     title='training loss D (monitoring purpose)', from_file=False)
                 plotLoss(plot_g_loss_avgs, plot_every, save_path=path_to_exp_out, f_name='g_loss_itr_'+str(iter)+'.png',
-                    title='training loss D (monitoring purpose)', from_file=False)
+                    title='training loss G (monitoring purpose)', from_file=False)
 
     # def train(self, **kwargs):
     #     pass
