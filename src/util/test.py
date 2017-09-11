@@ -112,7 +112,7 @@ scores = generated_q_novelty(sent_c_triplets, q)
 idx = np.argpartition(scores, -10)[-10:]
 scores(idx)
 for i in idx:
-	print(sent_c_triplets[2][i])
+	print(sent_c_triplets[1][i])
 
 ######################################################################
 ######################################################################

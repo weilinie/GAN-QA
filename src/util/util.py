@@ -88,11 +88,12 @@ def generated_q_novelty(triplets, generated_q):
     # input - tokenized triplets, each one a list of strings
     # input - generated question
     # output - a similarity score vector for each of the questions in the triplets
-    questions = triplets[2]
+    questions = triplets[1]
     scores = []
     if not (isinstance(generated_q, str) or isinstance(generated_q, unicode)):
         generated_q = ' '.join(generated_q)
     for q in questions:
+        print(q)
         q = ' '.join(q)
         scores.append(difflib.SequenceMatcher(None, generated_q, q).ratio)
     return np.array(scores)
