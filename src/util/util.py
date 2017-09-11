@@ -91,10 +91,10 @@ def generated_q_novelty(triplets, generated_q):
     questions = triplets[1]
     scores = []
     if not (isinstance(generated_q, str) or isinstance(generated_q, unicode)):
-        generated_q = ' '.join(generated_q)
+        generated_q = generated_q.join(' ')
     for q in questions:
         print(q)
-        q = ' '.join(q)
+        q = q.join(' ')
         scores.append(difflib.SequenceMatcher(None, generated_q, q).ratio)
     return np.array(scores)
 # test
