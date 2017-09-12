@@ -156,10 +156,11 @@ def tokenize_squad(squad, embeddings_index, opt='raw', c_EOS=True, a_EOS=True):
 def get_ans_sentence(raw_squad, sent_window=0):
 
     sent_c_triplets = [] # now each context in 
-
-    for triple in raw_squad:
-        c = triple[0]
-        a = triple[2]
+    unmatch = [] # for debug
+    for t in range(len(raw_squad)):
+        sent = None
+        c = raw_squad[t][0]
+        a = raw_squad[t][2]
         sent_c = list(spacynlp(c).sents)
         tokenized_a = spacynlp.tokenizer(a)
         # sanity check
@@ -167,41 +168,61 @@ def get_ans_sentence(raw_squad, sent_window=0):
         #     print('WARNING: sentence segmentation may not work in this triple')
         #     print(sent_c)
         # print(tokenized_c)
-        ans_start_idx = triple[3]
-        ans_end_idx = triple[4]
+        ans_start_idx = raw_squad[t][3]
+        ans_end_idx = raw_squad[t][4]
        
         # print(ans_start_idx)
         # print(ans_end_idx)
 
         idx = 0
         for s in sent_c:
+            print(idx)
             # print('currenet index: %d' % idx)
             if idx <= ans_start_idx and idx+len(s.string)>=ans_end_idx:
                 # print('enter if statement')
                 # print(s)
                 sent = s
+                # print(sent_c.index(sent))
                 # if isinstance(sent, unicode):
                 #     raise Exception('unicode detected, where expecting spacy span object.')
+                if tokenized_a[0].string not in sent.string:
+                    # print('c')
+                    # print(idx)
+                    # print(idx+len(s.string))
+                    # print(ans_start_idx)
+                    # print(ans_end_idx)
+                    print(type(tokenized_a[0]))
+                    print(type(sent))
+                    unmatch.append(t)
+                    # raise Exception('answer token not in current sentence')
                 break
-                if tokenized_a[0] not in sent:
-                    print('c')
-                    print(idx)
-                    print(idx+len(s.string))
-                    print(ans_start_idx)
-                    print(ans_end_idx)
-                    raise Exception('answer token not in current sentence')
             else:
                 idx += len(s.string)
+
+        try:
+            idx_temp = sent_c.index(sent)
+        except:
+
+            print(sent_c)
+            print(sent)
+            print(tokenized_a)
+            print('\n')
+            unmatch.append(t)
 
         #TODO: multiple sentences as context
         if sent_window > 0:
             ans_sent_idx = sent_c.index(sent)
-            print(ans_sent_idx)
-            for i in range(sent_window):
-                pass
-        sent_c_triplets.append( ( sent, triple[1], triple[2], triple[3], triple[4] ) )
+            # print(ans_sent_idx)
+            for i in range(1,sent_window):
+                if ans_sent_idx-i > 0 and ans_sent_idx+i < len(sent_c):
+                    sent = [sent_c[ans_sent_idx-i], sent, sent_c[ans_sent_idx+i]]
+                elif ans_sent_idx-1 <= 0 and ans_sent_idx+1 < len(sent_c):
+                    sent = [sent, sent_c[ans_sent_idx+i]]
+                elif ans_sent_idx-1 > 0 and ans_sent_idx+1 >= len(sent_c):
+                    sent = [sent_c[ans_sent_idx-i], sent]
+        sent_c_triplets.append( ( sent, raw_squad[t][1], raw_squad[t][2], raw_squad[t][3], raw_squad[t][4] ) )
 
-    return sent_c_triplets
+    return sent_c_triplets, set(unmatch)
 
 
 # helper function to get a window of tokens around the answer
@@ -235,7 +256,7 @@ def get_windowed_ans(raw_squad, window_size):
                 idx += len(token)
                 t += 1
         if t < window_size:
-            left_window = 0;
+            left_window = 0
         else:
             left_window = t - window_size
         if t + window_size + len(tokenized_a) > len(tokenized_c):

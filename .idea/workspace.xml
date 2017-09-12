@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f9ea85a3-5cef-4c19-a462-b9db063ecc13" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_c_a_sep/G_eval.py" afterPath="$PROJECT_DIR$/src/G_c_a_sep/G_eval.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" afterPath="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_c_a_sep/G_train.py" afterPath="$PROJECT_DIR$/src/G_c_a_sep/G_train.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/data_proc.py" afterPath="$PROJECT_DIR$/src/util/data_proc.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/test.py" afterPath="$PROJECT_DIR$/src/util/test.py" />
     </list>
     <ignored path="GAN-QA.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -36,14 +34,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="data_proc.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="data_proc.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="9520">
-              <caret line="476" column="28" selection-start-line="476" selection-start-column="23" selection-end-line="476" selection-end-column="28" />
+            <state relative-caret-position="2100">
+              <caret line="258" column="27" selection-start-line="258" selection-start-column="27" selection-end-line="258" selection-end-column="27" />
               <folding>
                 <element signature="e#424#489#0" expanded="true" />
-                <marker date="1505149845648" expanded="true" signature="22010:22211" ph="..." />
+                <marker date="1505250719978" expanded="true" signature="22954:23155" ph="..." />
               </folding>
             </state>
           </provider>
@@ -72,11 +70,9 @@
       <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/util/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="880">
-              <caret line="71" column="38" selection-start-line="71" selection-start-column="38" selection-end-line="71" selection-end-column="38" />
-              <folding>
-                <element signature="e#35#49#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="400">
+              <caret line="72" column="38" selection-start-line="72" selection-start-column="38" selection-end-line="72" selection-end-column="38" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -117,7 +113,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="G_main.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="G_main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_main.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="748">
@@ -184,12 +180,12 @@
         <option value="$PROJECT_DIR$/src/model_zoo.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py" />
         <option value="$PROJECT_DIR$/src/util/test.py" />
-        <option value="$PROJECT_DIR$/src/util/data_proc.py" />
         <option value="$PROJECT_DIR$/src/GAN_model/GAN_main.py" />
-        <option value="$PROJECT_DIR$/src/GAN_model/GAN_model.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_eval.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_train.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" />
+        <option value="$PROJECT_DIR$/src/GAN_model/GAN_model.py" />
+        <option value="$PROJECT_DIR$/src/util/data_proc.py" />
       </list>
     </option>
   </component>
@@ -985,7 +981,7 @@
           <caret line="316" column="0" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
           <folding>
             <element signature="e#424#489#0" expanded="true" />
-            <marker date="1505149845648" expanded="true" signature="22010:22211" ph="..." />
+            <marker date="1505250719978" expanded="true" signature="22954:23155" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1024,7 +1020,7 @@
           <caret line="316" column="0" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
           <folding>
             <element signature="e#424#489#0" expanded="true" />
-            <marker date="1505149845648" expanded="true" signature="22010:22211" ph="..." />
+            <marker date="1505250719978" expanded="true" signature="22954:23155" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1081,7 +1077,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1503250155673" expanded="true" signature="420:422" ph="..." />
+            <marker date="1502574090000" expanded="true" signature="420:422" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1123,7 +1119,7 @@
           <caret line="66" column="92" selection-start-line="66" selection-start-column="92" selection-end-line="66" selection-end-column="92" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
-            <marker date="1503869354362" expanded="true" signature="589:3366" ph="..." />
+            <marker date="1503869301000" expanded="true" signature="589:3366" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1154,32 +1150,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="880">
-          <caret line="71" column="38" selection-start-line="71" selection-start-column="38" selection-end-line="71" selection-end-column="38" />
-          <folding>
-            <element signature="e#35#49#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/G_baseline/G_main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2040">
           <caret line="106" column="66" selection-start-line="106" selection-start-column="53" selection-end-line="106" selection-end-column="76" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9520">
-          <caret line="476" column="28" selection-start-line="476" selection-start-column="23" selection-end-line="476" selection-end-column="28" />
-          <folding>
-            <element signature="e#424#489#0" expanded="true" />
-            <marker date="1505149845648" expanded="true" signature="22010:22211" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1190,14 +1165,6 @@
           <folding>
             <element signature="e#1#11#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3320">
-          <caret line="166" column="35" selection-start-line="166" selection-start-column="35" selection-end-line="166" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1253,6 +1220,33 @@
           <caret line="115" column="80" selection-start-line="115" selection-start-column="80" selection-end-line="115" selection-end-column="80" />
           <folding>
             <element signature="e#75#85#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3320">
+          <caret line="166" column="35" selection-start-line="166" selection-start-column="35" selection-end-line="166" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="72" column="38" selection-start-line="72" selection-start-column="38" selection-end-line="72" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2100">
+          <caret line="258" column="27" selection-start-line="258" selection-start-column="27" selection-end-line="258" selection-end-column="27" />
+          <folding>
+            <element signature="e#424#489#0" expanded="true" />
+            <marker date="1505250719978" expanded="true" signature="22954:23155" ph="..." />
           </folding>
         </state>
       </provider>

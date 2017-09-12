@@ -2,8 +2,8 @@
 
 # load model
 import sys, os
-# __file__ = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
-# sys.path.append(os.path.abspath(__file__))
+__file__ = '/home/jack/Documents/QA_QG/GAN-QA/src/util/'
+sys.path.append(os.path.abspath(__file__))
 import data_proc
 reload(data_proc)
 from data_proc import *
@@ -47,7 +47,7 @@ path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 ######### read corpus
-# raw_triplets = read_raw_squad(path_to_data)
+raw_triplets = read_raw_squad(path_to_data)
 
 # # test of windowed triplets
 # window_size = 10
@@ -59,7 +59,8 @@ embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 # test of selecting the sentence containing answer from context
 # test_idx = 0
-# sent_c_triplets = get_ans_sentence(raw_triplets)
+sent_window = 1
+sent_c_triplets, unmatch = get_ans_sentence(raw_triplets)
 # print(raw_triplets[test_idx][0])
 # print(raw_triplets[test_idx][2])
 # print('ans start idx: %d' % raw_triplets[test_idx][3])
