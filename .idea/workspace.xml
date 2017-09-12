@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f9ea85a3-5cef-4c19-a462-b9db063ecc13" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/GAN_model/GAN_main.py" afterPath="$PROJECT_DIR$/src/GAN_model/GAN_main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" afterPath="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/data_proc.py" afterPath="$PROJECT_DIR$/src/util/data_proc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/test.py" afterPath="$PROJECT_DIR$/src/util/test.py" />
     </list>
     <ignored path="GAN-QA.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -34,24 +35,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="data_proc.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2100">
-              <caret line="258" column="27" selection-start-line="258" selection-start-column="27" selection-end-line="258" selection-end-column="27" />
-              <folding>
-                <element signature="e#424#489#0" expanded="true" />
-                <marker date="1505250719978" expanded="true" signature="22954:23155" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="GAN_main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1686">
-              <caret line="28" column="88" selection-start-line="28" selection-start-column="88" selection-end-line="28" selection-end-column="88" />
+            <state relative-caret-position="640">
+              <caret line="35" column="41" selection-start-line="35" selection-start-column="41" selection-end-line="35" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -67,11 +55,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="data_proc.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="691">
+              <caret line="201" column="138" selection-start-line="201" selection-start-column="138" selection-end-line="201" selection-end-column="138" />
+              <folding>
+                <element signature="e#424#489#0" expanded="true" />
+                <marker date="1505255520402" expanded="true" signature="23385:23586" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/util/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="72" column="38" selection-start-line="72" selection-start-column="38" selection-end-line="72" selection-end-column="38" />
+            <state relative-caret-position="240">
+              <caret line="63" column="34" selection-start-line="63" selection-start-column="34" selection-end-line="63" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -116,8 +117,8 @@
       <file leaf-file-name="G_main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="748">
-              <caret line="115" column="80" selection-start-line="115" selection-start-column="80" selection-end-line="115" selection-end-column="80" />
+            <state relative-caret-position="1680">
+              <caret line="102" column="51" selection-start-line="102" selection-start-column="51" selection-end-line="102" selection-end-column="51" />
               <folding>
                 <element signature="e#75#85#0" expanded="true" />
               </folding>
@@ -180,11 +181,11 @@
         <option value="$PROJECT_DIR$/src/model_zoo.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_c_a_sep.py" />
         <option value="$PROJECT_DIR$/src/util/test.py" />
-        <option value="$PROJECT_DIR$/src/GAN_model/GAN_main.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_eval.py" />
         <option value="$PROJECT_DIR$/src/G_c_a_sep/G_train.py" />
-        <option value="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" />
         <option value="$PROJECT_DIR$/src/GAN_model/GAN_model.py" />
+        <option value="$PROJECT_DIR$/src/GAN_model/GAN_main.py" />
+        <option value="$PROJECT_DIR$/src/G_c_a_sep/G_main.py" />
         <option value="$PROJECT_DIR$/src/util/data_proc.py" />
       </list>
     </option>
@@ -878,7 +879,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32881" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="WINDOWED" visible="true" show_stripe_button="true" weight="0.23590814" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" x="65" y="24" width="1855" height="1056" />
+      <window_info id="Python Console" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="WINDOWED" visible="true" show_stripe_button="true" weight="0.23590814" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" x="65" y="24" width="1855" height="1056" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33194155" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985386" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -981,7 +982,7 @@
           <caret line="316" column="0" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
           <folding>
             <element signature="e#424#489#0" expanded="true" />
-            <marker date="1505250719978" expanded="true" signature="22954:23155" ph="..." />
+            <marker date="1505255520402" expanded="true" signature="23385:23586" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1020,7 +1021,7 @@
           <caret line="316" column="0" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
           <folding>
             <element signature="e#424#489#0" expanded="true" />
-            <marker date="1505250719978" expanded="true" signature="22954:23155" ph="..." />
+            <marker date="1505255520402" expanded="true" signature="23385:23586" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1196,30 +1197,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1686">
-          <caret line="28" column="88" selection-start-line="28" selection-start-column="88" selection-end-line="28" selection-end-column="88" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_train.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="914">
           <caret line="147" column="35" selection-start-line="147" selection-start-column="35" selection-end-line="147" selection-end-column="35" />
           <folding>
             <element signature="e#1#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
-          <caret line="115" column="80" selection-start-line="115" selection-start-column="80" selection-end-line="115" selection-end-column="80" />
-          <folding>
-            <element signature="e#75#85#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1232,22 +1215,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/test.py">
+    <entry file="file://$PROJECT_DIR$/src/GAN_model/GAN_main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="72" column="38" selection-start-line="72" selection-start-column="38" selection-end-line="72" selection-end-column="38" />
+        <state relative-caret-position="640">
+          <caret line="35" column="41" selection-start-line="35" selection-start-column="41" selection-end-line="35" selection-end-column="41" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/G_c_a_sep/G_main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1680">
+          <caret line="102" column="51" selection-start-line="102" selection-start-column="51" selection-end-line="102" selection-end-column="51" />
+          <folding>
+            <element signature="e#75#85#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/util/data_proc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2100">
-          <caret line="258" column="27" selection-start-line="258" selection-start-column="27" selection-end-line="258" selection-end-column="27" />
+        <state relative-caret-position="691">
+          <caret line="201" column="138" selection-start-line="201" selection-start-column="138" selection-end-line="201" selection-end-column="138" />
           <folding>
             <element signature="e#424#489#0" expanded="true" />
-            <marker date="1505250719978" expanded="true" signature="22954:23155" ph="..." />
+            <marker date="1505255520402" expanded="true" signature="23385:23586" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="63" column="34" selection-start-line="63" selection-start-column="34" selection-end-line="63" selection-end-column="34" />
+          <folding />
         </state>
       </provider>
     </entry>

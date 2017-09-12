@@ -27,7 +27,7 @@ path_to_dataset = '/home/jack/Documents/QA_QG/data/' # path to original dataset
 load_path = '/home/jack/Documents/QA_QG/data/processed/' # path to processed dataset
 G_path = '/home/jack/Documents/QA_QG/exp_results_temp/G_c_a_sep_pretrain_exp_0902(2)/generator_temp.pth' # path to saved generator model
 path_to_exp = '/home/jack/Documents/QA_QG/exp_results_temp/' # path to experiment folder
-
+exp_name = 'GAN_0911'
 
 # default values for the dataset and the path to the project/dataset
 dataset = 'squad'
@@ -117,7 +117,6 @@ d_steps = 1
 g_steps = 5
 
 # open the files
-exp_name = 'GAN_0911'
 path_to_exp_out = path_to_exp + exp_name
 if to_file:
     if not os.path.exists(path_to_exp_out):

@@ -92,13 +92,13 @@ to_file = True
 # open the files
 if to_file:
     exp_name = 'G_c_a_sep_pretrain_exp_windowed_c_noEOS_0911'
-    path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/'
+    path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/' + exp_name
     if not os.path.exists(path_to_exp_out+exp_name):
         os.mkdir(path_to_exp_out+exp_name)
     loss_f = 'loss_temp.txt'
     sample_out_f = 'sample_outputs_temp.txt'
-    path_to_loss_f = path_to_exp_out + exp_name + '/' + loss_f
-    path_to_sample_out_f = path_to_exp_out + exp_name + '/' + sample_out_f
+    path_to_loss_f = path_to_exp_out + '/' + loss_f
+    path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
     loss_f = open(path_to_loss_f,'w+')
     sample_out_f = open(path_to_sample_out_f, 'w+')
 else:

@@ -175,38 +175,45 @@ def get_ans_sentence(raw_squad, sent_window=0):
         # print(ans_end_idx)
 
         idx = 0
-        for s in sent_c:
-            print(idx)
+        for i in range(len(sent_c)):
+            s = sent_c[i]
+            offset = len(s.string)
+            # print(idx)
             # print('currenet index: %d' % idx)
             if idx <= ans_start_idx and idx+len(s.string)>=ans_end_idx:
                 # print('enter if statement')
                 # print(s)
-                sent = s
+                sent = s.string
                 # print(sent_c.index(sent))
                 # if isinstance(sent, unicode):
                 #     raise Exception('unicode detected, where expecting spacy span object.')
-                if tokenized_a[0].string not in sent.string:
-                    # print('c')
-                    # print(idx)
-                    # print(idx+len(s.string))
-                    # print(ans_start_idx)
-                    # print(ans_end_idx)
-                    print(type(tokenized_a[0]))
-                    print(type(sent))
-                    unmatch.append(t)
+                # if tokenized_a[0].string not in sent.string:
+                #     # print('c')
+                #     # print(idx)
+                #     # print(idx+len(s.string))
+                #     # print(ans_start_idx)
+                #     # print(ans_end_idx)
+                #     print(type(tokenized_a[0]))
+                #     print(type(sent))
+                #     unmatch.append(t)
                     # raise Exception('answer token not in current sentence')
+                offset = len(sent)
+                break
+            elif idx<=ans_start_idx and idx+len(sent_c[i+1].string)>=ans_end_idx and tokenized_a[-1].string in sent_c[i+1].string and i+1<len(sent_c)-1:
+                sent = s.string + sent_c[i+1].string
+                offset = len(sent)
                 break
             else:
-                idx += len(s.string)
+                idx += offset
 
         try:
             idx_temp = sent_c.index(sent)
         except:
 
-            print(sent_c)
-            print(sent)
-            print(tokenized_a)
-            print('\n')
+            # print(sent_c)
+            # print(sent)
+            # print(tokenized_a)
+            # print('\n')
             unmatch.append(t)
 
         #TODO: multiple sentences as context
@@ -215,14 +222,14 @@ def get_ans_sentence(raw_squad, sent_window=0):
             # print(ans_sent_idx)
             for i in range(1,sent_window):
                 if ans_sent_idx-i > 0 and ans_sent_idx+i < len(sent_c):
-                    sent = [sent_c[ans_sent_idx-i], sent, sent_c[ans_sent_idx+i]]
+                    sent = sent_c[ans_sent_idx-i].string + sent + sent_c[ans_sent_idx+i].string
                 elif ans_sent_idx-1 <= 0 and ans_sent_idx+1 < len(sent_c):
-                    sent = [sent, sent_c[ans_sent_idx+i]]
+                    sent = sent + sent_c[ans_sent_idx+i].string
                 elif ans_sent_idx-1 > 0 and ans_sent_idx+1 >= len(sent_c):
-                    sent = [sent_c[ans_sent_idx-i], sent]
+                    sent = sent_c[ans_sent_idx-i].string + sent
         sent_c_triplets.append( ( sent, raw_squad[t][1], raw_squad[t][2], raw_squad[t][3], raw_squad[t][4] ) )
 
-    return sent_c_triplets, set(unmatch)
+    return sent_c_triplets, list(set(unmatch))
 
 
 # helper function to get a window of tokens around the answer
