@@ -4,6 +4,7 @@
 -- Date: 9/18/17
 -- Time: 11:11 AM
 -- To change this template use File | Settings | File Templates.
+-- functions either copied or adapted from OpenNMT tools folder
 --
 
 unicode = require('lua_utils.unicode')

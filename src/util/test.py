@@ -47,78 +47,8 @@ path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 raw_triplets = read_raw_squad(path_to_data)
 
-
-# write raw_triples to context, ans, ans_start_idx, ans_end_idx files
-data_openNMT_path = '/home/jack/Documents/QA_QG/data/squad_openNMT/'
-processed_squad_path = '/home/jack/Documents/QA_QG/data/processed_squad/'
-c_f = open(processed_squad_path+'contexts_EnglishOnly_noEscape.txt', 'w')
-q_f = open(processed_squad_path+'questions_EnglishOnly_noEscape.txt', 'w')
-a_f = open(processed_squad_path+'answers_EnglishOnly_noEscape.txt', 'w')
-a_s_i = open(processed_squad_path+'a_start_idxs_EnglishOnly_noEscape.txt', 'w')
-a_e_i = open(processed_squad_path+'a_end_idxs_EnglishOnly_noEscape.txt', 'w')
-for i in range(len(new_triplets['contexts'])):
-	# do a test quetion read and write. If the read value does not match the original question, then do not write this example to file
-	# test_f =open(processed_squad_path+'test.txt', 'w')
-	# test_f.write(new_triplets['questions'][i] + '\n')
-	# test_f.close()
-	# with open(processed_squad_path+'test.txt') as f:
-	# 	content = f.readlines()
-	# test = [x.strip() for x in content]
-	# f.close()
-	# if test[0] == new_triplets['questions'][i]:
-		c_f.write(new_triplets['contexts'][i] + '\n')
-		q_f.write(new_triplets['questions'][i] + '\n')
-		a_f.write(new_triplets['answers'][i] + '\n')
-		a_s_i.write(str(new_triplets['ans_start_idx'][i])+'\n')
-		a_e_i.write((str(new_triplets['ans_end_idx'][i]))+'\n')
-# force add the additional entries in quetions file
-for i in range(60260, 60285):
-	q_f.write(new_triplets['questions'][i] + '\n')
-c_f.close()
-a_f.close()
-a_f.close()
-a_s_i.close()
-a_e_i.close()
-
-
-
-
-
-atsi = readLinesFromFile(data_openNMT_path+'ans_token_start_idxs.txt')
-atei = readLinesFromFile(data_openNMT_path+'ans_token_end_idxs.txt')
-t_cs = readLinesFromFile(data_openNMT_path+'contexts_EnglishOnly_noEscape_NoAnnotate.txt')
-t_qs = readLinesFromFile(data_openNMT_path+'questions_EnglishOnly_noEscape_NoAnnotate.txt')
-t_as = readLinesFromFile(data_openNMT_path+'answers_EnglishOnly_noEscape_NoAnnotate.txt')
-cs_min = open(data_openNMT_path+'cs_min_NoAnnotate.txt','w')
-qs_min = open(data_openNMT_path+'qs_min_NoAnnotate.txt', 'w')
-as_min = open(data_openNMT_path+'as_min_NoAnnotate.txt', 'w')
-atsi_min = open(data_openNMT_path+'atsi_min.txt', 'w')
-atei_min = open(data_openNMT_path+'atei_min.txt', 'w')
-# check if the tokens are correct
-# mismatch = []
-for i in range(len(t_cs)):
-	if int(atsi[i]) != -1:
-		cs_min.write(t_cs[i] + '\n')
-for i in range(len(t_qs)):
-	if int(atsi[i]) != -1:
-		qs_min.write(t_qs[i] + '\n')
-for i in range(len(t_as)):
-	if int(atsi[i]) != -1:
-		as_min.write(t_as[i] + '\n')
-for i in range(len(atsi)):
-	if int(atsi[i]) != -1:
-		atsi_min.write(atsi[i] + '\n')
-for i in range(len(atei)):
-	if int(atsi[i]) != -1:
-		atei_min.write(atei[i] + '\n')
-		# c = t_cs[i].split(" ")
-		# a = t_as[i].split(" ")
-		# if c[int(atsi[i])-1] != a[0]:
-		# 	mismatch.append(i)
-
 a_token_start_idxs, a_token_end_idxs = get_ans_token_idx(tokenized_contexts_f, tokenized_answers_f, raw_triplets,
 														 a_token_start_idxs_f, a_token_end_idxs_f)
-
 
 # # test of windowed triplets
 window_size = 30
