@@ -45,22 +45,96 @@ path_to_sample_out_f = path_to_exp_out + '/' + sample_out_f
 ######### first load the pretrained word embeddings
 path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
-
-######### read corpus
 raw_triplets = read_raw_squad(path_to_data)
 
+
+# write raw_triples to context, ans, ans_start_idx, ans_end_idx files
+data_openNMT_path = '/home/jack/Documents/QA_QG/data/squad_openNMT/'
+processed_squad_path = '/home/jack/Documents/QA_QG/data/processed_squad/'
+c_f = open(processed_squad_path+'contexts_EnglishOnly_noEscape.txt', 'w')
+q_f = open(processed_squad_path+'questions_EnglishOnly_noEscape.txt', 'w')
+a_f = open(processed_squad_path+'answers_EnglishOnly_noEscape.txt', 'w')
+a_s_i = open(processed_squad_path+'a_start_idxs_EnglishOnly_noEscape.txt', 'w')
+a_e_i = open(processed_squad_path+'a_end_idxs_EnglishOnly_noEscape.txt', 'w')
+for i in range(len(new_triplets['contexts'])):
+	# do a test quetion read and write. If the read value does not match the original question, then do not write this example to file
+	# test_f =open(processed_squad_path+'test.txt', 'w')
+	# test_f.write(new_triplets['questions'][i] + '\n')
+	# test_f.close()
+	# with open(processed_squad_path+'test.txt') as f:
+	# 	content = f.readlines()
+	# test = [x.strip() for x in content]
+	# f.close()
+	# if test[0] == new_triplets['questions'][i]:
+		c_f.write(new_triplets['contexts'][i] + '\n')
+		q_f.write(new_triplets['questions'][i] + '\n')
+		a_f.write(new_triplets['answers'][i] + '\n')
+		a_s_i.write(str(new_triplets['ans_start_idx'][i])+'\n')
+		a_e_i.write((str(new_triplets['ans_end_idx'][i]))+'\n')
+# force add the additional entries in quetions file
+for i in range(60260, 60285):
+	q_f.write(new_triplets['questions'][i] + '\n')
+c_f.close()
+a_f.close()
+a_f.close()
+a_s_i.close()
+a_e_i.close()
+
+
+
+
+
+atsi = readLinesFromFile(data_openNMT_path+'ans_token_start_idxs.txt')
+atei = readLinesFromFile(data_openNMT_path+'ans_token_end_idxs.txt')
+t_cs = readLinesFromFile(data_openNMT_path+'contexts_EnglishOnly_noEscape_NoAnnotate.txt')
+t_qs = readLinesFromFile(data_openNMT_path+'questions_EnglishOnly_noEscape_NoAnnotate.txt')
+t_as = readLinesFromFile(data_openNMT_path+'answers_EnglishOnly_noEscape_NoAnnotate.txt')
+cs_min = open(data_openNMT_path+'cs_min_NoAnnotate.txt','w')
+qs_min = open(data_openNMT_path+'qs_min_NoAnnotate.txt', 'w')
+as_min = open(data_openNMT_path+'as_min_NoAnnotate.txt', 'w')
+atsi_min = open(data_openNMT_path+'atsi_min.txt', 'w')
+atei_min = open(data_openNMT_path+'atei_min.txt', 'w')
+# check if the tokens are correct
+# mismatch = []
+for i in range(len(t_cs)):
+	if int(atsi[i]) != -1:
+		cs_min.write(t_cs[i] + '\n')
+for i in range(len(t_qs)):
+	if int(atsi[i]) != -1:
+		qs_min.write(t_qs[i] + '\n')
+for i in range(len(t_as)):
+	if int(atsi[i]) != -1:
+		as_min.write(t_as[i] + '\n')
+for i in range(len(atsi)):
+	if int(atsi[i]) != -1:
+		atsi_min.write(atsi[i] + '\n')
+for i in range(len(atei)):
+	if int(atsi[i]) != -1:
+		atei_min.write(atei[i] + '\n')
+		# c = t_cs[i].split(" ")
+		# a = t_as[i].split(" ")
+		# if c[int(atsi[i])-1] != a[0]:
+		# 	mismatch.append(i)
+
+a_token_start_idxs, a_token_end_idxs = get_ans_token_idx(tokenized_contexts_f, tokenized_answers_f, raw_triplets,
+														 a_token_start_idxs_f, a_token_end_idxs_f)
+
+
 # # test of windowed triplets
-# window_size = 10
+window_size = 30
 # test_idx = 250
-# windowed_c_triplets_10 = get_windowed_ans(raw_triplets, window_size)
+windowed_c_triplets_30, is_ans_token_vec, unmatch = get_windowed_ans(raw_triplets, window_size)
 # print(raw_triplets[test_idx][0])
 # print(raw_triplets[test_idx][2])
 # print(windowed_c_triplets[0][0])
 
+# write context, ans, question to separate text files, with one instance per line
+
+
 # test of selecting the sentence containing answer from context
 # test_idx = 0
-sent_window = 1
-sent_c_triplets, unmatch = get_ans_sentence(raw_triplets)
+sent_window = 2
+# sent_c_triplets, unmatch = get_ans_sentence(raw_triplets, sent_window)
 # print(raw_triplets[test_idx][0])
 # print(raw_triplets[test_idx][2])
 # print('ans start idx: %d' % raw_triplets[test_idx][3])
@@ -69,34 +143,31 @@ sent_c_triplets, unmatch = get_ans_sentence(raw_triplets)
 # windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window', a_EOS=False, c_EOS=False)
 # triplets = windowed_c_triplets_30_noEOS
 # windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10_noEOS, embeddings_index, opt='window')
-# sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
+sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
 # triplets = tokenize_squad(raw_triplets, embeddings_index)
 
-# print(raw_triplets[test_idx][0])
-# print(' '.join(triplets[test_idx][0]))
-# print(raw_triplets[test_idx][1])
-# print(' '.join(triplets[test_idx][1]))
-# print(raw_triplets[test_idx][2])
-# print(' '.join(triplets[test_idx][2]))
 
 # # save to files
-# import pickle
-# save_path = '/home/jack/Documents/QA_QG/data/processed/'
-# if not os.path.exists(save_path):
-# 	os.mkdir(save_path)
+import pickle
+save_path = '/home/jack/Documents/QA_QG/data/processed/'
+if not os.path.exists(save_path):
+	os.mkdir(save_path)
 # with open(save_path+'windowed_c_triplets_10_noEOS.txt', 'wb') as fp:
 # 	pickle.dump(windowed_c_triplets_10_noEOS, fp)
-# with open(save_path+'sent_c_triplets.txt', 'wb') as fp:
-# 	pickle.dump(sent_c_triplets, fp)
+with open(save_path+'sent_c_triplets_window_2.txt', 'wb') as fp:
+	pickle.dump(sent_c_triplets, fp)
 # with open(save_path+'triplets.txt', 'wb') as fp:
 # 	pickle.dump(triplets, fp)
 
+# # save data to txt, one sentence per line
+
+
 # # test pickle load
 import pickle
-load_path = '/home/jack/Documents/QA_QG/data/processed/'
+load_path = '/home/jack/Documents/QA_QG/data/processed_squad/'
 # triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
-sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
-# windowed_c_triplets_10 = pickle.load(open(load_path+'windowed_c_triplets_10.txt', 'rb'))
+# sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
+windowed_c_triplets_30_noEOS = pickle.load(open(load_path+'windowed_c_triplets_30_noEOS.txt', 'rb'))
 
 # # find max length of context, question, answer, respectively
 # # max_len_c, max_len_q, max_len_a = max_length(triplets)
