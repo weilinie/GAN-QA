@@ -167,35 +167,104 @@ def tokenize_squad(squad, embeddings_index, opt='raw', c_EOS=True, a_EOS=True):
     return tokenized_triplets
 
 
+# # helper function to get the sentence of where the answer appear in the context
+# # based on tokenized_squad, first element in output
+# # output seq of tokens only from the answer sentence (same format as element in tokenize_squad output)
+# def get_ans_sentence(raw_squad, sent_window=0):
+#
+#     sent_c_triplets = [] # now each context in
+#     is_ans_token_vec = []
+#     unmatch = [] # for debug
+#     for t in range(len(raw_squad)):
+#         sent = None
+#         split = False
+#         c = raw_squad[t][0]
+#         a = raw_squad[t][2]
+#         sent_c = list(spacynlp(c).sents)
+#         tokenized_a = spacynlp.tokenizer(a)
+#         # sanity check
+#         # if len(sent_c) == 1:
+#         #     print('WARNING: sentence segmentation may not work in this triple')
+#         #     print(sent_c)
+#         # print(tokenized_c)
+#         ans_start_idx = raw_squad[t][3]
+#         ans_end_idx = raw_squad[t][4]
+#
+#         # print(ans_start_idx)
+#         # print(ans_end_idx)
+#         idx = 0
+#         for i in range(len(sent_c)):
+#             s = sent_c[i]
+#             if idx <= ans_start_idx and idx+len(s.string)>=ans_start_idx:
+#                 ans_sent_idx = i
+#                 sent = s.string
+#                 break
+#             else:
+#                 idx += len(s.string)
+#
+#         if sent is None:
+#             # print(tokenized_a[0])
+#             # print(sent)
+#             unmatch.append(t)
+#
+#         #TODO: multiple sentences as context
+#         if sent_window > 0:
+#             for i in range(1,sent_window):
+#                 if not split:
+#                     if ans_sent_idx-i > 0 and ans_sent_idx+i < len(sent_c):
+#                         sent = sent_c[ans_sent_idx-i].string + sent + sent_c[ans_sent_idx+i].string
+#                     elif ans_sent_idx-i <= 0 and ans_sent_idx+i < len(sent_c):
+#                         sent = sent + sent_c[ans_sent_idx+i].string
+#                     elif ans_sent_idx-i > 0 and ans_sent_idx+i >= len(sent_c):
+#                         sent = sent_c[ans_sent_idx-i].string + sent
+#                 else:
+#                     if ans_sent_idx-i > 0 and ans_sent_idx+i+1 < len(sent_c):
+#                         sent = sent_c[ans_sent_idx-i].string + sent + sent_c[ans_sent_idx+i+1].string
+#                     elif ans_sent_idx-i <= 0 and ans_sent_idx+i+1 < len(sent_c):
+#                         sent = sent + sent_c[ans_sent_idx+i].string
+#                     elif ans_sent_idx-i > 0 and ans_sent_idx+i+1 >= len(sent_c):
+#                         sent = sent_c[ans_sent_idx-i].string + sent
+#
+#         tokenized_c = spacynlp.tokenizer(sent)
+#         is_ans_token = [0] * len(tokenized_c)
+#         for i in range(len(tokenized_c)):
+#             token = tokenized_c[i]
+#             if len(tokenized_c[0:i].string) == ans_start_idx:
+#                 is_ans_token[i:i+len(tokenized_a)] = [1] * len(tokenized_a)
+#                 break
+#
+#         sent_c_triplets.append( ( sent, raw_squad[t][1], raw_squad[t][2], raw_squad[t][3], raw_squad[t][4] ) )
+#         is_ans_token_vec.append(is_ans_token)
+#
+#     # return list(set(unmatch))
+#     return sent_c_triplets, is_ans_token_vec, list(set(unmatch))
+
 # helper function to get the sentence of where the answer appear in the context
 # based on tokenized_squad, first element in output
 # output seq of tokens only from the answer sentence (same format as element in tokenize_squad output)
-def get_ans_sentence(raw_squad, sent_window=0):
-
-    sent_c_triplets = [] # now each context in
+def get_ans_sentence(c, a, asi, aei, sent_window=0):
+    sent_cs = []  # now each context in
     is_ans_token_vec = []
-    unmatch = [] # for debug
-    for t in range(len(raw_squad)):
+    unmatch = []  # for debug
+    for t in range(len(c)):
         sent = None
         split = False
-        c = raw_squad[t][0]
-        a = raw_squad[t][2]
-        sent_c = list(spacynlp(c).sents)
-        tokenized_a = spacynlp.tokenizer(a)
+        sent_c = list(spacynlp(c[t]).sents)
+        tokenized_a = spacynlp.tokenizer(a[t])
         # sanity check
         # if len(sent_c) == 1:
         #     print('WARNING: sentence segmentation may not work in this triple')
         #     print(sent_c)
         # print(tokenized_c)
-        ans_start_idx = raw_squad[t][3]
-        ans_end_idx = raw_squad[t][4]
-       
+        ans_start_idx = int(asi[t])
+        ans_end_idx = int(aei[t])
+
         # print(ans_start_idx)
         # print(ans_end_idx)
         idx = 0
         for i in range(len(sent_c)):
             s = sent_c[i]
-            if idx <= ans_start_idx and idx+len(s.string)>=ans_start_idx:
+            if idx <= ans_start_idx and idx + len(s.string) >= ans_start_idx:
                 ans_sent_idx = i
                 sent = s.string
                 break
@@ -207,109 +276,107 @@ def get_ans_sentence(raw_squad, sent_window=0):
             # print(sent)
             unmatch.append(t)
 
-        #TODO: multiple sentences as context
+        # TODO: multiple sentences as context
         if sent_window > 0:
-            for i in range(1,sent_window):
+            for i in range(1, sent_window):
                 if not split:
-                    if ans_sent_idx-i > 0 and ans_sent_idx+i < len(sent_c):
-                        sent = sent_c[ans_sent_idx-i].string + sent + sent_c[ans_sent_idx+i].string
-                    elif ans_sent_idx-i <= 0 and ans_sent_idx+i < len(sent_c):
-                        sent = sent + sent_c[ans_sent_idx+i].string
-                    elif ans_sent_idx-i > 0 and ans_sent_idx+i >= len(sent_c):
-                        sent = sent_c[ans_sent_idx-i].string + sent
+                    if ans_sent_idx - i > 0 and ans_sent_idx + i < len(sent_c):
+                        sent = sent_c[ans_sent_idx - i].string + sent + sent_c[ans_sent_idx + i].string
+                    elif ans_sent_idx - i <= 0 and ans_sent_idx + i < len(sent_c):
+                        sent = sent + sent_c[ans_sent_idx + i].string
+                    elif ans_sent_idx - i > 0 and ans_sent_idx + i >= len(sent_c):
+                        sent = sent_c[ans_sent_idx - i].string + sent
                 else:
-                    if ans_sent_idx-i > 0 and ans_sent_idx+i+1 < len(sent_c):
-                        sent = sent_c[ans_sent_idx-i].string + sent + sent_c[ans_sent_idx+i+1].string
-                    elif ans_sent_idx-i <= 0 and ans_sent_idx+i+1 < len(sent_c):
-                        sent = sent + sent_c[ans_sent_idx+i].string
-                    elif ans_sent_idx-i > 0 and ans_sent_idx+i+1 >= len(sent_c):
-                        sent = sent_c[ans_sent_idx-i].string + sent
+                    if ans_sent_idx - i > 0 and ans_sent_idx + i + 1 < len(sent_c):
+                        sent = sent_c[ans_sent_idx - i].string + sent + sent_c[ans_sent_idx + i + 1].string
+                    elif ans_sent_idx - i <= 0 and ans_sent_idx + i + 1 < len(sent_c):
+                        sent = sent + sent_c[ans_sent_idx + i].string
+                    elif ans_sent_idx - i > 0 and ans_sent_idx + i + 1 >= len(sent_c):
+                        sent = sent_c[ans_sent_idx - i].string + sent
 
         tokenized_c = spacynlp.tokenizer(sent)
         is_ans_token = [0] * len(tokenized_c)
         for i in range(len(tokenized_c)):
             token = tokenized_c[i]
             if len(tokenized_c[0:i].string) == ans_start_idx:
-                is_ans_token[i:i+len(tokenized_a)] = [1] * len(tokenized_a)
+                is_ans_token[i:i + len(tokenized_a)] = [1] * len(tokenized_a)
                 break
 
-        sent_c_triplets.append( ( sent, raw_squad[t][1], raw_squad[t][2], raw_squad[t][3], raw_squad[t][4] ) )
+        sent_cs.append(sent)
         is_ans_token_vec.append(is_ans_token)
 
     # return list(set(unmatch))
-    return sent_c_triplets, is_ans_token_vec, list(set(unmatch))
-
+    return sent_cs, is_ans_token_vec, list(set(unmatch))
 
 # helper function to get a window of tokens around the answer
 # similar to get_ans_sentence; only difference is the span of tokens
 # NOTE: here the number of window operates on crude tokens: there's = one token.
 #       in proc_tokenized_sent, there's = 3 tokens. therefore, the actual
 #       number of tokens before and after the answer may exceed the set window size
-def get_windowed_ans(raw_squad, window_size):
-
-    windowed_c_triplets = []
-    is_ans_token_vec = []
-    unmatch = [] # unmatched triple in raw_squad where the answer and the answer span in context don't match
-    unmatch_temp = [] # (used for sanity check) unmatched strings where the extracted answer and the answer don't match
-
-    for triple_idx in range(len(raw_squad)):
-        triple = raw_squad[triple_idx]
-        c = triple[0]
-        a = triple[2]
-        tokenized_c = spacynlp.tokenizer(c)
-        # sanity check
-        # print(tokenized_c)
-        tokenized_a = spacynlp.tokenizer(a)
-        ans_start_idx = triple[3]
-        ans_end_idx = triple[4]
-        c_sub = c[:ans_start_idx]
-        is_ans_token = [0] * len(tokenized_c)
-        # print('first token in answer = %s' % tokenized_a[0])
-
-        # find the start token of the answer in context
-        idx = 0
-        t = 0
-        for i in range(len(tokenized_c)):
-            token = tokenized_c[i]
-            if len(tokenized_c[0:i].string) == ans_start_idx:
-                # print('answer detected')
-                t = i
-
-                is_ans_token[i:i+len(tokenized_a)] = [1] * len(tokenized_a)
-                break
-        if t < window_size:
-            left_window = 0
-        else:
-            left_window = t - window_size
-        if t + window_size + len(tokenized_a) > len(tokenized_c):
-            right_window = len(tokenized_c)
-        else:
-            right_window = t + window_size + len(tokenized_a)
-
-        windowed_c = tokenized_c[left_window:right_window]
-        # sanity check
-        # TODO examine each of these edge cases. For now, simply do not use those as windowed_c_triplets
-        if tokenized_a[0].string not in windowed_c.string:
-            unmatch.append(triple_idx)
-            # raise Exception('ERROR: windowed context does not contain answer token')
-        else:
-            windowed_c_triplets.append( ( windowed_c, triple[1], tokenized_a, triple[3], triple[4] ) )
-            is_ans_token_vec.append( is_ans_token )
-
-        # sanity check
-        selected_ans = ''
-        for i in range(len(tokenized_c)):
-            if is_ans_token[i]:
-                selected_ans += tokenized_c[i].string
-        # print(tokenized_a.string)
-        # print(selected_ans)
-        # print(tokenized_a.string.strip()==selected_ans.strip())
-        # print('---')
-        if tokenized_a.string.strip()!=selected_ans.strip():
-            unmatch_temp.append(triple_idx)
-
-    return windowed_c_triplets, is_ans_token_vec, unmatch
-
+# def get_windowed_ans_from_raw_squad(raw_squad, window_size):
+#
+#     windowed_c_triplets = []
+#     is_ans_token_vec = []
+#     unmatch = [] # unmatched triple in raw_squad where the answer and the answer span in context don't match
+#     unmatch_temp = [] # (used for sanity check) unmatched strings where the extracted answer and the answer don't match
+#
+#     for triple_idx in range(len(raw_squad)):
+#         triple = raw_squad[triple_idx]
+#         c = triple[0]
+#         a = triple[2]
+#         tokenized_c = spacynlp.tokenizer(c)
+#         # sanity check
+#         # print(tokenized_c)
+#         tokenized_a = spacynlp.tokenizer(a)
+#         ans_start_idx = triple[3]
+#         ans_end_idx = triple[4]
+#         c_sub = c[:ans_start_idx]
+#         is_ans_token = [0] * len(tokenized_c)
+#         # print('first token in answer = %s' % tokenized_a[0])
+#
+#         # find the start token of the answer in context
+#         idx = 0
+#         t = 0
+#         for i in range(len(tokenized_c)):
+#             token = tokenized_c[i]
+#             if len(tokenized_c[0:i].string) == ans_start_idx:
+#                 # print('answer detected')
+#                 t = i
+#
+#                 is_ans_token[i:i+len(tokenized_a)] = [1] * len(tokenized_a)
+#                 break
+#         if t < window_size:
+#             left_window = 0
+#         else:
+#             left_window = t - window_size
+#         if t + window_size + len(tokenized_a) > len(tokenized_c):
+#             right_window = len(tokenized_c)
+#         else:
+#             right_window = t + window_size + len(tokenized_a)
+#
+#         windowed_c = tokenized_c[left_window:right_window]
+#         # sanity check
+#         # TODO examine each of these edge cases. For now, simply do not use those as windowed_c_triplets
+#         if tokenized_a[0].string not in windowed_c.string:
+#             unmatch.append(triple_idx)
+#             # raise Exception('ERROR: windowed context does not contain answer token')
+#         else:
+#             windowed_c_triplets.append( ( windowed_c, triple[1], tokenized_a, triple[3], triple[4] ) )
+#             is_ans_token_vec.append( is_ans_token )
+#
+#         # sanity check
+#         selected_ans = ''
+#         for i in range(len(tokenized_c)):
+#             if is_ans_token[i]:
+#                 selected_ans += tokenized_c[i].string
+#         # print(tokenized_a.string)
+#         # print(selected_ans)
+#         # print(tokenized_a.string.strip()==selected_ans.strip())
+#         # print('---')
+#         if tokenized_a.string.strip()!=selected_ans.strip():
+#             unmatch_temp.append(triple_idx)
+#
+#     return windowed_c_triplets, is_ans_token_vec, unmatch
 
 # turns a sentence into individual tokens
 # this function takes care of word tokens that does not appear in pre trained embeddings
@@ -608,147 +675,6 @@ def print_batch(batch, batch_size, index2word):
 
 
 ######################################################################
-# functions adapted from tools in OpenNMT lua files
-def get_ans_token_idx(tokenized_contexts_f, tokenized_answers_f, raw_triplets, a_token_start_idxs_f, a_token_end_idxs_f):
-
-    marker = u'\uffed'
-
-    # init variables to store processed tokenized c and a
-    tokenized_c = []
-    tokenized_a = []
-
-    # read files
-    with open(tokenized_contexts_f) as f:
-        contexts = f.readlines()
-    contexts = [x.strip() for x in contexts]
-    f.close()
-    with open(tokenized_answers_f) as f:
-        answers = f.readlines()
-    answers = [x.strip() for x in answers]
-    f.close()
-
-    # open write files
-    a_token_start_idxs = open(a_token_start_idxs_f, 'w')
-    a_token_end_idxs = open(a_token_end_idxs_f, 'w')
-
-    # for testing purpose
-    sample_idx = random.sample(range(len(contexts)), 10)
-
-    # join
-    for i in sample_idx:
-    # for i in range(len(contexts)):
-        c = ''
-        c_w_copy = contexts[i].split()[3:-2]
-
-        # a short script for post processing to put "\\" and "uxxxx" into a single token
-        c_w = []
-        for w in range(len(c_w_copy)):
-            if u'\\' in c_w_copy[w]:
-                c_w.append(c_w_copy[w][0:-1]+c_w_copy[w+1][0:5]+marker)
-                c_w_copy[w+1] = c_w_copy[w+1][5:]
-            else:
-                c_w.append(c_w_copy[w])
-        # then remove all empty string such as ''
-        c_w = [w for w in c_w if w!=u'']
-        tokenized_c.append(c_w)
-
-        a_w_copy = answers[i].split()[3:-2]
-        a_w = []
-        for w in range(len(a_w_copy)):
-            if u'\\' in a_w_copy[w]:
-                a_w.append(a_w_copy[w][0:-1] + a_w_copy[w + 1][0:5] + marker)
-                a_w_copy[w + 1] = a_w_copy[w + 1][5:]
-            else:
-                a_w.append(a_w_copy[w])
-        a_w = [w for w in a_w if w != u'']
-        tokenized_a.append(a_w)
-
-        raw_answer = raw_triplets[i][2]
-        a_start_idx = raw_triplets[i][3]
-        a_end_idx = raw_triplets[i][4]
-        c_len = 0
-        for w in range(len(c_w)):
-            if w == 0:
-                # if c_w[0] == marker:
-                #     print('first word 'w)
-                if c_w[w][-1] != marker:
-                    c += c_w[w] + " "
-                    if u'\\' not in c_w[w]:
-                        c_len += len(c_w[w]) + 1
-                    else:
-                        c_len += 1 + 1
-                else:
-                    c += c_w[w][:-1]
-                    if u'\\' not in c_w[w]:
-                        c_len += len(c_w[w][:-1])
-                    else:
-                        c_len += 1
-            else:
-                if c_w[w][0] == marker and c_w[w][-1] == marker:
-                    c = c.strip()
-                    c += c_w[w][1:-1]
-
-                elif c_w[w][0] != marker and c_w[w][-1] == marker:
-                    c += c_w[w][0:-1]
-                elif c_w[w][0] == marker and c_w[w][-1] != marker:
-                    c = c.strip()
-                    c += c_w[w][1:] + ' '
-                elif c_w[w][0] != marker and c_w[w][-1] != marker:
-                    c += c_w[w] + ' '
-                else:
-                    print('something went wrong')
-
-            # a encoding specific post processing step for c to replace every '\\' with '\'
-
-            if c_len + 1 == a_start_idx:
-            # if len(c)+1 == a_start_idx:
-                a_token_start_idx = w
-                a_token_end_idx = w + len(a_w)
-                # a_token_start_idxs.write(unicode(a_token_start_idx)+'\n')
-                # a_token_end_idxs.write(unicode(a_token_end_idx)+'\n')
-                # break
-
-        # print(c)
-        if c[a_start_idx:a_end_idx] != raw_answer:
-            print('answer does not match.')
-            print(c[a_start_idx:a_end_idx])
-            print(' '.join(c_w[a_token_start_idx:a_token_end_idx]))
-            print(detokenize(answers[i]))
-            print(i)
-        print('-----------')
-
-        a_token_start_idxs.close()
-        a_token_end_idxs.close()
-
-    return a_token_start_idxs, a_token_end_idxs
-
-def detokenize(line):
-    marker = u'\uffed'
-    c = ''
-    c_w = line.split()
-    for w in range(len(c_w)):
-        if w == 0:
-
-            if c_w[-1] != marker:
-                c += c_w[w] + " "
-            else:
-                c += c_w[:-1]
-        else:
-            if c_w[w][0] == marker and c_w[w][-1] == marker:
-                c = c.strip()
-                c += c_w[w][1:-1]
-            elif c_w[w][0] != marker and c_w[w][-1] == marker:
-                c += c_w[w][0:-1]
-            elif c_w[w][0] == marker and c_w[w][-1] != marker:
-                c = c.strip()
-                c += c_w[w][1:] + ' '
-            elif c_w[w][0] != marker and c_w[w][-1] != marker:
-                c += c_w[w] + ' '
-            else:
-                print('something went wrong')
-    return c
-
-
 # function to read lines from file
 def readLinesFromFile(path):
     with open(path) as f:
@@ -757,6 +683,26 @@ def readLinesFromFile(path):
     f.close()
     return content
 
+# function to concat ans and context
+def concat_c_a(c, a, opt='ca'):
+    joints = []
+    for i in range(len(c)):
+        if opt=='ca':
+            joint = c[i] + " " + a[i]
+        elif opt=='ac':
+            joint = a[i] + " " + c[i]
+        else:
+            raise Exception('unknown option')
+        joints.append(joint)
+    return joints
+# unit test and write to file
+temp_c = readLinesFromFile(data_openNMT_path+'test/test_cs_min_NoAnnotate.txt')
+temp_a = readLinesFromFile(data_openNMT_path+'test/test_as_min_NoAnnotate.txt')
+concated = concat_c_a(temp_c, temp_a)
+f = open(data_openNMT_path+'test/test_ca_concat_min.txt', 'w')
+for i in range(len(concated)):
+    f.write(concated[i]+'\n')
+f.close()
 ######################################################################
 # character level processing
 

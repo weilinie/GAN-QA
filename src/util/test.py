@@ -63,18 +63,9 @@ windowed_c_triplets_30, is_ans_token_vec, unmatch = get_windowed_ans(raw_triplet
 
 # test of selecting the sentence containing answer from context
 # test_idx = 0
-sent_window = 2
-# sent_c_triplets, unmatch = get_ans_sentence(raw_triplets, sent_window)
-# print(raw_triplets[test_idx][0])
-# print(raw_triplets[test_idx][2])
-# print('ans start idx: %d' % raw_triplets[test_idx][3])
-# print('ans end idx:   %d' % raw_triplets[test_idx][4])
-# print(sent_c_triplets[0][0])
-# windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10, embeddings_index, opt='window', a_EOS=False, c_EOS=False)
-# triplets = windowed_c_triplets_30_noEOS
-# windowed_c_triplets_10_noEOS = tokenize_squad(windowed_c_triplets_10_noEOS, embeddings_index, opt='window')
-sent_c_triplets = tokenize_squad(sent_c_triplets, embeddings_index, opt='sent')
-# triplets = tokenize_squad(raw_triplets, embeddings_index)
+sent_window = 0
+sent_cs, is_ans_token_vec, unmatch = get_ans_sentence(temp_c, temp_a, temp_asi, temp_aei, sent_window)
+
 
 
 # # save to files

@@ -162,7 +162,8 @@ class AttnDecoderRNN(nn.Module):
         decoder_output = torch.cat((hidden.squeeze(0), context.squeeze(1)), 1)
 
         # output size: (batch size, vocab size)
-        decoder_output = F.log_softmax(self.out(decoder_output))
+        decoder_output = self.out(decoder_output)
+        # decoder_output = F.log_softmax(self.out(decoder_output))
 
         return decoder_output, hidden, attn_weights
 

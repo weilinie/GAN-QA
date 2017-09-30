@@ -379,7 +379,7 @@ function lines_from(file)
 end
 
 -- script to read the new json file only english no escape chars and compare if the answers are equal
-new_triplets = json.load('/home/jack/Documents/QA_QG/data/processed_squad/squad_EnglishOnly_noEscape.json')
+new_triplets = json.load('/home/jack/Documents/QA_QG/data/processed_squad/dev_squad_EnglishOnly_noEscape.json')
 for k = 1, #new_triplets['contexts'] do
   if new_triplets['contexts'][k]:sub(new_triplets['ans_start_idx'][k]+1, new_triplets['ans_end_idx'][k]) ~= new_triplets['answers'][k] then
     print(k)
@@ -392,22 +392,22 @@ new_a_start_idxs = new_triplets['ans_start_idx']
 new_a_end_idxs = new_triplets['ans_end_idx']
 -- write line by line
 -- have to do this in separate loops otherwise write to file will mess up
-new_cs_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/contexts_EnglishOnly_noEscape.txt","w")
+new_cs_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/dev_contexts_EnglishOnly_noEscape.txt","w")
 for i = 1, #new_cs do new_cs_f:write(new_cs[i]..'\n') end new_cs_f:close()
-new_qs_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/questions_EnglishOnly_noEscape.txt","w")
+new_qs_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/dev_questions_EnglishOnly_noEscape.txt","w")
 for i = 1, #new_qs do new_qs_f:write(new_qs[i]..'\n') end new_qs_f:close()
-new_as_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/answers_EnglishOnly_noEscape.txt","w")
+new_as_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/dev_answers_EnglishOnly_noEscape.txt","w")
 for i = 1, #new_as do new_as_f:write(new_as[i]..'\n') end new_as_f:close()
-new_a_start_idxs_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/a_start_idxs_EnglishOnly_noEscape.txt","w")
+new_a_start_idxs_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/dev_a_start_idxs_EnglishOnly_noEscape.txt","w")
 for i = 1, #new_a_start_idxs do new_a_start_idxs_f:write(new_a_start_idxs[i]..'\n') end new_a_start_idxs_f:close()
-new_a_end_idxs_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/a_end_idxs_EnglishOnly_noEscape.txt","w")
+new_a_end_idxs_f ,err = io.open("/home/jack/Documents/QA_QG/data/processed_squad/dev_a_end_idxs_EnglishOnly_noEscape.txt","w")
 for i = 1, #new_a_end_idxs do new_a_end_idxs_f:write(new_a_end_idxs[i]..'\n')  end new_a_end_idxs_f:close()
 -- sanity check: read new triplets that dont contain escape characters and are only english
-new_cs_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/contexts_EnglishOnly_noEscape.txt')
-new_qs_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/questions_EnglishOnly_noEscape.txt')
-new_as_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/answers_EnglishOnly_noEscape.txt')
-new_a_start_idxs_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/a_start_idxs_EnglishOnly_noEscape.txt')
-new_a_end_idxs_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/a_end_idxs_EnglishOnly_noEscape.txt')
+new_cs_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/dev_contexts_EnglishOnly_noEscape.txt')
+new_qs_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/dev_questions_EnglishOnly_noEscape.txt')
+new_as_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/dev_answers_EnglishOnly_noEscape.txt')
+new_a_start_idxs_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/dev_a_start_idxs_EnglishOnly_noEscape.txt')
+new_a_end_idxs_r = lines_from('/home/jack/Documents/QA_QG/data/processed_squad/dev_a_end_idxs_EnglishOnly_noEscape.txt')
 -- sanity check to ensure the data read and the data before write are the same
 for i = 1, #new_cs_r do
   if new_triplets['ans_end_idx'][i] ~= tonumber(new_a_end_idxs[i]) then print(i) end
@@ -426,9 +426,9 @@ end
 cs = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/contexts_EnglishOnly_noEscape_NoAnnotate.txt')
 qs = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/questions_EnglishOnly_noEscape_NoAnnotate.txt')
 as = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/answers_EnglishOnly_noEscape_NoAnnotate.txt')
-t_cs = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/contexts_EnglishOnly_noEscape_annotate.txt')
-t_qs = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/questions_EnglishOnly_noEscape_annotate.txt')
-t_as = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/answers_EnglishOnly_noEscape_annotate.txt')
+t_cs = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/preparation/dev/tokenized_annotate/dev_contexts_EnglishOnly_noEscape_annotate.txt')
+t_qs = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/preparation/dev/tokenized_annotate/dev_questions_EnglishOnly_noEscape_annotate.txt')
+t_as = lines_from('/home/jack/Documents/QA_QG/data/squad_openNMT/preparation/dev/tokenized_annotate/dev_answers_EnglishOnly_noEscape_annotate.txt')
 -- run the detokenizer and record answer token start and end indices
 opt = {}
 opt.joiner = separators.joiner_marker
@@ -441,14 +441,14 @@ for i = 1, #t_cs do
   ans_token_end_idxs[i] = ans_token_end_idx
 end
 -- save file
-ans_token_start_idxs_f,err = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/ans_token_start_idxs.txt","w")
+ans_token_start_idxs_f,err = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/preparation/dev/dev_ans_token_start_idxs.txt","w")
 for i = 1, #ans_token_start_idxs do ans_token_start_idxs_f:write(ans_token_start_idxs[i]..'\n') end ans_token_start_idxs_f:close()
-ans_token_end_idxs_f,err = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/ans_token_end_idxs.txt","w")
+ans_token_end_idxs_f,err = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/preparation/dev/dev_ans_token_end_idxs.txt","w")
 for i = 1, #ans_token_end_idxs do ans_token_end_idxs_f:write(ans_token_end_idxs[i]..'\n') end ans_token_end_idxs_f:close()
 -- sanity check: read those files
-atsis_temp = lines_from("/home/jack/Documents/QA_QG/data/squad_openNMT/ans_token_start_idxs.txt")
+atsis_temp = lines_from("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_ans_token_start_idxs.txt")
 --atsis = {} for i in 1, #atsis_temp do atsis[i] = tonumber(atsis_temp[i]) end
-ateis_temp = lines_from("/home/jack/Documents/QA_QG/data/squad_openNMT/ans_token_end_idxs.txt")
+ateis_temp = lines_from("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_ans_token_end_idxs.txt")
 --ateis = {} for i in 1, #ateis_temp do ateis[i] = tonumber(ateis_temp[i]) end
 -- sanity check: check whether any start token is not found
 mismatch_idx = {}
@@ -460,56 +460,56 @@ for i = 1, #t_cs do
   end
 end
 -- save those that are NOT mismatch to file
-cs_min_annotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/cs_min_annotate.txt", 'w')
+cs_min_annotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_cs_min_annotate.txt", 'w')
 for i = 1, #t_cs do
   if ans_token_start_idxs[i] ~= -1 and ans_token_start_idxs[i] ~= nil then
     cs_min_annotate:write(t_cs[i]..'\n')
   end
 end
 cs_min_annotate:close()
-cs_min_NoAnnotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/cs_min_NoAnnotate.txt", 'w')
+cs_min_NoAnnotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_cs_min_NoAnnotate.txt", 'w')
 for i = 1, #cs do
   if ans_token_start_idxs[i] ~= -1 and ans_token_start_idxs[i] ~= nil then
     cs_min_NoAnnotate:write(cs[i]..'\n')
   end
 end
 cs_min_NoAnnotate:close()
-qs_min_annotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/qs_min_annotate.txt", 'w')
+qs_min_annotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_qs_min_annotate.txt", 'w')
 for i = 1, #t_qs do
   if ans_token_start_idxs[i] ~= -1 and ans_token_start_idxs[i] ~= nil then
     qs_min_annotate:write(t_qs[i]..'\n')
   end
 end
 qs_min_annotate:close()
-qs_min_NoAnnotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/qs_min_NoAnnotate.txt", 'w')
+qs_min_NoAnnotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_qs_min_NoAnnotate.txt", 'w')
 for i = 1, #qs do
   if ans_token_start_idxs[i] ~= -1 and ans_token_start_idxs[i] ~= nil then
     qs_min_NoAnnotate:write(qs[i]..'\n')
   end
 end
 qs_min_NoAnnotate:close()
-as_min_annotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/as_min_annotate.txt", 'w')
+as_min_annotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_as_min_annotate.txt", 'w')
 for i = 1, #t_as do
   if ans_token_start_idxs[i] ~= -1 and ans_token_start_idxs[i] ~= nil then
     as_min_annotate:write(t_as[i]..'\n')
   end
 end
 as_min_annotate:close()
-as_min_NoAnnotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/as_min_NoAnnotate.txt", 'w')
+as_min_NoAnnotate = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_as_min_NoAnnotate.txt", 'w')
 for i = 1, #as do
   if ans_token_start_idxs[i] ~= -1 and ans_token_start_idxs[i] ~= nil then
     as_min_NoAnnotate:write(as[i]..'\n')
   end
 end
 as_min_NoAnnotate:close()
-atsi_min = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/atsi_min.txt", 'w')
+atsi_min = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_atsi_min.txt", 'w')
 for i = 1, #atsis_temp do
   if ans_token_start_idxs[i] ~= -1 and ans_token_start_idxs[i] ~= nil then
     atsi_min:write(ans_token_start_idxs[i]..'\n')
   end
 end
 atsi_min:close()
-atei_min = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/atei_min.txt", 'w')
+atei_min = io.open("/home/jack/Documents/QA_QG/data/squad_openNMT/dev/dev_atei_min.txt", 'w')
 for i = 1, #ateis_temp do
   if ans_token_start_idxs[i] ~= -1 and ans_token_start_idxs[i] ~= nil then
     atei_min:write(ans_token_end_idxs[i]..'\n')

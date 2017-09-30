@@ -118,16 +118,17 @@ def trainIters(generator, optimizer, batch_size, embeddings_size,
             print_loss_total = 0
             print('%s (%d %d%%) %.4f' % (timeSince(begin_time, iter / float(n_iters)),
                                          iter, iter / n_iters * 100, print_loss_avg))
-            print('---sample generated question---')
+            # print('---sample generated question---')
             # sample a triple and print the generated question
-            evaluate(generator, triplets, embeddings_index, embeddings_size, word2index, index2word, max_length)
-            print('-------------------------------')
-            print('-------------------------------')
             print()
             if to_file:
                 sample_out_f.write(unicode('%s (%d %d%%)\n' % (timeSince(begin_time, iter / float(n_iters)), iter, float(iter) / float(n_iters) * 100)))
-                evaluate(generator, triplets, embeddings_index, embeddings_size, word2index, index2word, max_length, to_file, sample_out_f)
+                evaluate(generator, triplets, embeddings_index, embeddings_size, word2index, index2word, max_length, to_file=to_file, sample_out_f=sample_out_f, sample_method='sampling')
                 sample_out_f.write(unicode('\n'))
+            else:
+                evaluate(generator, triplets, embeddings_index, embeddings_size, word2index, index2word, max_length, sample_method='sampling')
+                print('-------------------------------')
+                print('-------------------------------')
         if iter % plot_every == 0:
             plot_loss_avg = plot_loss_total / plot_every
             plot_loss_avgs.append(plot_loss_avg)

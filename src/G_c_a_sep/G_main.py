@@ -26,7 +26,7 @@ GLOVE_DIR = path_to_dataset + 'glove.6B/'
 
 
 ######### first load the pretrained word embeddings
-path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.100d.txt')
+path_to_glove = os.path.join(GLOVE_DIR, 'glove.6B.300d.txt')
 embeddings_index, embeddings_size = readGlove(path_to_glove)
 
 
@@ -38,9 +38,11 @@ import pickle
 load_path = '/home/jack/Documents/QA_QG/data/processed/'
 # triplets = pickle.load(open(load_path+'triplets.txt', 'rb'))
 # sent_c_triplets = pickle.load(open(load_path+'sent_c_triplets.txt', 'rb'))
-windowed_c_triplets_30_noEOS = pickle.load(open(load_path+'windowed_c_triplets_30_noEOS.txt', 'rb'))
+# windowed_c_triplets_30_noEOS = pickle.load(open(load_path+'windowed_c_triplets_30_noEOS.txt', 'rb'))
+sent_c_triplets_window_2 = pickle.load(open(load_path+'sent_c_triplets_window_2.txt', 'rb'))
 # triplets = sent_c_triplets
-triplets = windowed_c_triplets_30_noEOS
+triplets = sent_c_triplets_window_2
+# triplets = windowed_c_triplets_30_noEOS
 
 # find max length of context, question, answer, respectively
 # max_len_c, max_len_q, max_len_a = max_length(triplets)
@@ -91,10 +93,10 @@ to_file = True
 
 # open the files
 if to_file:
-    exp_name = 'G_c_a_sep_pretrain_exp_windowed_c_noEOS_0911'
+    exp_name = 'G_c_a_sep_pretrain_exp_sent_c_window_2_0914(2)'
     path_to_exp_out = '/home/jack/Documents/QA_QG/exp_results_temp/' + exp_name
-    if not os.path.exists(path_to_exp_out+exp_name):
-        os.mkdir(path_to_exp_out+exp_name)
+    if not os.path.exists(path_to_exp_out):
+        os.mkdir(path_to_exp_out)
     loss_f = 'loss_temp.txt'
     sample_out_f = 'sample_outputs_temp.txt'
     path_to_loss_f = path_to_exp_out + '/' + loss_f
@@ -113,6 +115,6 @@ trainIters(generator, optimizer, batch_size, embeddings_size,
 
 # save the final model
 if to_file:
-    torch.save(generator, path_to_exp_out + exp_name +'/generator_temp.pth.tar')
+    torch.save(generator, path_to_exp_out +'/generator_temp.pth.tar')
 
 

@@ -6,17 +6,25 @@ from data_proc import *
 
 import torch
 from torch.autograd import Variable
+import numpy as np
+import random
+import torch.nn.functional as F
+
 
 use_cuda = torch.cuda.is_available()
 
 
 # max_length constrains the maximum length of the generated question
 def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index, index2word, max_length,
-             to_file = False, sample_out_f = None):
+             sample_method='argmax', to_file = False, sample_out_f=None, random_seed=None):
 
     # prepare test input
     batch_size = 1
-    training, seq_lens = get_random_batch(triplets, batch_size)
+    if random_seed is not None:
+        random.seed(random_seed)
+        training, seq_lens = get_random_batch(triplets, batch_size, random_seed)
+    else:
+        training, seq_lens = get_random_batch(triplets, batch_size)
     context_words = training[0]
     answer_words = training[2]
     question_words = training[1]
@@ -35,6 +43,7 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
     all_decoder_outputs = generator.forward(inputs, seq_lens, batch_size, max_length,
                                             embeddings_index, embeddings_size, word2index, index2word,
                                             teacher_forcing_ratio=0)
+    # all_decoder_outputs = F.softmax(all_decoder_outputs)
 
     decoded_sentences = []
     decoded_words = []
@@ -42,14 +51,33 @@ def evaluate(generator, triplets, embeddings_index, embeddings_size, word2index,
         # get the word token and add to the list of words
         for di in range(max_length):
             # top value and index of every batch
-            topv, topi = all_decoder_outputs[di,b].data.topk(1)
-            ni = topi[0]
-            if (ni == word2index['EOS']) or (ni == word2index['PAD']):
-                decoded_words.append('EOS')
-                # decoder_attentions[di] = decoder_attention[0].data
-                break
-            else:
-                decoded_words.append(index2word[ni])
+            if sample_method=='argmax':
+                topv, topi = F.softmax(all_decoder_outputs[di,b]).data.topk(1)
+                ni = topi[0]
+                if (ni == word2index['EOS']) or (ni == word2index['PAD']):
+                    decoded_words.append('EOS')
+                    # decoder_attentions[di] = decoder_attention[0].data
+                    break
+                else:
+                    decoded_words.append(index2word[ni])
+
+            elif sample_method=='sampling':
+                val = range(generator.decoder.output_size)
+                # temp = [float(i) for i in F.softmax(all_decoder_outputs[di,b]).data]
+                temp = (F.softmax(all_decoder_outputs[di,b]).data.cpu().numpy())
+                # print(type(F.softmax(all_decoder_outputs[di,b]).data.cpu().numpy()))
+                # print(len(temp))
+                # prob = [i - (sum(temp)-1)/len(val) for i in temp]
+                prob = temp / sum(temp)
+                print(sum(prob))
+                ni = np.random.choice(val, 1, p=prob)[0]
+                if (ni == word2index['EOS']) or (ni == word2index['PAD']):
+                    decoded_words.append('EOS')
+                    # decoder_attentions[di] = decoder_attention[0].data
+                    break
+                else:
+                    decoded_words.append(index2word[ni])
+
         decoded_sentences.append(decoded_words)
 
     # print results
