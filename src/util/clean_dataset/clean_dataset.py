@@ -123,7 +123,7 @@ def isEnglish(s):
 
 # function to read lines from file
 def readLinesFromFile(path):
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         content = f.readlines()
     content = [x.rstrip('\n') for x in content]
     f.close()
